@@ -13,7 +13,7 @@ import SettingsModal from './components/SettingsModal';
 import { Flame, BarChart2, Newspaper, MessageSquare, Sparkles, ShieldCheck } from 'lucide-react';
 
 import { fetchSubredditPosts, SUBREDDITS } from './services/redditApi';
-import { compileStockAnalytics, fetchUSDEURRate, fetchFinnhubQuote, fetchLiveYahooQuote, DEFAULT_USD_EUR_RATE, DEFAULT_USD_INR_RATE, MASTER_STOCKS_DATABASE } from './services/stockApi';
+import { compileStockAnalytics, fetchUSDEURRate, fetchLiveYahooQuote, DEFAULT_USD_EUR_RATE, DEFAULT_USD_INR_RATE, MASTER_STOCKS_DATABASE } from './services/stockApi';
 import { fetchDynamicStockInfo } from './services/dynamicStockFetcher';
 
 export default function App() {
