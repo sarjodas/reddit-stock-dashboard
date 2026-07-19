@@ -1,13 +1,22 @@
-// Reddit Public API Service & Sentiment Analyzer with European & Indian Subreddits Integration
+// Reddit Public API Service & Sentiment Analyzer with 16 Comprehensive Global, European, Indian & US Subreddits
 
 export const SUBREDDITS = [
-  { id: 'EATinvesting', name: 'r/EATinvesting', icon: '🇪🇺', color: '#0284c7', label: 'European Stocks' },
-  { id: 'Finanzen', name: 'r/Finanzen', icon: '🇩🇪', color: '#f59e0b', label: 'DACH Markets' },
-  { id: 'IndianStreetBets', name: 'r/IndianStreetBets', icon: '🇮🇳', color: '#f97316', label: 'India Moonshots' },
-  { id: 'IndiaInvestments', name: 'r/IndiaInvestments', icon: '🪷', color: '#10b981', label: 'India Long-Term' },
-  { id: 'UKInvesting', name: 'r/UKInvesting', icon: '🇬🇧', color: '#8b5cf6', label: 'UK & LSE' },
+  { id: 'wallstreetbets', name: 'r/wallstreetbets', icon: '🚀', color: '#f43f5e', label: 'WSB Moonshots' },
   { id: 'stocks', name: 'r/stocks', icon: '📈', color: '#06b6d4', label: 'General Stocks' },
-  { id: 'wallstreetbets', name: 'r/wallstreetbets', icon: '🚀', color: '#f43f5e', label: 'WSB Moonshots' }
+  { id: 'StockMarket', name: 'r/StockMarket', icon: '💼', color: '#3b82f6', label: 'Global Markets' },
+  { id: 'ValueInvesting', name: 'r/ValueInvesting', icon: '🧠', color: '#10b981', label: 'Deep Value' },
+  { id: 'dividends', name: 'r/dividends', icon: '💰', color: '#84cc16', label: 'Dividend Growth' },
+  { id: 'options', name: 'r/options', icon: '⚡', color: '#eab308', label: 'Options Strategy' },
+  { id: 'investing', name: 'r/investing', icon: '🌐', color: '#6366f1', label: 'Macro Strategy' },
+  { id: 'pennystocks', name: 'r/pennystocks', icon: '🪙', color: '#f97316', label: 'Small-Cap Gems' },
+  { id: 'Bogleheads', name: 'r/Bogleheads', icon: '📊', color: '#14b8a6', label: 'Index Compounding' },
+  { id: 'EATinvesting', name: 'r/EATinvesting', icon: '🇪🇺', color: '#0284c7', label: 'European Stocks' },
+  { id: 'Finanzen', name: 'r/Finanzen', icon: '🇩🇪', color: '#f59e0b', label: 'DACH Region' },
+  { id: 'UKInvesting', name: 'r/UKInvesting', icon: '🇬🇧', color: '#8b5cf6', label: 'UK & LSE' },
+  { id: 'IndianStreetBets', name: 'r/IndianStreetBets', icon: '🇮🇳', color: '#ec4899', label: 'India Trading' },
+  { id: 'IndiaInvestments', name: 'r/IndiaInvestments', icon: '🪷', color: '#059669', label: 'Nifty 50 Long' },
+  { id: 'teslainvestorsclub', name: 'r/teslainvestorsclub', icon: '⚡', color: '#e11d48', label: 'EV Tech' },
+  { id: 'spacs', name: 'r/spacs', icon: '💎', color: '#a855f7', label: 'Emerging Tech' }
 ];
 
 export const MOCK_REDDIT_POSTS = [
@@ -38,66 +47,66 @@ export const MOCK_REDDIT_POSTS = [
     summary: 'Industry-leading ROE (18%+) and retail deposit growth acceleration confirm India private banks as top defensive growth plays.'
   },
   {
-    id: 'p_in3',
-    title: 'Infosys Topaz AI & TCS enterprise cloud contract momentum: IT sector rebound in 2025/2026',
-    author: 'TechieInvestor_BLR',
-    subreddit: 'IndiaInvestments',
-    score: 890,
-    numComments: 195,
-    createdUtc: Date.now() - 3600 * 1000 * 5,
-    url: 'https://reddit.com/r/IndiaInvestments',
-    tickers: ['INFY', 'TCS'],
-    sentiment: { score: 0.86, label: 'Bullish', confidence: 'High' },
-    summary: 'Multi-year digital transformation deals and Generative AI client bootcamps positioning Indian IT leaders for revenue acceleration.'
-  },
-  {
     id: 'p_e1',
-    title: 'ASML & Rheinmetall: Why European Tech & Defense are the strongest multi-year plays in 2025/2026',
+    title: 'Delivery Hero SE (DHER) Glovo revenue turn-around & Rheinmetall NATO backlog acceleration',
     author: 'EuroTrader_99',
     subreddit: 'EATinvesting',
     score: 1420,
     numComments: 340,
     createdUtc: Date.now() - 3600 * 1000 * 2,
     url: 'https://reddit.com/r/EATinvesting',
-    tickers: ['ASML', 'RHM'],
+    tickers: ['DHER', 'RHM'],
     sentiment: { score: 0.92, label: 'Bullish', confidence: 'High' },
-    summary: 'ASML lithography monopoly combined with Rheinmetall NATO 2%+ GDP defense backlog makes them premier European compounders.'
+    summary: 'Delivery Hero inflection to positive free cash flow combined with Rheinmetall €50B defense order backlog makes them core European picks.'
   },
   {
     id: 'p_e2',
-    title: 'Novo Nordisk Wegovy demand & Roche Vabysmo earnings breakdown: European Healthcare supercycle',
-    author: 'ZurichAnalyst',
+    title: 'Zalando SE & HelloFresh turn-around thesis: E-Commerce & Factor ready-to-eat scale up',
+    author: 'DACH_Investor',
     subreddit: 'Finanzen',
-    score: 980,
+    score: 1100,
     numComments: 210,
-    createdUtc: Date.now() - 3600 * 1000 * 4,
+    createdUtc: Date.now() - 3600 * 1000 * 3,
     url: 'https://reddit.com/r/Finanzen',
-    tickers: ['NVO', 'RHHBY'],
+    tickers: ['ZAL', 'HFG'],
     sentiment: { score: 0.88, label: 'Bullish', confidence: 'High' },
-    summary: 'Novo Nordisk GLP-1 weight-loss scaling and Roche diagnostic margins provide defensive double-digit earnings growth.'
+    summary: 'Zalando expanding B2B logistics services across Western Europe while HelloFresh Factor ready-to-eat meals rapidly gain subscriber scale.'
   },
   {
-    id: 'p1',
-    title: 'NVIDIA Blackwell Ultra AI GPU Shipping Acceleration: Earnings Preview & Supply Chain Analysis',
-    author: 'TechAnalystPro',
-    subreddit: 'stocks',
-    score: 2450,
-    numComments: 580,
-    createdUtc: Date.now() - 3600 * 1000 * 3,
-    url: 'https://reddit.com/r/stocks',
-    tickers: ['NVDA', 'TSM'],
-    sentiment: { score: 0.94, label: 'Bullish', confidence: 'High' },
-    summary: 'Hyperscaler AI capex growth driving record Blackwell GPU chip wafer orders.'
+    id: 'p_us1',
+    title: 'NVIDIA Blackwell Ultra rack shipments accelerating: Hyperscaler AI capex demand unbroken',
+    author: 'SiliconAlpha',
+    subreddit: 'wallstreetbets',
+    score: 4200,
+    numComments: 980,
+    createdUtc: Date.now() - 3600 * 1000 * 1,
+    url: 'https://reddit.com/r/wallstreetbets',
+    tickers: ['NVDA', 'SMCI'],
+    sentiment: { score: 0.96, label: 'Bullish', confidence: 'High' },
+    summary: 'Big tech cloud providers ramping up Blackwell GPU cluster orders with direct liquid cooling infrastructure.'
+  },
+  {
+    id: 'p_us2',
+    title: 'Palantir AIP US Commercial bootcamps expanding at 100%+ YoY: Valuation analysis',
+    author: 'DeepValueHunter',
+    subreddit: 'ValueInvesting',
+    score: 2150,
+    numComments: 410,
+    createdUtc: Date.now() - 3600 * 1000 * 5,
+    url: 'https://reddit.com/r/ValueInvesting',
+    tickers: ['PLTR'],
+    sentiment: { score: 0.89, label: 'Bullish', confidence: 'High' },
+    summary: 'Unprecedented customer conversion speeds for AIP software platform driving GAAP operating margin expansion.'
   }
 ];
 
-export async function fetchSubredditPosts(subredditIds = []) {
+export async function fetchSubredditPosts(selectedSubreddits = []) {
   try {
-    const targetSubs = subredditIds.length > 0 ? subredditIds : SUBREDDITS.map(s => s.id);
-    const mockPosts = MOCK_REDDIT_POSTS.filter(p => targetSubs.includes(p.subreddit));
-    return mockPosts.length > 0 ? mockPosts : MOCK_REDDIT_POSTS;
+    const subsToFetch = selectedSubreddits.length > 0 ? selectedSubreddits : SUBREDDITS.map(s => s.id);
+    const mockFiltered = MOCK_REDDIT_POSTS.filter(p => subsToFetch.includes(p.subreddit));
+    return mockFiltered.length > 0 ? mockFiltered : MOCK_REDDIT_POSTS;
   } catch (err) {
-    console.warn('Reddit API fetch fallback to mock stream:', err.message);
+    console.warn('Reddit API live fetch fallback used:', err.message);
     return MOCK_REDDIT_POSTS;
   }
 }
