@@ -53,7 +53,158 @@ export async function fetchFinnhubQuote(symbol, apiKey) {
 }
 
 export const MASTER_STOCKS_DATABASE = {
-  // --- EUROPEAN GIANTS ---
+  // --- EUROPEAN DEFENSE GIANTS ---
+  RHM: {
+    symbol: 'RHM',
+    name: 'Rheinmetall AG',
+    sector: 'Industrials / European Defense & Ammunition',
+    exchange: 'XETRA / Frankfurt',
+    country: '🇩🇪 Germany / Europe',
+    price: 535.40,
+    change24h: 3.85,
+    marketCap: '$25.2 Billion (€23.2B)',
+    peRatio: 38.2,
+    pbRatio: 7.4,
+    eps: 14.01,
+    week52High: 571.00,
+    week52Low: 232.00,
+    beta: 1.25,
+    volatility: 42.0,
+    sparkline: [480, 500, 510, 520, 515, 528, 535.40],
+    isEmergingGem: true,
+    gemReason: 'Europe #1 defense contractor surge driven by NATO 2%+ GDP defense spend mandates',
+    catalyst: 'Ammunition & Panther tank backlog expansion & European defense re-armament',
+    downsideRisk: 'Defense procurement timing shifts & supply chain material constraints',
+    analystRating: 'Strong Buy',
+    analystScore: 4.9,
+    targetPrice: 640.00,
+    targetLow: 520.00,
+    targetHigh: 720.00,
+    buyCount: 20,
+    holdCount: 2,
+    sellCount: 0
+  },
+  BAESY: {
+    symbol: 'BAESY',
+    name: 'BAE Systems plc',
+    sector: 'Industrials / Defense & Aerospace',
+    exchange: 'OTC / LSE (BA)',
+    country: '🇬🇧 UK / Europe',
+    price: 68.50,
+    change24h: 1.45,
+    marketCap: '$52.4 Billion (£41B)',
+    peRatio: 19.8,
+    pbRatio: 3.6,
+    eps: 3.46,
+    week52High: 74.20,
+    week52Low: 48.90,
+    beta: 0.72,
+    volatility: 21.5,
+    sparkline: [63, 64.5, 65, 66.2, 67, 67.8, 68.50],
+    isEmergingGem: false,
+    catalyst: 'Global AUKUS submarine program & European combat air system backlog',
+    downsideRisk: 'UK government budget allocation changes',
+    analystRating: 'Buy',
+    analystScore: 4.6,
+    targetPrice: 82.00,
+    targetLow: 65.00,
+    targetHigh: 92.00,
+    buyCount: 18,
+    holdCount: 3,
+    sellCount: 0
+  },
+  SAAB: {
+    symbol: 'SAAB',
+    name: 'Saab AB',
+    sector: 'Industrials / Aerospace & Defense Systems',
+    exchange: 'Nasdaq Stockholm (SAAB-B)',
+    country: '🇸🇪 Sweden / Europe',
+    price: 228.60,
+    change24h: 4.10,
+    marketCap: '$14.5 Billion (SEK 152B)',
+    peRatio: 34.2,
+    pbRatio: 4.8,
+    eps: 6.68,
+    week52High: 254.00,
+    week52Low: 118.00,
+    beta: 1.12,
+    volatility: 38.0,
+    sparkline: [205, 210, 215, 220, 218, 224, 228.60],
+    isEmergingGem: true,
+    gemReason: 'Sweden NATO accession driving massive order backlog for Gripen fighter jets & NLAW systems',
+    catalyst: 'NATO Nordic defense integration & anti-tank missile exports',
+    downsideRisk: 'Production capacity scaling constraints',
+    analystRating: 'Strong Buy',
+    analystScore: 4.7,
+    targetPrice: 275.00,
+    targetLow: 210.00,
+    targetHigh: 310.00,
+    buyCount: 15,
+    holdCount: 2,
+    sellCount: 0
+  },
+
+  // --- SWISS PHARMA GIANTS ---
+  RHHBY: {
+    symbol: 'RHHBY',
+    name: 'Roche Holding AG',
+    sector: 'Healthcare / Pharmaceuticals & Diagnostics',
+    exchange: 'OTC / SIX Swiss Exchange (ROG)',
+    country: '🇨🇭 Switzerland / Europe',
+    price: 36.80,
+    change24h: 1.15,
+    marketCap: '$242 Billion (CHF 215B)',
+    peRatio: 17.2,
+    pbRatio: 6.4,
+    eps: 2.14,
+    week52High: 41.50,
+    week52Low: 29.80,
+    beta: 0.52,
+    volatility: 19.5,
+    sparkline: [33.5, 34, 35, 35.8, 36, 36.4, 36.80],
+    isEmergingGem: false,
+    catalyst: 'Oncology pipeline & Vabysmo eye disease drug blockbuster acceleration',
+    downsideRisk: 'Biosimilar competition for legacy oncology drugs',
+    analystRating: 'Buy',
+    analystScore: 4.4,
+    targetPrice: 44.00,
+    targetLow: 35.00,
+    targetHigh: 50.00,
+    buyCount: 19,
+    holdCount: 7,
+    sellCount: 0
+  },
+  NVO: {
+    symbol: 'NVO',
+    name: 'Novo Nordisk A/S',
+    sector: 'Healthcare / Pharmaceuticals',
+    exchange: 'NYSE / Euronext Copenhagen',
+    country: '🇩🇰 Denmark / Europe',
+    price: 132.40,
+    change24h: 1.85,
+    marketCap: '$592 Billion',
+    peRatio: 38.6,
+    pbRatio: 32.1,
+    eps: 3.43,
+    week52High: 147.15,
+    week52Low: 88.50,
+    beta: 0.65,
+    volatility: 24.0,
+    sparkline: [124, 126, 128, 127, 130, 131, 132.40],
+    isEmergingGem: false,
+    catalyst: 'Ozempic & Wegovy GLP-1 weight-loss drug monopoly expansion',
+    downsideRisk: 'Compounding pharmacy competition & Medicare price negotiations',
+    analystRating: 'Buy',
+    analystScore: 4.6,
+    targetPrice: 158.00,
+    targetLow: 125.00,
+    targetHigh: 180.00,
+    buyCount: 24,
+    holdCount: 5,
+    sellCount: 1
+  },
+
+  // --- OTHER EUROPEAN GIANTS ---
   DHER: {
     symbol: 'DHER',
     name: 'Delivery Hero SE',
@@ -143,35 +294,6 @@ export const MASTER_STOCKS_DATABASE = {
     holdCount: 4,
     sellCount: 0
   },
-  NVO: {
-    symbol: 'NVO',
-    name: 'Novo Nordisk A/S',
-    sector: 'Healthcare / Pharmaceuticals',
-    exchange: 'NYSE / Euronext Copenhagen',
-    country: '🇩🇰 Denmark / Europe',
-    price: 132.40,
-    change24h: 1.85,
-    marketCap: '$592 Billion',
-    peRatio: 38.6,
-    pbRatio: 32.1,
-    eps: 3.43,
-    week52High: 147.15,
-    week52Low: 88.50,
-    beta: 0.65,
-    volatility: 24.0,
-    sparkline: [124, 126, 128, 127, 130, 131, 132.40],
-    isEmergingGem: false,
-    catalyst: 'Ozempic & Wegovy GLP-1 weight-loss drug monopoly expansion',
-    downsideRisk: 'Compounding pharmacy competition & Medicare price negotiations',
-    analystRating: 'Buy',
-    analystScore: 4.6,
-    targetPrice: 158.00,
-    targetLow: 125.00,
-    targetHigh: 180.00,
-    buyCount: 24,
-    holdCount: 5,
-    sellCount: 1
-  },
   SAP: {
     symbol: 'SAP',
     name: 'SAP SE',
@@ -258,35 +380,6 @@ export const MASTER_STOCKS_DATABASE = {
     buyCount: 22,
     holdCount: 6,
     sellCount: 1
-  },
-  AZN: {
-    symbol: 'AZN',
-    name: 'AstraZeneca PLC',
-    sector: 'Healthcare / Pharmaceuticals',
-    exchange: 'NASDAQ / LSE',
-    country: '🇬🇧 UK / Europe',
-    price: 76.80,
-    change24h: 0.95,
-    marketCap: '$238 Billion',
-    peRatio: 36.4,
-    pbRatio: 6.1,
-    eps: 2.11,
-    week52High: 87.65,
-    week52Low: 61.50,
-    beta: 0.58,
-    volatility: 21.0,
-    sparkline: [73, 74, 75, 74.5, 75.5, 76, 76.80],
-    isEmergingGem: false,
-    catalyst: 'Enhertu antibody-drug conjugate oncology blockbuster growth',
-    downsideRisk: 'China investigation inquiries & R&D trial outcomes',
-    analystRating: 'Buy',
-    analystScore: 4.5,
-    targetPrice: 92.00,
-    targetLow: 75.00,
-    targetHigh: 105.00,
-    buyCount: 22,
-    holdCount: 4,
-    sellCount: 0
   },
 
   // --- ASIAN GIANTS ---
@@ -436,35 +529,6 @@ export const MASTER_STOCKS_DATABASE = {
     targetLow: 50.00,
     targetHigh: 82.00,
     buyCount: 32,
-    holdCount: 3,
-    sellCount: 0
-  },
-  HDB: {
-    symbol: 'HDB',
-    name: 'HDFC Bank Limited',
-    sector: 'Financials / Banking',
-    exchange: 'NYSE / NSE India',
-    country: '🇮🇳 India / Asia',
-    price: 64.20,
-    change24h: 1.45,
-    marketCap: '$162 Billion',
-    peRatio: 18.5,
-    pbRatio: 2.6,
-    eps: 3.47,
-    week52High: 71.00,
-    week52Low: 52.80,
-    beta: 0.92,
-    volatility: 22.0,
-    sparkline: [59, 60.5, 61, 62, 63, 63.8, 64.20],
-    isEmergingGem: false,
-    catalyst: 'India GDP 7%+ economic growth & credit expansion supercycle',
-    downsideRisk: 'Post-merger deposit growth cost stabilization',
-    analystRating: 'Buy',
-    analystScore: 4.6,
-    targetPrice: 78.00,
-    targetLow: 62.00,
-    targetHigh: 90.00,
-    buyCount: 25,
     holdCount: 3,
     sellCount: 0
   },
@@ -878,20 +942,17 @@ export function calculateTimingScore(tickerData, postMetrics) {
 }
 
 export const STOCK_NEWS_DATABASE = {
-  DHER: [
-    { id: 'dher1', title: 'Delivery Hero Glovo Revenue Surges Across European & Asian Markets', source: 'Handelsblatt', time: '1 hour ago', impact: 'Positive', impactText: 'Free cash flow breakeven milestones reached in Q3', url: 'https://finance.yahoo.com' }
+  RHM: [
+    { id: 'rhm1', title: 'Rheinmetall NATO Ammunition Orders Surge to Record Highs', source: 'Handelsblatt Defense', time: '1 hour ago', impact: 'Positive', impactText: 'European defense re-armament backlog extending into 2030', url: 'https://finance.yahoo.com' }
   ],
-  LVMUY: [
-    { id: 'lvm1', title: 'LVMH Reports Resilient Fashion & Leather Goods Revenues', source: 'Le Figaro', time: '2 hours ago', impact: 'Positive', impactText: 'Louis Vuitton and Christian Dior demand accelerates in Asia', url: 'https://finance.yahoo.com' }
+  SAAB: [
+    { id: 'saab1', title: 'Saab Secures Major NATO Counter-Measure & Gripen Jet Order', source: 'Dagens Industri', time: '2 hours ago', impact: 'Positive', impactText: 'Sweden NATO accession accelerating order backlog', url: 'https://finance.yahoo.com' }
   ],
-  TCEHY: [
-    { id: 'tce1', title: 'Tencent Games Division Launch Boosts Overseas Revenues 29%', source: 'South China Morning Post', time: '1 hour ago', impact: 'Positive', impactText: 'WeChat Mini Games and AI cloud ecosystem expansion', url: 'https://finance.yahoo.com' }
+  RHHBY: [
+    { id: 'rhhby1', title: 'Roche Vabysmo Ophthalmology Blockbuster Revenues Beat Estimates', source: 'Neue Zürcher Zeitung', time: '3 hours ago', impact: 'Positive', impactText: 'Swiss pharma diagnostics division expands margin growth', url: 'https://finance.yahoo.com' }
   ],
-  TM: [
-    { id: 'tm1', title: 'Toyota Hybrid Sales Hit All-Time High Across Global Markets', source: 'Nikkei Asia', time: '3 hours ago', impact: 'Positive', impactText: 'Consumer demand for hybrid powertrains outpaces full EVs', url: 'https://finance.yahoo.com' }
-  ],
-  NVDA: [
-    { id: 'n1', title: 'NVIDIA Blackwell Ultra AI GPU Shipping Schedules Accelerated', source: 'Bloomberg Markets', time: '2 hours ago', impact: 'Positive', impactText: 'Hyperscaler demand exceeding 2025 supply capacity', url: 'https://finance.yahoo.com' }
+  NVO: [
+    { id: 'nvo1', title: 'Novo Nordisk Wegovy Weight Loss Drug Demand Expands Globally', source: 'Bloomberg Europe', time: '2 hours ago', impact: 'Positive', impactText: 'Manufacturing capacity scaling to meet European and US demand', url: 'https://finance.yahoo.com' }
   ]
 };
 
