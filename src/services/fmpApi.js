@@ -12,7 +12,7 @@ export async function fetchDCFValuation(symbol, apiKey) {
     if (data && data.length > 0) {
       const result = {
         dcf: data[0].dcf,
-        currentPrice: data[0].Stock Price,
+        currentPrice: data[0]['Stock Price'] || data[0].StockPrice || data[0].price,
         date: data[0].date
       };
       dcfCache.set(symbol, result);
