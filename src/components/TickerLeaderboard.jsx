@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TrendingUp, TrendingDown, Star, Zap, ShieldCheck, BarChart2, ChevronRight, Target, Sparkles, AlertOctagon } from 'lucide-react';
+import { TrendingUp, TrendingDown, Star, Zap, ShieldCheck, BarChart2, ChevronRight, Target, Sparkles, SlidersHorizontal } from 'lucide-react';
 import { formatCurrency } from '../services/stockApi';
 
 export default function TickerLeaderboard({ stocks, watchlist, onToggleWatchlist, onSelectTicker, currencyMode, fxRate }) {
@@ -7,7 +7,6 @@ export default function TickerLeaderboard({ stocks, watchlist, onToggleWatchlist
 
   let filteredStocks = [...stocks];
   if (horizonFilter === 'discovery') {
-    // Discovery Plays: High Implied Upside (>25%) + Elevated Risk Rating (>=45) OR High Swing Velocity
     filteredStocks = filteredStocks.filter(s => 
       s.impliedUpside >= 20 || s.riskModel.riskScore >= 45 || s.isEmergingGem
     ).sort((a, b) => (b.impliedUpside * (b.riskModel.riskScore / 50)) - (a.impliedUpside * (a.riskModel.riskScore / 50)));
@@ -30,8 +29,8 @@ export default function TickerLeaderboard({ stocks, watchlist, onToggleWatchlist
     const min = Math.min(...points);
     const max = Math.max(...points);
     const range = max - min || 1;
-    const width = 80;
-    const height = 24;
+    const width = 75;
+    const height = 22;
 
     const coords = points.map((val, idx) => {
       const x = (idx / (points.length - 1)) * width;
@@ -58,25 +57,25 @@ export default function TickerLeaderboard({ stocks, watchlist, onToggleWatchlist
   return (
     <div className="glass-panel" style={{ padding: '24px', marginBottom: '28px' }}>
       
-      {/* Header & Filter Tabs */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', flexWrap: 'wrap', gap: '14px' }}>
+      {/* Sleek Header & Filter Bar */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '18px', flexWrap: 'wrap', gap: '14px' }}>
         <div>
           <h2 style={{ fontSize: '1.2rem', fontWeight: 800, letterSpacing: '-0.01em', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <BarChart2 size={20} color="#38bdf8" /> Top Hot Stock Tickers Leaderboard
+            <BarChart2 size={20} color="#38bdf8" /> Trending Stock Leaderboard
           </h2>
-          <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-            Ranked by Reddit mention volume, sentiment, Buy/Wait entry signals & Wall St. targets ({currencyMode} Mode)
+          <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
+            Subreddit volume rankings, AI sentiment, Buy/Wait entry signals & Wall St. targets ({currencyMode} Mode)
           </p>
         </div>
 
-        {/* Filter Tabs */}
-        <div style={{ display: 'flex', background: 'rgba(0, 0, 0, 0.3)', padding: '4px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', flexWrap: 'wrap', gap: '4px' }}>
+        {/* Clean Horizon Tabs */}
+        <div style={{ display: 'flex', background: 'rgba(0, 0, 0, 0.4)', padding: '3px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', flexWrap: 'wrap', gap: '2px' }}>
           <button
             onClick={() => setHorizonFilter('all')}
             style={{
-              padding: '6px 12px',
+              padding: '5px 11px',
               borderRadius: 'var(--radius-sm)',
-              fontSize: '0.78rem',
+              fontSize: '0.76rem',
               fontWeight: 600,
               border: 'none',
               cursor: 'pointer',
@@ -84,16 +83,15 @@ export default function TickerLeaderboard({ stocks, watchlist, onToggleWatchlist
               color: horizonFilter === 'all' ? '#fff' : 'var(--text-muted)'
             }}
           >
-            🔥 All Hot Tickers
+            🔥 All Tickers
           </button>
 
-          {/* NEW: High-Risk Discovery Tab */}
           <button
             onClick={() => setHorizonFilter('discovery')}
             style={{
-              padding: '6px 12px',
+              padding: '5px 11px',
               borderRadius: 'var(--radius-sm)',
-              fontSize: '0.78rem',
+              fontSize: '0.76rem',
               fontWeight: 700,
               border: 'none',
               cursor: 'pointer',
@@ -104,15 +102,15 @@ export default function TickerLeaderboard({ stocks, watchlist, onToggleWatchlist
               gap: '4px'
             }}
           >
-            <Sparkles size={14} color="#f59e0b" /> 🔍 High-Risk, High-Upside Discovery
+            <Sparkles size={13} color="#f59e0b" /> 🔍 High-Risk Discovery
           </button>
 
           <button
             onClick={() => setHorizonFilter('buy')}
             style={{
-              padding: '6px 12px',
+              padding: '5px 11px',
               borderRadius: 'var(--radius-sm)',
-              fontSize: '0.78rem',
+              fontSize: '0.76rem',
               fontWeight: 600,
               border: 'none',
               cursor: 'pointer',
@@ -120,14 +118,15 @@ export default function TickerLeaderboard({ stocks, watchlist, onToggleWatchlist
               color: horizonFilter === 'buy' ? '#10b981' : 'var(--text-muted)'
             }}
           >
-            🛒 Best Buy Dip Days
+            🛒 Buy Dip Days
           </button>
+
           <button
             onClick={() => setHorizonFilter('upside')}
             style={{
-              padding: '6px 12px',
+              padding: '5px 11px',
               borderRadius: 'var(--radius-sm)',
-              fontSize: '0.78rem',
+              fontSize: '0.76rem',
               fontWeight: 600,
               border: 'none',
               cursor: 'pointer',
@@ -135,14 +134,15 @@ export default function TickerLeaderboard({ stocks, watchlist, onToggleWatchlist
               color: horizonFilter === 'upside' ? '#38bdf8' : 'var(--text-muted)'
             }}
           >
-            🎯 Highest Target Upside
+            🎯 Highest Upside
           </button>
+
           <button
             onClick={() => setHorizonFilter('short')}
             style={{
-              padding: '6px 12px',
+              padding: '5px 11px',
               borderRadius: 'var(--radius-sm)',
-              fontSize: '0.78rem',
+              fontSize: '0.76rem',
               fontWeight: 600,
               border: 'none',
               cursor: 'pointer',
@@ -150,14 +150,15 @@ export default function TickerLeaderboard({ stocks, watchlist, onToggleWatchlist
               color: horizonFilter === 'short' ? '#06b6d4' : 'var(--text-muted)'
             }}
           >
-            ⚡ Short-Term Swing
+            ⚡ Swing
           </button>
+
           <button
             onClick={() => setHorizonFilter('long')}
             style={{
-              padding: '6px 12px',
+              padding: '5px 11px',
               borderRadius: 'var(--radius-sm)',
-              fontSize: '0.78rem',
+              fontSize: '0.76rem',
               fontWeight: 600,
               border: 'none',
               cursor: 'pointer',
@@ -165,27 +166,25 @@ export default function TickerLeaderboard({ stocks, watchlist, onToggleWatchlist
               color: horizonFilter === 'long' ? '#8b5cf6' : 'var(--text-muted)'
             }}
           >
-            🏛️ Long-Term Conviction
+            🏛️ Hold
           </button>
         </div>
       </div>
 
-      {/* Table */}
+      {/* Clean Table Layout */}
       <div style={{ overflowX: 'auto' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem' }}>
           <thead>
-            <tr style={{ borderBottom: '1px solid var(--border-color)', color: 'var(--text-muted)', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              <th style={{ padding: '12px 8px' }}>Rank</th>
-              <th style={{ padding: '12px 12px' }}>Ticker & Company</th>
-              <th style={{ padding: '12px 12px' }}>Entry Timing Signal</th>
-              <th style={{ padding: '12px 12px' }}>Wall St. Target & Upside</th>
-              <th style={{ padding: '12px 12px' }}>24h Buzz</th>
-              <th style={{ padding: '12px 12px' }}>Sentiment</th>
-              <th style={{ padding: '12px 12px' }}>Horizon Scores</th>
-              <th style={{ padding: '12px 12px' }}>Risk Level</th>
-              <th style={{ padding: '12px 12px' }}>Price ({currencyMode})</th>
-              <th style={{ padding: '12px 12px' }}>Trend</th>
-              <th style={{ padding: '12px 8px', textAlign: 'right' }}>Actions</th>
+            <tr style={{ borderBottom: '1px solid var(--border-color)', color: 'var(--text-muted)', fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              <th style={{ padding: '10px 6px' }}>Rank</th>
+              <th style={{ padding: '10px 10px' }}>Ticker</th>
+              <th style={{ padding: '10px 10px' }}>Price ({currencyMode})</th>
+              <th style={{ padding: '10px 10px' }}>Entry Timing Signal</th>
+              <th style={{ padding: '10px 10px' }}>Wall St. Target</th>
+              <th style={{ padding: '10px 10px' }}>Sentiment & Risk</th>
+              <th style={{ padding: '10px 10px' }}>Horizon Scores</th>
+              <th style={{ padding: '10px 10px' }}>Trend</th>
+              <th style={{ padding: '10px 6px', textAlign: 'right' }}>Action</th>
             </tr>
           </thead>
           <tbody>
@@ -203,45 +202,53 @@ export default function TickerLeaderboard({ stocks, watchlist, onToggleWatchlist
                   }}
                   className="leaderboard-row"
                 >
-                  <td style={{ padding: '14px 8px', fontWeight: 700, color: idx < 3 ? '#f59e0b' : 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
+                  <td style={{ padding: '12px 6px', fontWeight: 700, color: idx < 3 ? '#f59e0b' : 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
                     #{idx + 1}
                   </td>
 
-                  <td style={{ padding: '14px 12px' }}>
+                  <td style={{ padding: '12px 10px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <button
                         onClick={() => onToggleWatchlist(stock.symbol)}
                         style={{ background: 'none', border: 'none', color: isSaved ? '#f59e0b' : 'var(--text-muted)', cursor: 'pointer' }}
                         title={isSaved ? 'Remove from Watchlist' : 'Add to Watchlist'}
                       >
-                        <Star size={16} fill={isSaved ? '#f59e0b' : 'none'} />
+                        <Star size={15} fill={isSaved ? '#f59e0b' : 'none'} />
                       </button>
                       <div onClick={() => onSelectTicker(stock)} style={{ cursor: 'pointer' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                          <span style={{ fontWeight: 800, fontSize: '1rem', color: '#fff', fontFamily: 'var(--font-mono)' }}>
+                          <span style={{ fontWeight: 800, fontSize: '0.95rem', color: '#fff', fontFamily: 'var(--font-mono)' }}>
                             ${stock.symbol}
                           </span>
-                          {horizonFilter === 'discovery' && (
-                            <span className="badge badge-risk-high" style={{ fontSize: '0.65rem', padding: '1px 6px' }}>
-                              ⚡ High Upside Discovery
-                            </span>
-                          )}
+                          <span className="badge badge-exchange" style={{ fontSize: '0.62rem', padding: '1px 5px' }}>{stock.exchange}</span>
                         </div>
-                        <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{stock.name}</div>
+                        <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{stock.name}</div>
                       </div>
                     </div>
                   </td>
 
-                  <td style={{ padding: '14px 12px' }}>
-                    <span className={`badge ${timing.badgeClass}`} style={{ fontSize: '0.75rem' }}>
+                  {/* Price */}
+                  <td style={{ padding: '12px 10px' }}>
+                    <div style={{ fontWeight: 700, fontFamily: 'var(--font-mono)', fontSize: '0.85rem' }}>
+                      {formatCurrency(stock.price, currencyMode, fxRate)}
+                    </div>
+                    <div style={{ fontSize: '0.72rem', fontWeight: 600, color: stock.change24h >= 0 ? '#10b981' : '#ef4444' }}>
+                      {stock.change24h >= 0 ? `+${stock.change24h}%` : `${stock.change24h}%`} (24h)
+                    </div>
+                  </td>
+
+                  {/* Entry Timing Badge */}
+                  <td style={{ padding: '12px 10px' }}>
+                    <span className={`badge ${timing.badgeClass}`} style={{ fontSize: '0.72rem', padding: '3px 8px' }}>
                       {timing.icon} {timing.signal}
                     </span>
-                    <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+                    <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', marginTop: '2px' }}>
                       Score: {timing.timingScore}/100
                     </div>
                   </td>
 
-                  <td style={{ padding: '14px 12px' }}>
+                  {/* Wall St Analyst Target & Implied Upside */}
+                  <td style={{ padding: '12px 10px' }}>
                     <div style={{ fontWeight: 700, color: stock.impliedUpside >= 0 ? '#38bdf8' : '#ef4444', fontFamily: 'var(--font-mono)', fontSize: '0.8rem' }}>
                       Target: {formatCurrency(stock.targetPrice, currencyMode, fxRate)}
                     </div>
@@ -250,57 +257,41 @@ export default function TickerLeaderboard({ stocks, watchlist, onToggleWatchlist
                     </div>
                   </td>
 
-                  <td style={{ padding: '14px 12px' }}>
-                    <div style={{ fontWeight: 700, fontFamily: 'var(--font-mono)' }}>{stock.mentionCount} posts</div>
-                    <div style={{ fontSize: '0.72rem', color: stock.mentionChange24h >= 0 ? '#10b981' : '#ef4444' }}>
-                      {stock.mentionChange24h >= 0 ? `+${stock.mentionChange24h}%` : `${stock.mentionChange24h}%`} (24h)
+                  {/* Sentiment & Risk Combined */}
+                  <td style={{ padding: '12px 10px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                      <span className={`badge ${stock.bullishRatio >= 55 ? 'badge-bullish' : stock.bullishRatio <= 40 ? 'badge-bearish' : 'badge-neutral'}`} style={{ fontSize: '0.68rem', padding: '1px 6px' }}>
+                        {stock.bullishRatio >= 55 ? <TrendingUp size={10} /> : <TrendingDown size={10} />}
+                        {stock.bullishRatio}% Bull ({stock.mentionCount} posts)
+                      </span>
+                      <span className={`badge ${stock.riskModel.badgeClass}`} style={{ fontSize: '0.68rem', padding: '1px 6px' }}>
+                        {stock.riskModel.icon} {stock.riskModel.tier} ({stock.riskModel.riskScore})
+                      </span>
                     </div>
                   </td>
 
-                  <td style={{ padding: '14px 12px' }}>
-                    <span className={`badge ${stock.bullishRatio >= 55 ? 'badge-bullish' : stock.bullishRatio <= 40 ? 'badge-bearish' : 'badge-neutral'}`}>
-                      {stock.bullishRatio >= 55 ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
-                      {stock.bullishRatio}% Bull
-                    </span>
-                  </td>
-
-                  <td style={{ padding: '14px 12px' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                      <span className="badge badge-short-term" style={{ fontSize: '0.68rem', padding: '2px 8px' }}>
+                  <td style={{ padding: '12px 10px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                      <span className="badge badge-short-term" style={{ fontSize: '0.65rem', padding: '1px 6px' }}>
                         ⚡ Swing: {stock.shortTermScore}/100
                       </span>
-                      <span className="badge badge-long-term" style={{ fontSize: '0.68rem', padding: '2px 8px' }}>
+                      <span className="badge badge-long-term" style={{ fontSize: '0.65rem', padding: '1px 6px' }}>
                         🏛️ Hold: {stock.longTermScore}/100
                       </span>
                     </div>
                   </td>
 
-                  <td style={{ padding: '14px 12px' }}>
-                    <span className={`badge ${stock.riskModel.badgeClass}`} style={{ fontSize: '0.7rem' }}>
-                      {stock.riskModel.icon} {stock.riskModel.tier} ({stock.riskModel.riskScore})
-                    </span>
-                  </td>
-
-                  <td style={{ padding: '14px 12px' }}>
-                    <div style={{ fontWeight: 700, fontFamily: 'var(--font-mono)', fontSize: '0.85rem' }}>
-                      {formatCurrency(stock.price, currencyMode, fxRate)}
-                    </div>
-                    <div style={{ fontSize: '0.75rem', fontWeight: 600, color: stock.change24h >= 0 ? '#10b981' : '#ef4444' }}>
-                      {stock.change24h >= 0 ? `+${stock.change24h}%` : `${stock.change24h}%`}
-                    </div>
-                  </td>
-
-                  <td style={{ padding: '14px 12px' }}>
+                  <td style={{ padding: '12px 10px' }}>
                     {renderSparkline(stock.sparkline, stock.change24h >= 0)}
                   </td>
 
-                  <td style={{ padding: '14px 8px', textAlign: 'right' }}>
+                  <td style={{ padding: '12px 6px', textAlign: 'right' }}>
                     <button
                       onClick={() => onSelectTicker(stock)}
                       className="btn btn-secondary"
-                      style={{ padding: '4px 10px', fontSize: '0.75rem' }}
+                      style={{ padding: '4px 8px', fontSize: '0.72rem' }}
                     >
-                      Details <ChevronRight size={14} />
+                      Details <ChevronRight size={13} />
                     </button>
                   </td>
 

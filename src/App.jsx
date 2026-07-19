@@ -9,11 +9,13 @@ import StockNewsFeed from './components/StockNewsFeed';
 import PostsFeed from './components/PostsFeed';
 import TickerModal from './components/TickerModal';
 import SettingsModal from './components/SettingsModal';
+import { Flame, BarChart2, Newspaper, MessageSquare, Sparkles } from 'lucide-react';
 
 import { fetchSubredditPosts, SUBREDDITS } from './services/redditApi';
 import { compileStockAnalytics, fetchUSDEURRate, DEFAULT_USD_EUR_RATE } from './services/stockApi';
 
 export default function App() {
+  const [activeTab, setActiveTab] = useState('leaderboard'); // 'leaderboard', 'analytics', 'news'
   const [selectedSubreddits, setSelectedSubreddits] = useState(SUBREDDITS.map(s => s.id));
   const [searchTerm, setSearchTerm] = useState('');
   const [posts, setPosts] = useState([]);
@@ -40,7 +42,7 @@ export default function App() {
       redditClientId: '',
       redditClientSecret: '',
       finnhubApiKey: '',
-      refreshInterval: 5 // Default: Every 5 seconds!
+      refreshInterval: 10 // High-Speed Default: 10s
     };
   });
 
@@ -135,44 +137,138 @@ export default function App() {
         onChangeRefreshInterval={handleChangeRefreshInterval}
       />
 
-      <main style={{ maxWidth: '1400px', margin: '0 auto', padding: '24px 20px 60px' }}>
+      <main style={{ maxWidth: '1400px', margin: '0 auto', padding: '20px 20px 60px' }}>
         
-        {/* Top Metrics Banner */}
-        <MetricsOverview stocks={stocks} totalPostsCount={posts.length} />
+        {/* Sleek Uncluttered View Navigation Bar */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: '24px',
+          padding: '6px',
+          background: 'rgba(15, 23, 42, 0.75)',
+          border: '1px solid var(--border-color)',
+          borderRadius: 'var(--radius-lg)',
+          backdropFilter: 'blur(16px)',
+          flexWrap: 'wrap',
+          gap: '8px'
+        }}>
+          <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+            <button
+              onClick={() => setActiveTab('leaderboard')}
+              style={{
+                padding: '8px 18px',
+                borderRadius: 'var(--radius-md)',
+                fontSize: '0.85rem',
+                fontWeight: 700,
+                border: 'none',
+                cursor: 'pointer',
+                background: activeTab === 'leaderboard' ? 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)' : 'transparent',
+                color: activeTab === 'leaderboard' ? '#fff' : 'var(--text-muted)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                boxShadow: activeTab === 'leaderboard' ? '0 4px 12px rgba(2, 132, 199, 0.3)' : 'none',
+                transition: 'var(--transition-normal)'
+              }}
+            >
+              <Flame size={16} color={activeTab === 'leaderboard' ? '#fff' : 'var(--text-muted)'} /> 🔥 Tickers & Emerging Gems
+            </button>
 
-        {/* Subreddit Filter Buttons */}
-        <SubredditFilter
-          selectedSubreddits={selectedSubreddits}
-          onToggleSubreddit={handleToggleSubreddit}
-          onSelectAll={handleSelectAllSubreddits}
-        />
+            <button
+              onClick={() => setActiveTab('analytics')}
+              style={{
+                padding: '8px 18px',
+                borderRadius: 'var(--radius-md)',
+                fontSize: '0.85rem',
+                fontWeight: 700,
+                border: 'none',
+                cursor: 'pointer',
+                background: activeTab === 'analytics' ? 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)' : 'transparent',
+                color: activeTab === 'analytics' ? '#fff' : 'var(--text-muted)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                boxShadow: activeTab === 'analytics' ? '0 4px 12px rgba(2, 132, 199, 0.3)' : 'none',
+                transition: 'var(--transition-normal)'
+              }}
+            >
+              <BarChart2 size={16} color={activeTab === 'analytics' ? '#fff' : 'var(--text-muted)'} /> 📊 Visual Analytics & Risk Matrix
+            </button>
 
-        {/* Emerging Gems Spotlight */}
-        <EmergingGems
-          stocks={stocks}
-          onSelectTicker={(s) => setSelectedTickerModal(s)}
-          currencyMode={currencyMode}
-          fxRate={fxRate}
-        />
+            <button
+              onClick={() => setActiveTab('news')}
+              style={{
+                padding: '8px 18px',
+                borderRadius: 'var(--radius-md)',
+                fontSize: '0.85rem',
+                fontWeight: 700,
+                border: 'none',
+                cursor: 'pointer',
+                background: activeTab === 'news' ? 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)' : 'transparent',
+                color: activeTab === 'news' ? '#fff' : 'var(--text-muted)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                boxShadow: activeTab === 'news' ? '0 4px 12px rgba(2, 132, 199, 0.3)' : 'none',
+                transition: 'var(--transition-normal)'
+              }}
+            >
+              <Newspaper size={16} color={activeTab === 'news' ? '#fff' : 'var(--text-muted)'} /> 📰 Impact News & Reddit Discussions
+            </button>
+          </div>
 
-        {/* Main Stock Leaderboard */}
-        <TickerLeaderboard
-          stocks={filteredStocks}
-          watchlist={watchlist}
-          onToggleWatchlist={handleToggleWatchlist}
-          onSelectTicker={(s) => setSelectedTickerModal(s)}
-          currencyMode={currencyMode}
-          fxRate={fxRate}
-        />
+          <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', paddingRight: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981' }}></span>
+            Subreddits: <strong>{selectedSubreddits.length}/8 Active</strong>
+          </div>
+        </div>
 
-        {/* Live Financial News Stream */}
-        <StockNewsFeed stocks={stocks} />
+        {/* Tab 1: Leaderboard, Emerging Gems & Metrics */}
+        {activeTab === 'leaderboard' && (
+          <>
+            {/* Subreddit Filter Buttons */}
+            <SubredditFilter
+              selectedSubreddits={selectedSubreddits}
+              onToggleSubreddit={handleToggleSubreddit}
+              onSelectAll={handleSelectAllSubreddits}
+            />
 
-        {/* Visual Analytics & Charts Suite */}
-        <AnalyticsCharts stocks={stocks} />
+            {/* Top Metrics Overview Banner */}
+            <MetricsOverview stocks={stocks} totalPostsCount={posts.length} />
 
-        {/* Live Reddit Discussion Posts Reader */}
-        <PostsFeed posts={posts} selectedSubreddits={selectedSubreddits} />
+            {/* Emerging Gems Spotlight */}
+            <EmergingGems
+              stocks={stocks}
+              onSelectTicker={(s) => setSelectedTickerModal(s)}
+              currencyMode={currencyMode}
+              fxRate={fxRate}
+            />
+
+            {/* Main Stock Leaderboard */}
+            <TickerLeaderboard
+              stocks={filteredStocks}
+              watchlist={watchlist}
+              onToggleWatchlist={handleToggleWatchlist}
+              onSelectTicker={(s) => setSelectedTickerModal(s)}
+              currencyMode={currencyMode}
+              fxRate={fxRate}
+            />
+          </>
+        )}
+
+        {/* Tab 2: Visual Analytics & Risk Matrix */}
+        {activeTab === 'analytics' && (
+          <AnalyticsCharts stocks={stocks} />
+        )}
+
+        {/* Tab 3: News & Live Reddit Threads */}
+        {activeTab === 'news' && (
+          <>
+            <StockNewsFeed stocks={stocks} />
+            <PostsFeed posts={posts} selectedSubreddits={selectedSubreddits} />
+          </>
+        )}
 
       </main>
 
