@@ -1,6 +1,9 @@
 name: Automated Reddit Stock Snapshot & GitHub Pages Deploy
 
 on:
+  push:
+    branches:
+      - main
   schedule:
     # Run every 6 hours
     - cron: '0 */6 * * *'
