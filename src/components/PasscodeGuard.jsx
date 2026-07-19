@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Lock, ShieldCheck, Key, ArrowRight, Eye, EyeOff } from 'lucide-react';
+import { Lock, ShieldCheck, ArrowRight, Eye, EyeOff, RefreshCw } from 'lucide-react';
 
 export default function PasscodeGuard({ isLocked, onUnlock, savedPasscode }) {
   const [inputCode, setInputCode] = useState('');
@@ -10,14 +10,22 @@ export default function PasscodeGuard({ isLocked, onUnlock, savedPasscode }) {
 
   const handleUnlock = (e) => {
     e.preventDefault();
-    const correctCode = savedPasscode || '1234';
+    const cleanInput = inputCode.trim();
+    const targetCode = (savedPasscode && savedPasscode.trim()) ? savedPasscode.trim() : '1234';
     
-    if (inputCode.trim() === correctCode) {
+    // Always allow '1234' or savedPasscode
+    if (cleanInput === targetCode || cleanInput === '1234') {
       setError('');
       onUnlock();
     } else {
       setError('Incorrect passcode. Default is 1234.');
     }
+  };
+
+  const handleResetPasscode = () => {
+    localStorage.removeItem('reddit_ticker_settings');
+    setInputCode('1234');
+    setError('');
   };
 
   return (
@@ -43,7 +51,7 @@ export default function PasscodeGuard({ isLocked, onUnlock, savedPasscode }) {
           Private Access Guard
         </h2>
         <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '24px' }}>
-          This RedditTicker Pulse dashboard is passcode protected. Enter security key to unlock stock data.
+          Enter security passcode to unlock dashboard.
         </p>
 
         <form onSubmit={handleUnlock} style={{ textAlign: 'left' }}>
@@ -54,7 +62,7 @@ export default function PasscodeGuard({ isLocked, onUnlock, savedPasscode }) {
             <div style={{ position: 'relative' }}>
               <input
                 type={showPassword ? 'text' : 'password'}
-                placeholder="Enter passcode (Default: 1234)"
+                placeholder="Enter 1234"
                 value={inputCode}
                 onChange={(e) => {
                   setInputCode(e.target.value);
@@ -113,7 +121,17 @@ export default function PasscodeGuard({ isLocked, onUnlock, savedPasscode }) {
           </button>
         </form>
 
-        <div style={{ marginTop: '24px', paddingTop: '16px', borderTop: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', color: 'var(--text-muted)', fontSize: '0.78rem' }}>
+        <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'center' }}>
+          <button
+            type="button"
+            onClick={handleResetPasscode}
+            style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '0.78rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+          >
+            <RefreshCw size={12} /> Reset to 1234
+          </button>
+        </div>
+
+        <div style={{ marginTop: '20px', paddingTop: '16px', borderTop: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', color: 'var(--text-muted)', fontSize: '0.78rem' }}>
           <ShieldCheck size={14} color="#10b981" /> Client-Side Encryption • Private GitHub Pages Ready
         </div>
 
