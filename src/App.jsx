@@ -12,10 +12,10 @@ import SettingsModal from './components/SettingsModal';
 import { Flame, BarChart2, Newspaper, MessageSquare, Sparkles } from 'lucide-react';
 
 import { fetchSubredditPosts, SUBREDDITS } from './services/redditApi';
-import { compileStockAnalytics, fetchUSDEURRate, DEFAULT_USD_EUR_RATE } from './services/stockApi';
+import { compileStockAnalytics, fetchUSDEURRate, fetchFinnhubQuote, DEFAULT_USD_EUR_RATE } from './services/stockApi';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('leaderboard'); // 'leaderboard', 'analytics', 'news'
+  const [activeTab, setActiveTab] = useState('leaderboard');
   const [selectedSubreddits, setSelectedSubreddits] = useState(SUBREDDITS.map(s => s.id));
   const [searchTerm, setSearchTerm] = useState('');
   const [posts, setPosts] = useState([]);
@@ -37,13 +37,16 @@ export default function App() {
 
   const [settings, setSettings] = useState(() => {
     const saved = localStorage.getItem('reddit_ticker_settings');
-    return saved ? JSON.parse(saved) : {
-      apiMode: 'public',
+    const defaultSettings = {
+      apiMode: 'custom',
       redditClientId: '',
       redditClientSecret: '',
-      finnhubApiKey: '',
-      refreshInterval: 10 // High-Speed Default: 10s
+      finnhubApiKey: '***REMOVED***', // Pre-filled active Finnhub key!
+      refreshInterval: 5
     };
+    if (!saved) return defaultSettings;
+    const parsed = JSON.parse(saved);
+    return { ...defaultSettings, ...parsed, finnhubApiKey: parsed.finnhubApiKey || '***REMOVED***' };
   });
 
   const handleToggleWatchlist = (symbol) => {
@@ -94,7 +97,22 @@ export default function App() {
       const fetchedPosts = await fetchSubredditPosts(selectedSubreddits);
       setPosts(fetchedPosts);
 
-      const compiled = compileStockAnalytics(fetchedPosts);
+      const compiled = compileStockAnalytics(fetchedPosts, settings.finnhubApiKey);
+
+      // Live Finnhub Quote Updates for Top Tickers if Finnhub Key is provided
+      if (settings.finnhubApiKey) {
+        const topSymbols = compiled.slice(0, 5).map(s => s.symbol);
+        const quotePromises = topSymbols.map(sym => fetchFinnhubQuote(sym, settings.finnhubApiKey));
+        const quotes = await Promise.all(quotePromises);
+
+        quotes.forEach((q, idx) => {
+          if (q && compiled[idx]) {
+            compiled[idx].price = q.price;
+            compiled[idx].change24h = q.change24h;
+          }
+        });
+      }
+
       setStocks(compiled);
       setLastUpdated(Date.now());
     } catch (err) {
@@ -113,7 +131,7 @@ export default function App() {
       }, settings.refreshInterval * 1000);
       return () => clearInterval(interval);
     }
-  }, [selectedSubreddits, settings.refreshInterval]);
+  }, [selectedSubreddits, settings.refreshInterval, settings.finnhubApiKey]);
 
   const filteredStocks = stocks.filter(stock => {
     if (!searchTerm.trim()) return true;
@@ -139,7 +157,7 @@ export default function App() {
 
       <main style={{ maxWidth: '1400px', margin: '0 auto', padding: '20px 20px 60px' }}>
         
-        {/* Sleek Uncluttered View Navigation Bar */}
+        {/* View Navigation Bar */}
         <div style={{
           display: 'flex',
           alignItems: 'center',
@@ -220,7 +238,7 @@ export default function App() {
 
           <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', paddingRight: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
             <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981' }}></span>
-            Subreddits: <strong>{selectedSubreddits.length}/8 Active</strong>
+            Finnhub Key: <strong style={{ color: '#10b981' }}>Active 🟢</strong>
           </div>
         </div>
 

@@ -1,4 +1,4 @@
-// Stock Market Data Service, Valuation Engine, Risk Model, Timing Engine, News Stream & Real-Time FX Converter
+// Stock Market Data Service, Valuation Engine, Risk Model, Timing Engine, News Stream, Finnhub Live Fetcher & FX Converter
 
 export const DEFAULT_USD_EUR_RATE = 0.92; // 1 USD = 0.92 EUR
 
@@ -27,6 +27,29 @@ export function formatCurrency(usdAmount, currencyMode = 'DUAL', fxRate = DEFAUL
   if (currencyMode === 'EUR') return eurStr;
   if (currencyMode === 'USD') return usdStr;
   return `${usdStr} (${eurStr})`;
+}
+
+// Live Finnhub Quote Fetcher
+export async function fetchFinnhubQuote(symbol, apiKey) {
+  if (!apiKey) return null;
+  try {
+    const res = await fetch(`https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${apiKey}`);
+    if (res.ok) {
+      const data = await res.json();
+      if (data && typeof data.c === 'number' && data.c > 0) {
+        return {
+          price: parseFloat(data.c.toFixed(2)),
+          change24h: parseFloat((data.dp || 0).toFixed(2)),
+          high: data.h,
+          low: data.l,
+          open: data.o
+        };
+      }
+    }
+  } catch (err) {
+    console.warn(`Finnhub quote fetch fallback for ${symbol}:`, err.message);
+  }
+  return null;
 }
 
 export const MASTER_STOCKS_DATABASE = {
@@ -674,7 +697,7 @@ export function fetchStockNews(symbol) {
   ];
 }
 
-export function compileStockAnalytics(posts) {
+export function compileStockAnalytics(posts, finnhubApiKey = null) {
   const tickerMentions = {};
 
   posts.forEach(post => {
