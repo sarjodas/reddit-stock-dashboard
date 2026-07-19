@@ -13,7 +13,7 @@ import SettingsModal from './components/SettingsModal';
 import { Flame, BarChart2, Newspaper, MessageSquare, Sparkles, ShieldCheck } from 'lucide-react';
 
 import { fetchSubredditPosts, SUBREDDITS } from './services/redditApi';
-import { compileStockAnalytics, fetchUSDEURRate, fetchLiveYahooQuote, DEFAULT_USD_EUR_RATE, DEFAULT_USD_INR_RATE, MASTER_STOCKS_DATABASE } from './services/stockApi';
+import { compileStockAnalytics, fetchUSDEURRate, fetchLiveYahooQuote, fetchLiveStockNews, DEFAULT_USD_EUR_RATE, DEFAULT_USD_INR_RATE, MASTER_STOCKS_DATABASE } from './services/stockApi';
 import { fetchDynamicStockInfo } from './services/dynamicStockFetcher';
 
 export default function App() {
@@ -128,6 +128,16 @@ export default function App() {
         if (q && compiled[idx]) {
           compiled[idx].price = q.price;
           compiled[idx].change24h = q.change24h;
+        }
+      });
+
+      // Fetch live news from Finnhub for each stock (top 8 to stay within rate limits)
+      const newsSymbols = compiled.slice(0, 8);
+      const newsPromises = newsSymbols.map(s => fetchLiveStockNews(s.symbol, settings.finnhubApiKey));
+      const newsResults = await Promise.all(newsPromises);
+      newsResults.forEach((news, idx) => {
+        if (news && compiled[idx]) {
+          compiled[idx].newsFeed = news;
         }
       });
 

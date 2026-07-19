@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Newspaper, ExternalLink, TrendingUp, TrendingDown, Clock, Tag } from 'lucide-react';
-import { STOCK_NEWS_DATABASE } from '../services/stockApi';
 
 export default function StockNewsFeed({ stocks }) {
   const [selectedTicker, setSelectedTicker] = useState('ALL');

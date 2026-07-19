@@ -1171,19 +1171,80 @@ export function calculateTimingScore(tickerData, postMetrics) {
   return { timingScore, signal, badgeClass, icon, reasoning, channelPos: Math.round(channelPos * 100) };
 }
 
-export const STOCK_NEWS_DATABASE = {
-  DHER: [
-    { id: 'dher1', title: 'Delivery Hero Glovo Revenue Surges Across European & Asian Markets', source: 'Handelsblatt', time: '1 hour ago', impact: 'Positive', impactText: 'Free cash flow breakeven milestones reached on XETRA DHER.DE', url: 'https://finance.yahoo.com' }
-  ],
-  RELIANCE: [
-    { id: 'rel1', title: 'Reliance Jio 5G Subscribers Reach 150M Benchmark Across India', source: 'Economic Times', time: '1 hour ago', impact: 'Positive', impactText: 'ARPU tariff increases accelerating telecom free cash flow', url: 'https://finance.yahoo.com' }
-  ]
-};
+// Live News Fetcher via Finnhub Company News API
+const newsCache = new Map();
 
-export function fetchStockNews(symbol) {
-  return STOCK_NEWS_DATABASE[symbol] || [
-    { id: 'gen1', title: `${symbol} Global Market & Earnings Performance Overview`, source: 'Reuters Financial', time: '3 hours ago', impact: 'Neutral', impactText: 'Analyst sentiment remains balanced ahead of earnings call.', url: 'https://finance.yahoo.com' }
+export async function fetchLiveStockNews(symbol, apiKey) {
+  if (newsCache.has(symbol)) {
+    return newsCache.get(symbol);
+  }
+
+  // Build date range: last 7 days
+  const now = new Date();
+  const weekAgo = new Date(now.getTime() - 7 * 24 * 3600 * 1000);
+  const toDate = now.toISOString().slice(0, 10);
+  const fromDate = weekAgo.toISOString().slice(0, 10);
+
+  try {
+    const res = await fetch(
+      `https://finnhub.io/api/v1/company-news?symbol=${symbol}&from=${fromDate}&to=${toDate}&token=${apiKey}`
+    );
+    if (!res.ok) throw new Error('Finnhub news API error');
+    const articles = await res.json();
+
+    if (!Array.isArray(articles) || articles.length === 0) {
+      const fallback = createFallbackNews(symbol);
+      newsCache.set(symbol, fallback);
+      return fallback;
+    }
+
+    // Take the top 3 most recent articles and map to our format
+    const mapped = articles.slice(0, 3).map((a, idx) => {
+      const ageMs = Date.now() - a.datetime * 1000;
+      const ageHours = Math.floor(ageMs / (3600 * 1000));
+      const ageDays = Math.floor(ageHours / 24);
+      const timeLabel = ageDays > 0 ? `${ageDays}d ago` : ageHours > 0 ? `${ageHours}h ago` : 'Just now';
+
+      // Simple sentiment heuristic from headline keywords
+      const headlineLower = (a.headline || '').toLowerCase();
+      let impact = 'Neutral';
+      if (/surge|soar|beat|record|upgrade|buy|bull|growth|profit|strong|outperform|raise/i.test(headlineLower)) {
+        impact = 'Positive';
+      } else if (/crash|plunge|sell|downgrade|miss|loss|warn|cut|bear|decline|risk|weak/i.test(headlineLower)) {
+        impact = 'Negative';
+      }
+
+      return {
+        id: `live-${symbol}-${a.id || idx}`,
+        title: a.headline || `${symbol} Market Update`,
+        source: a.source || 'Finnhub',
+        time: timeLabel,
+        impact,
+        impactText: a.summary ? (a.summary.length > 160 ? a.summary.slice(0, 157) + '...' : a.summary) : '',
+        url: a.url || `https://finance.yahoo.com/quote/${symbol}`,
+        image: a.image || null
+      };
+    });
+
+    newsCache.set(symbol, mapped);
+    return mapped;
+  } catch (err) {
+    console.warn(`Live news fetch failed for ${symbol}:`, err.message);
+    const fallback = createFallbackNews(symbol);
+    newsCache.set(symbol, fallback);
+    return fallback;
+  }
+}
+
+function createFallbackNews(symbol) {
+  return [
+    { id: `fb-${symbol}`, title: `${symbol} Global Market & Earnings Performance Overview`, source: 'Reuters Financial', time: 'Today', impact: 'Neutral', impactText: 'Analyst sentiment remains balanced ahead of the next earnings call.', url: `https://finance.yahoo.com/quote/${symbol}` }
   ];
+}
+
+// Legacy sync fallback (used during initial compile before async news loads)
+export function fetchStockNews(symbol) {
+  return createFallbackNews(symbol);
 }
 
 export function compileStockAnalytics(posts, finnhubApiKey = null, dynamicCacheUpdates = {}, activeSubredditCount = 16, totalSubredditCount = 16) {
