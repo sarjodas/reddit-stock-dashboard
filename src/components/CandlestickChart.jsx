@@ -189,7 +189,7 @@ export default function CandlestickChart({ symbol, basePrice, currencyMode, fxRa
               alignItems: 'center'
             }}>
               <span style={{ color: '#38bdf8', fontWeight: 800 }}>📅 {activeCandle.label}:</span>
-              <span>Stock: <strong style={{ color: '#fff' }}>{formatCurrency(activeCandle.close, 'USD', fxRate, nativeCurrency)}</strong></span>
+              <span>Stock: <strong style={{ color: '#fff' }}>{formatCurrency(activeCandle.close, currencyMode, fxRate, nativeCurrency)}</strong></span>
               <span>EUR: <strong style={{ color: '#34d399' }}>€{activePriceEUR.toFixed(2)}</strong></span>
               <span>O: <strong style={{ color: 'var(--text-muted)' }}>{activeCandle.open}</strong></span>
               <span>H: <strong style={{ color: '#10b981' }}>{activeCandle.high}</strong></span>

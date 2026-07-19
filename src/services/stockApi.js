@@ -22,14 +22,31 @@ export async function fetchUSDEURRate() {
   return { eur: DEFAULT_USD_EUR_RATE, inr: DEFAULT_USD_INR_RATE };
 }
 
-export function formatCurrency(usdAmount, currencyMode = 'DUAL', fxRates = { eur: DEFAULT_USD_EUR_RATE, inr: DEFAULT_USD_INR_RATE }, nativeCurrency = 'USD') {
-  if (typeof usdAmount !== 'number' || isNaN(usdAmount)) return '€0.00';
+export function formatCurrency(amount, currencyMode = 'DUAL', fxRates = { eur: DEFAULT_USD_EUR_RATE, inr: DEFAULT_USD_INR_RATE }, nativeCurrency = 'USD') {
+  if (typeof amount !== 'number' || isNaN(amount)) return '€0.00';
   
-  const eurRate = typeof fxRates === 'object' ? (fxRates.eur || DEFAULT_USD_EUR_RATE) : fxRates;
+  const eurRate = typeof fxRates === 'object' ? (fxRates.eur || DEFAULT_USD_EUR_RATE) : (fxRates || DEFAULT_USD_EUR_RATE);
   const inrRate = typeof fxRates === 'object' ? (fxRates.inr || DEFAULT_USD_INR_RATE) : DEFAULT_USD_INR_RATE;
 
-  const eurAmount = usdAmount * eurRate;
-  const inrAmount = usdAmount * inrRate;
+  let usdAmount, eurAmount, inrAmount;
+
+  if (nativeCurrency === 'EUR') {
+    eurAmount = amount;
+    usdAmount = amount / (eurRate || 0.92);
+    inrAmount = usdAmount * inrRate;
+  } else if (nativeCurrency === 'INR') {
+    inrAmount = amount;
+    usdAmount = amount / (inrRate || 83.5);
+    eurAmount = usdAmount * eurRate;
+  } else if (nativeCurrency === 'GBP') {
+    usdAmount = amount / 0.79;
+    eurAmount = usdAmount * eurRate;
+    inrAmount = usdAmount * inrRate;
+  } else {
+    usdAmount = amount;
+    eurAmount = usdAmount * eurRate;
+    inrAmount = usdAmount * inrRate;
+  }
 
   const eurStr = `€${eurAmount.toFixed(2)}`;
   const usdStr = `$${usdAmount.toFixed(2)}`;
@@ -39,9 +56,9 @@ export function formatCurrency(usdAmount, currencyMode = 'DUAL', fxRates = { eur
   if (currencyMode === 'INR') return inrStr;
   if (currencyMode === 'USD') return usdStr;
 
-  if (nativeCurrency === 'EUR') return eurStr;
+  if (nativeCurrency === 'EUR') return `${eurStr} (${usdStr})`;
   if (nativeCurrency === 'INR') return `${inrStr} (${eurStr})`;
-  if (nativeCurrency === 'GBP') return `£${(usdAmount * 0.79).toFixed(2)} (${eurStr})`;
+  if (nativeCurrency === 'GBP') return `£${amount.toFixed(2)} (${eurStr})`;
   return `${usdStr} (${eurStr})`;
 }
 
@@ -91,9 +108,9 @@ export const MASTER_STOCKS_DATABASE = {
     country: '🇩🇪 Germany / Europe',
     nativeCurrency: 'EUR',
     brokers: ['Scalable', 'Trading 212', 'Revolut'],
-    price: 28.70,
-    change24h: 4.20,
-    marketCap: '€7.2 Billion ($7.8B)',
+    price: 38.96,
+    change24h: 3.45,
+    marketCap: '€10.8 Billion ($11.7B)',
     peRatio: -15.4,
     pbRatio: 2.8,
     eps: -1.72,
@@ -101,14 +118,14 @@ export const MASTER_STOCKS_DATABASE = {
     week52Low: 16.20,
     beta: 1.85,
     volatility: 52.0,
-    sparkline: [22, 23.5, 24, 25, 24.8, 25.5, 26.40],
+    sparkline: [32, 33.5, 35, 36.2, 37.8, 38.5, 38.96],
     isEmergingGem: true,
     gemReason: 'Leading European & Asian food delivery network with free cash flow inflection',
     catalyst: 'Glovo & Foodpanda market expansion and positive adjusted EBITDA acceleration',
     downsideRisk: 'European tech delivery price competition & quick-commerce debt obligations',
     analystRating: 'Buy',
     analystScore: 4.3,
-    targetPrice: 41.30,
+    targetPrice: 48.50,
     targetLow: 23.90,
     targetHigh: 54.35,
     buyCount: 16,
