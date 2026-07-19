@@ -10,8 +10,14 @@ const brokerColor = b =>
 export default function TickerLeaderboard({ stocks, watchlist, onToggleWatchlist, onSelectTicker, currencyMode, fxRate }) {
   const [horizonFilter, setHorizonFilter] = useState('all');
   const [regionFilter,  setRegionFilter]  = useState('all');
+  const [hideDeadStocks, setHideDeadStocks] = useState(true);
 
   let filtered = [...stocks];
+  
+  // Dead stock filter
+  if (hideDeadStocks) {
+    filtered = filtered.filter(s => !s.isDeadStock);
+  }
 
   // Region filter
   if (regionFilter === 'europe') {
@@ -73,6 +79,17 @@ export default function TickerLeaderboard({ stocks, watchlist, onToggleWatchlist
             <button onClick={() => setHorizonFilter('long')}      className={`pill-btn ${horizonFilter === 'long'      ? 'active' : ''}`} style={{ padding: '4px 9px', fontSize: '0.72rem' }}>🏛️ Long-Term</button>
             <button onClick={() => setHorizonFilter('short')}     className={`pill-btn ${horizonFilter === 'short'     ? 'active' : ''}`} style={{ padding: '4px 9px', fontSize: '0.72rem' }}>⚡ Momentum</button>
             <button onClick={() => setHorizonFilter('watchlist')} className={`pill-btn ${horizonFilter === 'watchlist' ? 'active' : ''}`} style={{ padding: '4px 9px', fontSize: '0.72rem' }}>⭐ Watchlist ({watchlist.length})</button>
+          </div>
+
+          {/* Dynamic Dead Stock Toggle */}
+          <div style={{ display: 'flex', background: 'rgba(0,0,0,0.45)', padding: '3px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
+            <button 
+              onClick={() => setHideDeadStocks(!hideDeadStocks)} 
+              className={`pill-btn ${hideDeadStocks ? 'active' : ''}`} 
+              style={{ padding: '4px 9px', fontSize: '0.72rem', color: hideDeadStocks ? '#f43f5e' : 'var(--text-muted)' }}
+            >
+              {hideDeadStocks ? '🚫 Dead Stocks Hidden' : '💀 Show Dead Stocks'}
+            </button>
           </div>
 
         </div>

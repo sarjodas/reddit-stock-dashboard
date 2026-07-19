@@ -1325,10 +1325,8 @@ export function compileStockAnalytics(posts, finnhubApiKey = null, dynamicCacheU
     const hasLowChatter = totalMentions < 5 || mentionChange24h <= 0;
     const isAnalystBearish = (baseData.analystScore || 3.5) < 3.5 || ['Sell', 'Strong Sell', 'Underperform'].includes(baseData.analystRating);
 
-    // If it's a small cap losing Reddit momentum AND Wall Street doesn't like it, drop it from the dashboard.
-    if (isSmallCap && hasLowChatter && isAnalystBearish) {
-      return; 
-    }
+    // Flag as dead stock instead of dropping it entirely, so UI can toggle
+    enriched.isDeadStock = isSmallCap && hasLowChatter && isAnalystBearish;
 
     results.push(enriched);
   });
