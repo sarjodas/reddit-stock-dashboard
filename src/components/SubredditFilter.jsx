@@ -74,7 +74,7 @@ export default function SubredditFilter({
           </span>
         </div>
 
-        <div style={{ display: 'flex', background: 'rgba(0, 0, 0, 0.45)', padding: '3px', borderRadius: 'var(--radius-full)', border: '1px solid var(--border-color)' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', background: 'rgba(0, 0, 0, 0.45)', padding: '3px', borderRadius: 'var(--radius-full)', border: '1px solid var(--border-color)' }}>
           <button
             onClick={() => onChangeBroker('all')}
             className={`pill-btn ${brokerFilter === 'all' ? 'active' : ''}`}
@@ -102,6 +102,20 @@ export default function SubredditFilter({
             style={{ padding: '5px 14px', fontSize: '0.76rem' }}
           >
             💳 Revolut
+          </button>
+          <button
+            onClick={() => onChangeBroker('Zerodha')}
+            className={`pill-btn ${brokerFilter === 'Zerodha' ? 'active' : ''}`}
+            style={{ padding: '5px 14px', fontSize: '0.76rem' }}
+          >
+            🇮🇳 Zerodha
+          </button>
+          <button
+            onClick={() => onChangeBroker('Interactive Brokers')}
+            className={`pill-btn ${brokerFilter === 'Interactive Brokers' ? 'active' : ''}`}
+            style={{ padding: '5px 14px', fontSize: '0.76rem' }}
+          >
+            🏦 IBKR
           </button>
         </div>
       </div>
