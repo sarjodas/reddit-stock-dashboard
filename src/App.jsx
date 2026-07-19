@@ -14,7 +14,6 @@ import { fetchSubredditPosts, SUBREDDITS } from './services/redditApi';
 import { compileStockAnalytics, fetchUSDEURRate, DEFAULT_USD_EUR_RATE } from './services/stockApi';
 
 export default function App() {
-  // Passcode guard removed — dashboard opens directly
   const [selectedSubreddits, setSelectedSubreddits] = useState(SUBREDDITS.map(s => s.id));
   const [searchTerm, setSearchTerm] = useState('');
   const [posts, setPosts] = useState([]);
@@ -41,7 +40,7 @@ export default function App() {
       redditClientId: '',
       redditClientSecret: '',
       finnhubApiKey: '',
-      refreshInterval: 60
+      refreshInterval: 10 // High-speed default: Every 10 seconds!
     };
   });
 

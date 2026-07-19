@@ -32,7 +32,7 @@ export default function SettingsModal({ isOpen, onClose, settings, onSaveSetting
             </div>
             <div>
               <h2 style={{ fontSize: '1.25rem', fontWeight: 700 }}>API & Dashboard Settings</h2>
-              <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Configure Reddit OAuth, Stock Market Providers & Security Passcode</p>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Configure Reddit OAuth, Auto-Refresh Rates & Stock Market Data Providers</p>
             </div>
           </div>
           <button onClick={onClose} className="btn-icon">
@@ -116,39 +116,27 @@ export default function SettingsModal({ isOpen, onClose, settings, onSaveSetting
             </div>
           )}
 
-          {/* Security & Passcode Section */}
-          <div style={{ marginBottom: '20px', padding: '14px', background: 'rgba(255, 255, 255, 0.03)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
-              <Lock size={16} color="#38bdf8" />
-              <label style={{ fontSize: '0.85rem', fontWeight: 600 }}>Security Lock Passcode</label>
-            </div>
-            <input
-              type="text"
-              placeholder="Set passcode (Current: 1234)"
-              value={formData.passcode || '1234'}
-              onChange={(e) => handleChange('passcode', e.target.value)}
-              style={{ width: '100%', padding: '10px', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: '#fff', fontFamily: 'var(--font-mono)' }}
-            />
-            <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '6px' }}>
-              This passcode protects your GitHub Pages dashboard access.
-            </p>
-          </div>
-
           {/* Auto Refresh Setting */}
           <div style={{ marginBottom: '24px' }}>
             <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px' }}>
-              Auto-Refresh Interval
+              ⚡ High-Speed Auto-Refresh Rate
             </label>
             <select
-              value={formData.refreshInterval || 60}
+              value={formData.refreshInterval !== undefined ? formData.refreshInterval : 10}
               onChange={(e) => handleChange('refreshInterval', Number(e.target.value))}
               style={{ width: '100%', padding: '10px', background: '#1a2234', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: '#fff' }}
             >
-              <option value={0}>Manual Only (Off)</option>
+              <option value={5}>⚡ Ultra Fast — Every 5 Seconds</option>
+              <option value={10}>🚀 High Speed — Every 10 Seconds (Recommended)</option>
+              <option value={15}>Every 15 Seconds</option>
               <option value={30}>Every 30 Seconds</option>
               <option value={60}>Every 1 Minute</option>
               <option value={300}>Every 5 Minutes</option>
+              <option value={0}>Manual Refresh Only (Off)</option>
             </select>
+            <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '6px' }}>
+              Select how frequently live Reddit tickers and prices refresh automatically.
+            </p>
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
