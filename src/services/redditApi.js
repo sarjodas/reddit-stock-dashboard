@@ -96,6 +96,7 @@ export const MOCK_REDDIT_POSTS = [
     url: 'https://reddit.com/r/ValueInvesting',
     tickers: ['PLTR'],
     sentiment: { score: 0.89, label: 'Bullish', confidence: 'High' },
+    summary: 'Palantir AIP enterprise adoption is accelerating rapidly with bootcamp conversion rates exceeding expectations.'
   },
   {
     id: 'p_us3',
@@ -107,6 +108,8 @@ export const MOCK_REDDIT_POSTS = [
     createdUtc: Date.now() - 3600 * 1000 * 2,
     url: 'https://reddit.com/r/investing',
     tickers: ['SPCX'],
+    sentiment: { score: 0.95, label: 'Bullish', confidence: 'High' },
+    summary: 'Starlink cash flow generation combined with Starship launch dominance makes SpaceX the premier aerospace monopoly.'
   },
   {
     id: 'p_us4',

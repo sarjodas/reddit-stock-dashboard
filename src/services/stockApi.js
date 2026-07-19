@@ -1053,8 +1053,8 @@ export function compileStockAnalytics(posts, finnhubApiKey = null, dynamicCacheU
       }
 
       tickerMentions[symbol].mentionCount += 1;
-      if (post.sentiment.label === 'Bullish') tickerMentions[symbol].bullishCount += 1;
-      if (post.sentiment.label === 'Bearish') tickerMentions[symbol].bearishCount += 1;
+      if (post.sentiment?.label === 'Bullish') tickerMentions[symbol].bullishCount += 1;
+      if (post.sentiment?.label === 'Bearish') tickerMentions[symbol].bearishCount += 1;
       tickerMentions[symbol].subreddits.add(post.subreddit);
       tickerMentions[symbol].posts.push(post);
     });
