@@ -42,9 +42,9 @@ export default function CandlestickChart({ symbol, basePrice, currencyMode, fxRa
       if (tf === '1D') {
         label = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
       } else if (tf === '1Y') {
-        label = dateObj.toLocaleDateString([], { month: 'short', year: '2-digit' });
+        label = `${dateObj.toLocaleString('en-US', { month: 'short' })} '${dateObj.getFullYear().toString().slice(-2)}`;
       } else {
-        label = dateObj.toLocaleDateString([], { month: 'short', day: 'numeric' });
+        label = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
       }
 
       reversedCandles.push({
