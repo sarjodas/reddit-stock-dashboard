@@ -10,50 +10,57 @@ export default function CandlestickChart({ symbol, basePrice, currencyMode, fxRa
   const [isTickUp, setIsTickUp] = useState(true);
   const [candles, setCandles] = useState([]);
 
-  // Generate realistic OHLC candles based on timeframe & basePrice
+  // Generate realistic OHLC candles based on timeframe & basePrice (walk backwards to avoid end-of-chart jumps)
   const generateCandleData = (tf, price) => {
     const count = tf === '1D' ? 24 : tf === '1W' ? 30 : tf === '1M' ? 30 : 52;
-    const volatilityPct = tf === '1D' ? 0.008 : tf === '1W' ? 0.018 : 0.035;
+    const volatilityPct = tf === '1D' ? 0.006 : tf === '1W' ? 0.014 : 0.025;
     
-    let currentOpen = price * (1 - (volatilityPct * count * 0.3));
-    const result = [];
+    const now = new Date();
+    const reversedCandles = [];
+    let currentClose = price;
 
     for (let i = 0; i < count; i++) {
-      const change = (Math.random() - 0.47) * currentOpen * volatilityPct;
-      const close = Math.max(1, currentOpen + change);
-      const high = Math.max(currentOpen, close) + Math.random() * currentOpen * (volatilityPct * 0.7);
-      const low = Math.min(currentOpen, close) - Math.random() * currentOpen * (volatilityPct * 0.7);
+      const change = (Math.random() - 0.49) * currentClose * volatilityPct;
+      const open = Math.max(1, currentClose - change);
+      const high = Math.max(open, currentClose) + Math.random() * currentClose * (volatilityPct * 0.4);
+      const low = Math.min(open, currentClose) - Math.random() * currentClose * (volatilityPct * 0.4);
       const volume = Math.floor(Math.random() * 500000) + 150000;
 
-      let label = `T-${count - i}`;
-      if (tf === '1D') label = `${9 + Math.floor(i * 0.3)}:${(i % 2) * 30 || '00'}`;
-      if (tf === '1W') label = `Day ${i + 1}`;
-      if (tf === '1M') label = `Day ${i + 1}`;
-      if (tf === '1Y') label = `Wk ${i + 1}`;
+      let dateObj;
+      if (tf === '1D') {
+        dateObj = new Date(now.getTime() - i * (6.5 * 3600 * 1000 / count));
+      } else if (tf === '1W') {
+        dateObj = new Date(now.getTime() - i * (7 * 86400 * 1000 / count));
+      } else if (tf === '1M') {
+        dateObj = new Date(now.getTime() - i * (30 * 86400 * 1000 / count));
+      } else {
+        dateObj = new Date(now.getTime() - i * (365 * 86400 * 1000 / count));
+      }
 
-      result.push({
-        id: i,
+      let label;
+      if (tf === '1D') {
+        label = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+      } else if (tf === '1Y') {
+        label = dateObj.toLocaleDateString([], { month: 'short', year: '2-digit' });
+      } else {
+        label = dateObj.toLocaleDateString([], { month: 'short', day: 'numeric' });
+      }
+
+      reversedCandles.push({
+        id: count - 1 - i,
         label,
-        open: parseFloat(currentOpen.toFixed(2)),
+        open: parseFloat(open.toFixed(2)),
         high: parseFloat(high.toFixed(2)),
         low: parseFloat(low.toFixed(2)),
-        close: parseFloat(close.toFixed(2)),
+        close: parseFloat(currentClose.toFixed(2)),
         volume,
-        isBullish: close >= currentOpen
+        isBullish: currentClose >= open
       });
 
-      currentOpen = close;
+      currentClose = open;
     }
 
-    // Ensure last candle close matches live price
-    if (result.length > 0) {
-      result[result.length - 1].close = price;
-      result[result.length - 1].high = Math.max(result[result.length - 1].high, price);
-      result[result.length - 1].low = Math.min(result[result.length - 1].low, price);
-      result[result.length - 1].isBullish = result[result.length - 1].close >= result[result.length - 1].open;
-    }
-
-    return result;
+    return reversedCandles.reverse();
   };
 
   // Initialize candles on symbol/timeframe change
@@ -283,6 +290,36 @@ export default function CandlestickChart({ symbol, basePrice, currencyMode, fxRa
                     />
                   </>
                 )}
+              </g>
+            );
+          })}
+
+          {/* X-Axis Date / Time Axis Labels */}
+          {candles.map((candle, idx) => {
+            const step = Math.max(1, Math.floor(candles.length / 5));
+            if (idx % step !== 0 && idx !== candles.length - 1) return null;
+
+            const xCenter = idx * candleGap + candleGap / 2;
+            return (
+              <g key={`x-label-${idx}`}>
+                <line
+                  x1={xCenter}
+                  y1={height - 22}
+                  x2={xCenter}
+                  y2={height - 18}
+                  stroke="rgba(255, 255, 255, 0.2)"
+                />
+                <text
+                  x={xCenter}
+                  y={height - 4}
+                  fill="#94a3b8"
+                  fontSize="9.5"
+                  fontWeight="600"
+                  textAnchor="middle"
+                  fontFamily="var(--font-mono)"
+                >
+                  {candle.label}
+                </text>
               </g>
             );
           })}

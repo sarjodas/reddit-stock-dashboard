@@ -1094,17 +1094,24 @@ export function compileStockAnalytics(posts, finnhubApiKey = null, dynamicCacheU
       sellCount: 1
     };
 
+    let seed = 0;
+    for (let i = 0; i < symbol.length; i++) {
+      seed = (seed << 5) - seed + symbol.charCodeAt(i);
+      seed |= 0;
+    }
+    seed = Math.abs(seed);
+
     const metrics = tickerMentions[symbol] || {
-      mentionCount: Math.floor(Math.random() * 40) + 12,
-      bullishCount: 20,
-      bearishCount: 5,
+      mentionCount: (seed % 35) + 12,
+      bullishCount: (seed % 20) + 10,
+      bearishCount: (seed % 6) + 1,
       subreddits: new Set(['stocks', 'wallstreetbets']),
       posts: []
     };
 
     const totalMentions = metrics.mentionCount;
     const bullishRatio = Math.round((metrics.bullishCount / Math.max(1, metrics.bullishCount + metrics.bearishCount)) * 100);
-    const mentionChange24h = Math.round((Math.random() * 180) - 20);
+    const mentionChange24h = (seed % 140) - 20;
 
     const postMetrics = {
       mentionCount: totalMentions,
