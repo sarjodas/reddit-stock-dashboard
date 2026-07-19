@@ -1313,6 +1313,23 @@ export function compileStockAnalytics(posts, finnhubApiKey = null, dynamicCacheU
                        + mentionLog 
                        + sentimentBonus;
 
+    // Filter out dead small stocks (low/negative chatter AND bearish/neutral analysts)
+    let isSmallCap = false;
+    if (baseData.marketCap.includes('Million')) {
+      isSmallCap = true;
+    } else if (baseData.marketCap.includes('Billion')) {
+      const capNum = parseFloat(baseData.marketCap.replace(/[^0-9.]/g, ''));
+      if (capNum && capNum < 10) isSmallCap = true;
+    }
+
+    const hasLowChatter = totalMentions < 5 || mentionChange24h <= 0;
+    const isAnalystBearish = (baseData.analystScore || 3.5) < 3.5 || ['Sell', 'Strong Sell', 'Underperform'].includes(baseData.analystRating);
+
+    // If it's a small cap losing Reddit momentum AND Wall Street doesn't like it, drop it from the dashboard.
+    if (isSmallCap && hasLowChatter && isAnalystBearish) {
+      return; 
+    }
+
     results.push(enriched);
   });
 
