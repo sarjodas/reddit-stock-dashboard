@@ -62,6 +62,46 @@ export function formatCurrency(amount, currencyMode = 'DUAL', fxRates = { eur: D
   return `${usdStr} (${eurStr})`;
 }
 
+// Live Yahoo Finance Quote Fetcher (Open endpoint - no API key required)
+export async function fetchLiveYahooQuote(symbol) {
+  const yahooSymbolMap = {
+    DHER: 'DHER.DE',
+    RHM: 'RHM.DE',
+    ZAL: 'ZAL.DE',
+    HFG: 'HFG.DE',
+    SAP: 'SAP.DE',
+    ASML: 'ASML.AS',
+    RELIANCE: 'RELIANCE.NS',
+    TCS: 'TCS.NS',
+    TATAMOTORS: 'TATAMOTORS.NS'
+  };
+
+  const targetSymbol = yahooSymbolMap[symbol] || symbol;
+
+  try {
+    const res = await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${targetSymbol}`);
+    if (res.ok) {
+      const data = await res.json();
+      const meta = data?.chart?.result?.[0]?.meta;
+      if (meta && typeof meta.regularMarketPrice === 'number' && meta.regularMarketPrice > 0) {
+        const price = meta.regularMarketPrice;
+        const prevClose = meta.previousClose || price;
+        const changePct = ((price - prevClose) / prevClose) * 100;
+        return {
+          price: parseFloat(price.toFixed(2)),
+          change24h: parseFloat(changePct.toFixed(2)),
+          high: meta.regularMarketDayHigh || price,
+          low: meta.regularMarketDayLow || price,
+          open: prevClose
+        };
+      }
+    }
+  } catch (err) {
+    console.warn(`Yahoo live fetch fallback for ${symbol}:`, err.message);
+  }
+  return null;
+}
+
 // Live Finnhub Quote Fetcher
 export async function fetchFinnhubQuote(symbol, apiKey) {
   if (!apiKey) return null;

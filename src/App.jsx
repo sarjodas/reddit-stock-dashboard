@@ -13,7 +13,7 @@ import SettingsModal from './components/SettingsModal';
 import { Flame, BarChart2, Newspaper, MessageSquare, Sparkles, ShieldCheck } from 'lucide-react';
 
 import { fetchSubredditPosts, SUBREDDITS } from './services/redditApi';
-import { compileStockAnalytics, fetchUSDEURRate, fetchFinnhubQuote, DEFAULT_USD_EUR_RATE, DEFAULT_USD_INR_RATE, MASTER_STOCKS_DATABASE } from './services/stockApi';
+import { compileStockAnalytics, fetchUSDEURRate, fetchFinnhubQuote, fetchLiveYahooQuote, DEFAULT_USD_EUR_RATE, DEFAULT_USD_INR_RATE, MASTER_STOCKS_DATABASE } from './services/stockApi';
 import { fetchDynamicStockInfo } from './services/dynamicStockFetcher';
 
 export default function App() {
@@ -121,6 +121,17 @@ export default function App() {
       }
 
       const compiled = compileStockAnalytics(fetchedPosts, settings.finnhubApiKey, dynamicCacheUpdates);
+
+      // Fetch live regularMarketPrice directly from Yahoo Finance open endpoint (no API key required)
+      const liveQuotePromises = compiled.map(s => fetchLiveYahooQuote(s.symbol));
+      const liveQuotes = await Promise.all(liveQuotePromises);
+
+      liveQuotes.forEach((q, idx) => {
+        if (q && compiled[idx]) {
+          compiled[idx].price = q.price;
+          compiled[idx].change24h = q.change24h;
+        }
+      });
 
       if (settings.finnhubApiKey && settings.finnhubApiKey !== '***REMOVED***') {
         const topSymbols = compiled.slice(0, 5).map(s => s.symbol);
