@@ -879,9 +879,17 @@ export function fetchStockNews(symbol) {
 
 export function compileStockAnalytics(posts, finnhubApiKey = null) {
   const tickerMentions = {};
+  const processedPostIds = new Set();
 
   posts.forEach(post => {
-    post.tickers.forEach(symbol => {
+    // Prevent duplicate counting of the same post
+    if (processedPostIds.has(post.id)) return;
+    processedPostIds.add(post.id);
+
+    // Prevent counting the same ticker multiple times in a single post
+    const uniqueTickers = [...new Set(post.tickers)];
+
+    uniqueTickers.forEach(symbol => {
       if (!tickerMentions[symbol]) {
         tickerMentions[symbol] = {
           mentionCount: 0,
