@@ -1,5 +1,5 @@
 import React from 'react';
-import { Flame, RefreshCw, Search, Sliders, TrendingUp } from 'lucide-react';
+import { Flame, RefreshCw, Search, Sliders, TrendingUp, Zap } from 'lucide-react';
 
 export default function Header({
   searchTerm,
@@ -9,7 +9,9 @@ export default function Header({
   onOpenSettings,
   lastUpdated,
   currencyMode,
-  onChangeCurrency
+  onChangeCurrency,
+  refreshInterval,
+  onChangeRefreshInterval
 }) {
   return (
     <header style={{
@@ -62,11 +64,11 @@ export default function Header({
         </div>
 
         {/* Search Input */}
-        <div style={{ flex: '1', maxWidth: '340px', position: 'relative' }}>
+        <div style={{ flex: '1', maxWidth: '300px', position: 'relative' }}>
           <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
           <input
             type="text"
-            placeholder="Search stock ticker (e.g. NVDA, TSLA, PLTR)..."
+            placeholder="Search ticker (NVDA, TSLA)..."
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
             style={{
@@ -83,16 +85,87 @@ export default function Header({
           />
         </div>
 
-        {/* Currency & Actions */}
+        {/* Controls: Speed, Currency & Actions */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
           
+          {/* High-Speed Auto-Refresh Rate Selector */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(0, 0, 0, 0.4)', padding: '3px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)' }}>
+            <span style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-muted)', padding: '0 4px', display: 'flex', alignItems: 'center', gap: '2px' }}>
+              <Zap size={12} color="#f59e0b" /> Auto-Refresh:
+            </span>
+            <button
+              onClick={() => onChangeRefreshInterval(5)}
+              style={{
+                padding: '3px 7px',
+                fontSize: '0.72rem',
+                fontWeight: 700,
+                border: 'none',
+                borderRadius: 'var(--radius-sm)',
+                cursor: 'pointer',
+                background: refreshInterval === 5 ? 'rgba(245, 158, 11, 0.25)' : 'transparent',
+                color: refreshInterval === 5 ? '#f59e0b' : 'var(--text-muted)'
+              }}
+              title="Refresh every 5 seconds"
+            >
+              ⚡ 5s
+            </button>
+            <button
+              onClick={() => onChangeRefreshInterval(10)}
+              style={{
+                padding: '3px 7px',
+                fontSize: '0.72rem',
+                fontWeight: 700,
+                border: 'none',
+                borderRadius: 'var(--radius-sm)',
+                cursor: 'pointer',
+                background: refreshInterval === 10 ? 'rgba(16, 185, 129, 0.25)' : 'transparent',
+                color: refreshInterval === 10 ? '#10b981' : 'var(--text-muted)'
+              }}
+              title="Refresh every 10 seconds"
+            >
+              🚀 10s
+            </button>
+            <button
+              onClick={() => onChangeRefreshInterval(30)}
+              style={{
+                padding: '3px 7px',
+                fontSize: '0.72rem',
+                fontWeight: 700,
+                border: 'none',
+                borderRadius: 'var(--radius-sm)',
+                cursor: 'pointer',
+                background: refreshInterval === 30 ? 'rgba(56, 189, 248, 0.25)' : 'transparent',
+                color: refreshInterval === 30 ? '#38bdf8' : 'var(--text-muted)'
+              }}
+              title="Refresh every 30 seconds"
+            >
+              30s
+            </button>
+            <button
+              onClick={() => onChangeRefreshInterval(0)}
+              style={{
+                padding: '3px 7px',
+                fontSize: '0.72rem',
+                fontWeight: 700,
+                border: 'none',
+                borderRadius: 'var(--radius-sm)',
+                cursor: 'pointer',
+                background: refreshInterval === 0 ? 'rgba(239, 68, 68, 0.25)' : 'transparent',
+                color: refreshInterval === 0 ? '#ef4444' : 'var(--text-muted)'
+              }}
+              title="Turn off auto refresh"
+            >
+              Off
+            </button>
+          </div>
+
           {/* Currency Toggle */}
           <div style={{ display: 'flex', background: 'rgba(0, 0, 0, 0.4)', padding: '3px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)' }}>
             <button
               onClick={() => onChangeCurrency('USD')}
               style={{
                 padding: '4px 8px',
-                fontSize: '0.75rem',
+                fontSize: '0.72rem',
                 fontWeight: 700,
                 border: 'none',
                 borderRadius: 'var(--radius-sm)',
@@ -107,7 +180,7 @@ export default function Header({
               onClick={() => onChangeCurrency('EUR')}
               style={{
                 padding: '4px 8px',
-                fontSize: '0.75rem',
+                fontSize: '0.72rem',
                 fontWeight: 700,
                 border: 'none',
                 borderRadius: 'var(--radius-sm)',
@@ -122,7 +195,7 @@ export default function Header({
               onClick={() => onChangeCurrency('DUAL')}
               style={{
                 padding: '4px 8px',
-                fontSize: '0.75rem',
+                fontSize: '0.72rem',
                 fontWeight: 700,
                 border: 'none',
                 borderRadius: 'var(--radius-sm)',
@@ -131,23 +204,23 @@ export default function Header({
                 color: currencyMode === 'DUAL' ? '#8b5cf6' : 'var(--text-muted)'
               }}
             >
-              Dual ($ / €)
+              Dual ($/€)
             </button>
           </div>
 
           <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '6px' }}>
             <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10b981', display: 'inline-block', boxShadow: '0 0 8px #10b981' }}></span>
-            {lastUpdated ? `Updated ${new Date(lastUpdated).toLocaleTimeString()}` : 'Live'}
+            {lastUpdated ? `${new Date(lastUpdated).toLocaleTimeString()}` : 'Live'}
           </div>
 
           <button
             onClick={onRefresh}
             className="btn btn-secondary"
             disabled={isLoading}
-            style={{ padding: '8px 14px' }}
+            style={{ padding: '8px 12px', fontSize: '0.78rem' }}
           >
-            <RefreshCw size={16} className={isLoading ? 'spin-anim' : ''} style={{ animation: isLoading ? 'spin 1s linear infinite' : 'none' }} />
-            {isLoading ? 'Fetching...' : 'Refresh'}
+            <RefreshCw size={14} className={isLoading ? 'spin-anim' : ''} style={{ animation: isLoading ? 'spin 1s linear infinite' : 'none' }} />
+            {isLoading ? 'Refreshing...' : 'Refresh'}
           </button>
 
           <button onClick={onOpenSettings} className="btn-icon" title="API Settings">

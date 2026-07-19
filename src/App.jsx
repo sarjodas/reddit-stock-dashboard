@@ -40,7 +40,7 @@ export default function App() {
       redditClientId: '',
       redditClientSecret: '',
       finnhubApiKey: '',
-      refreshInterval: 5 // Ultra Fast: Every 5 seconds!
+      refreshInterval: 5 // Default: Every 5 seconds!
     };
   });
 
@@ -58,6 +58,12 @@ export default function App() {
   const handleSaveSettings = (newSettings) => {
     setSettings(newSettings);
     localStorage.setItem('reddit_ticker_settings', JSON.stringify(newSettings));
+  };
+
+  const handleChangeRefreshInterval = (newInterval) => {
+    const updatedSettings = { ...settings, refreshInterval: newInterval };
+    setSettings(updatedSettings);
+    localStorage.setItem('reddit_ticker_settings', JSON.stringify(updatedSettings));
   };
 
   const handleToggleSubreddit = (subId) => {
@@ -125,6 +131,8 @@ export default function App() {
         lastUpdated={lastUpdated}
         currencyMode={currencyMode}
         onChangeCurrency={setCurrencyMode}
+        refreshInterval={settings.refreshInterval}
+        onChangeRefreshInterval={handleChangeRefreshInterval}
       />
 
       <main style={{ maxWidth: '1400px', margin: '0 auto', padding: '24px 20px 60px' }}>
