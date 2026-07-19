@@ -54,8 +54,8 @@ body {
 
 /* Ergonomic Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
   background: rgba(7, 9, 14, 0.9);
@@ -68,7 +68,7 @@ body {
   background: rgba(255, 255, 255, 0.3);
 }
 
-/* Ergonomic Glass Cards (Gestalt Grouping) */
+/* Glassmorphism Containers */
 .glass-panel {
   background: var(--bg-card);
   backdrop-filter: blur(24px);
@@ -83,12 +83,12 @@ body {
   border-color: rgba(255, 255, 255, 0.14);
 }
 
-/* HCI Interactive Pill Buttons */
+/* Touch-Friendly Pill Buttons */
 .pill-btn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 14px;
+  padding: 6px 12px;
   border-radius: var(--radius-full);
   font-size: 0.78rem;
   font-weight: 700;
@@ -98,13 +98,13 @@ body {
   cursor: pointer;
   transition: var(--transition-fast);
   user-select: none;
+  touch-action: manipulation;
 }
 
-.pill-btn:hover {
+.pill-btn:hover, .pill-btn:active {
   background: rgba(255, 255, 255, 0.08);
   color: #fff;
   border-color: rgba(255, 255, 255, 0.18);
-  transform: translateY(-1px);
 }
 
 .pill-btn.active {
@@ -114,7 +114,7 @@ body {
   box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35);
 }
 
-/* Status Badges with High Color Contrast (WCAG Compliant) */
+/* Badges */
 .badge {
   display: inline-flex;
   align-items: center;
@@ -182,7 +182,7 @@ body {
   font-family: var(--font-mono);
 }
 
-/* HCI Standard Action Buttons (Minimum 44px hit height) */
+/* Touch Buttons */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -196,6 +196,8 @@ body {
   transition: var(--transition-normal);
   outline: none;
   user-select: none;
+  touch-action: manipulation;
+  min-height: 40px;
 }
 
 .btn-primary {
@@ -204,25 +206,10 @@ body {
   box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);
 }
 
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 22px rgba(2, 132, 199, 0.5);
-}
-
-.btn-primary:active {
-  transform: translateY(0);
-}
-
 .btn-secondary {
   background: rgba(255, 255, 255, 0.05);
   color: var(--text-primary);
   border: 1px solid var(--border-color);
-}
-
-.btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.2);
-  transform: translateY(-1px);
 }
 
 .btn-icon {
@@ -239,63 +226,73 @@ body {
   transition: var(--transition-normal);
 }
 
-.btn-icon:hover {
-  background: rgba(255, 255, 255, 0.12);
-  color: #fff;
-  transform: translateY(-1px);
-}
-
-/* Micro-Animations & Glow Effects */
-@keyframes pulseGlow {
-  0%, 100% { box-shadow: 0 0 10px rgba(16, 185, 129, 0.4); }
-  50% { box-shadow: 0 0 20px rgba(16, 185, 129, 0.8); }
-}
-
-.pulse-dot {
-  animation: pulseGlow 2s infinite ease-in-out;
-}
-
-/* Table Ergonomics & Row Hover Feedback */
-.leaderboard-row {
-  transition: var(--transition-fast);
-}
-
+/* Table Ergonomics */
 .leaderboard-row:hover {
   background: rgba(56, 189, 248, 0.04) !important;
-  box-shadow: inset 2px 0 0 #38bdf8;
 }
 
-/* Modal Overlay & Transitions */
+/* Modal styling */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(3, 7, 18, 0.85);
+  background: rgba(3, 7, 18, 0.88);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 999;
-  padding: 20px;
-  animation: fadeIn 0.2s ease-out;
+  padding: 16px;
 }
 
 .modal-content {
   width: 100%;
   max-height: 92vh;
   overflow-y: auto;
-  animation: scaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+/* Mobile & Responsive Breakpoints */
+@media (max-width: 768px) {
+  header {
+    padding: 12px 14px !important;
+  }
+
+  .glass-panel {
+    border-radius: var(--radius-md) !important;
+    padding: 16px !important;
+  }
+
+  .modal-overlay {
+    padding: 10px !important;
+  }
+
+  .modal-content {
+    padding: 16px !important;
+    border-radius: var(--radius-md) !important;
+    max-height: 96vh !important;
+  }
+
+  /* Table Horizontal Scrolling on Mobile */
+  table {
+    min-width: 680px;
+  }
 }
 
-@keyframes scaleUp {
-  from { opacity: 0; transform: scale(0.97); }
-  to { opacity: 1; transform: scale(1); }
+@media (max-width: 480px) {
+  h1 {
+    font-size: 1.15rem !important;
+  }
+
+  .btn {
+    padding: 8px 12px !important;
+    font-size: 0.8rem !important;
+  }
+
+  .pill-btn {
+    padding: 4px 8px !important;
+    font-size: 0.72rem !important;
+  }
 }
