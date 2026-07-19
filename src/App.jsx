@@ -118,7 +118,7 @@ export default function App() {
         });
       }
 
-      const compiled = compileStockAnalytics(fetchedPosts, settings.finnhubApiKey, dynamicCacheUpdates);
+      const compiled = compileStockAnalytics(fetchedPosts, settings.finnhubApiKey, dynamicCacheUpdates, selectedSubreddits.length, SUBREDDITS.length);
 
       // Apply live regularMarketPrice quotes
       const liveQuotePromises = compiled.map(s => fetchLiveYahooQuote(s.symbol));

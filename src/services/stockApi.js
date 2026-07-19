@@ -1186,7 +1186,7 @@ export function fetchStockNews(symbol) {
   ];
 }
 
-export function compileStockAnalytics(posts, finnhubApiKey = null, dynamicCacheUpdates = {}) {
+export function compileStockAnalytics(posts, finnhubApiKey = null, dynamicCacheUpdates = {}, activeSubredditCount = 16, totalSubredditCount = 16) {
   const tickerMentions = {};
   const processedPostIds = new Set();
 
@@ -1218,7 +1218,17 @@ export function compileStockAnalytics(posts, finnhubApiKey = null, dynamicCacheU
   });
 
   const results = [];
-  const allSymbols = new Set([...Object.keys(MASTER_STOCKS_DATABASE), ...Object.keys(dynamicCacheUpdates), ...Object.keys(tickerMentions)]);
+  const isStreamFiltered = activeSubredditCount < totalSubredditCount;
+
+  // When user has filtered subreddits, ONLY show stocks that are actually mentioned
+  // in the active streams. When all subreddits are active, show everything.
+  let allSymbols;
+  if (isStreamFiltered) {
+    // Only include tickers that appear in the active subreddit posts, plus any dynamically fetched ones
+    allSymbols = new Set([...Object.keys(tickerMentions), ...Object.keys(dynamicCacheUpdates)]);
+  } else {
+    allSymbols = new Set([...Object.keys(MASTER_STOCKS_DATABASE), ...Object.keys(dynamicCacheUpdates), ...Object.keys(tickerMentions)]);
+  }
 
   allSymbols.forEach(symbol => {
     const baseData = MASTER_STOCKS_DATABASE[symbol] || dynamicCacheUpdates[symbol] || {
