@@ -13,7 +13,8 @@ import SettingsModal from './components/SettingsModal';
 import { Flame, BarChart2, Newspaper, MessageSquare, Sparkles, ShieldCheck } from 'lucide-react';
 
 import { fetchSubredditPosts, SUBREDDITS } from './services/redditApi';
-import { compileStockAnalytics, fetchUSDEURRate, fetchFinnhubQuote, DEFAULT_USD_EUR_RATE, DEFAULT_USD_INR_RATE } from './services/stockApi';
+import { compileStockAnalytics, fetchUSDEURRate, fetchFinnhubQuote, DEFAULT_USD_EUR_RATE, DEFAULT_USD_INR_RATE, MASTER_STOCKS_DATABASE } from './services/stockApi';
+import { fetchDynamicStockInfo } from './services/dynamicStockFetcher';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('leaderboard');
@@ -99,7 +100,25 @@ export default function App() {
       const fetchedPosts = await fetchSubredditPosts(selectedSubreddits);
       setPosts(fetchedPosts);
 
-      const compiled = compileStockAnalytics(fetchedPosts, settings.finnhubApiKey);
+      // Extract unique tickers from posts to dynamically fetch unknown ones
+      const uniqueTickers = new Set();
+      fetchedPosts.forEach(p => p.tickers.forEach(t => uniqueTickers.add(t)));
+      
+      const unknownTickers = [...uniqueTickers].filter(t => !MASTER_STOCKS_DATABASE[t]);
+      
+      const dynamicCacheUpdates = {};
+      if (unknownTickers.length > 0) {
+        // Fetch missing tickers dynamically in parallel
+        const dynamicPromises = unknownTickers.map(t => fetchDynamicStockInfo(t, settings.finnhubApiKey));
+        const dynamicResults = await Promise.all(dynamicPromises);
+        unknownTickers.forEach((t, i) => {
+          if (dynamicResults[i]) {
+            dynamicCacheUpdates[t] = dynamicResults[i];
+          }
+        });
+      }
+
+      const compiled = compileStockAnalytics(fetchedPosts, settings.finnhubApiKey, dynamicCacheUpdates);
 
       if (settings.finnhubApiKey) {
         const topSymbols = compiled.slice(0, 5).map(s => s.symbol);

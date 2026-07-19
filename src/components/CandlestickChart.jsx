@@ -4,6 +4,7 @@ import { formatCurrency } from '../services/stockApi';
 
 export default function CandlestickChart({ symbol, basePrice, currencyMode, fxRate }) {
   const [timeframe, setTimeframe] = useState('1D'); // '1D', '1W', '1M', '1Y'
+  const [chartType, setChartType] = useState('candlestick'); // 'candlestick' or 'line'
   const [hoveredCandle, setHoveredCandle] = useState(null);
   const [livePrice, setLivePrice] = useState(basePrice);
   const [isTickUp, setIsTickUp] = useState(true);
@@ -150,6 +151,22 @@ export default function CandlestickChart({ symbol, basePrice, currencyMode, fxRa
           )}
         </div>
 
+        {/* Chart Type Selector */}
+        <div style={{ display: 'flex', background: 'rgba(0,0,0,0.4)', padding: '3px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)' }}>
+          <button
+            onClick={() => setChartType('candlestick')}
+            style={{ padding: '4px 10px', fontSize: '0.75rem', fontWeight: 700, border: 'none', borderRadius: 'var(--radius-sm)', cursor: 'pointer', background: chartType === 'candlestick' ? 'rgba(56, 189, 248, 0.25)' : 'transparent', color: chartType === 'candlestick' ? '#38bdf8' : 'var(--text-muted)' }}
+          >
+            Candlestick
+          </button>
+          <button
+            onClick={() => setChartType('line')}
+            style={{ padding: '4px 10px', fontSize: '0.75rem', fontWeight: 700, border: 'none', borderRadius: 'var(--radius-sm)', cursor: 'pointer', background: chartType === 'line' ? 'rgba(56, 189, 248, 0.25)' : 'transparent', color: chartType === 'line' ? '#38bdf8' : 'var(--text-muted)' }}
+          >
+            Line
+          </button>
+        </div>
+
         {/* Timeframe Selector */}
         <div style={{ display: 'flex', background: 'rgba(0,0,0,0.4)', padding: '3px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)' }}>
           {['1D', '1W', '1M', '1Y'].map(tf => (
@@ -195,6 +212,20 @@ export default function CandlestickChart({ symbol, basePrice, currencyMode, fxRa
             );
           })}
 
+          {/* Render Line Graph */}
+          {chartType === 'line' && (
+            <polyline
+              fill="none"
+              stroke="#38bdf8"
+              strokeWidth="2"
+              points={candles.map((candle, idx) => {
+                const xCenter = idx * candleGap + candleGap / 2;
+                const yClose = chartPaddingTop + ((maxPrice - candle.close) / priceRange) * (height - chartPaddingBottom - chartPaddingTop);
+                return `${xCenter},${yClose}`;
+              }).join(' ')}
+            />
+          )}
+
           {/* Render Candlesticks & Volume Histogram */}
           {candles.map((candle, idx) => {
             const xCenter = idx * candleGap + candleGap / 2;
@@ -229,27 +260,29 @@ export default function CandlestickChart({ symbol, basePrice, currencyMode, fxRa
                   rx="1"
                 />
 
-                {/* Candlestick Wick */}
-                <line
-                  x1={xCenter}
-                  y1={yHigh}
-                  x2={xCenter}
-                  y2={yLow}
-                  stroke={color}
-                  strokeWidth="1.2"
-                />
-
-                {/* Candlestick Body */}
-                <rect
-                  x={xLeft}
-                  y={bodyTop}
-                  width={candleWidth}
-                  height={bodyHeight}
-                  fill={color}
-                  rx="1"
-                  stroke={color}
-                  strokeWidth="0.5"
-                />
+                {/* Candlestick Wick & Body (Only if type is candlestick) */}
+                {chartType === 'candlestick' && (
+                  <>
+                    <line
+                      x1={xCenter}
+                      y1={yHigh}
+                      x2={xCenter}
+                      y2={yLow}
+                      stroke={color}
+                      strokeWidth="1.2"
+                    />
+                    <rect
+                      x={xLeft}
+                      y={bodyTop}
+                      width={candleWidth}
+                      height={bodyHeight}
+                      fill={color}
+                      rx="1"
+                      stroke={color}
+                      strokeWidth="0.5"
+                    />
+                  </>
+                )}
               </g>
             );
           })}

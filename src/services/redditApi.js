@@ -107,8 +107,19 @@ export const MOCK_REDDIT_POSTS = [
     createdUtc: Date.now() - 3600 * 1000 * 2,
     url: 'https://reddit.com/r/investing',
     tickers: ['SPCX'],
-    sentiment: { score: 0.95, label: 'Bullish', confidence: 'High' },
-    summary: 'SpaceX public trading debut has ignited immense retail interest. Starship cost-per-kg to orbit and Starlink revenue acceleration make this the ultimate space monopoly play.'
+  },
+  {
+    id: 'p_us4',
+    title: 'Rocket Lab (RKLB) Neutron development update: Why they are the only real SpaceX competitor',
+    author: 'SpaceInvestor',
+    subreddit: 'investing',
+    score: 1200,
+    numComments: 340,
+    createdUtc: Date.now() - 3600 * 1000 * 1,
+    url: 'https://reddit.com/r/investing',
+    tickers: ['RKLB'],
+    sentiment: { score: 0.88, label: 'Bullish', confidence: 'High' },
+    summary: 'Neutron launch vehicle development is ahead of schedule. At this market cap, it is a massive value compared to SpaceX private valuation.'
   }
 ];
 
