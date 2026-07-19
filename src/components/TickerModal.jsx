@@ -36,15 +36,11 @@ export default function TickerModal({ stock, onClose, currencyMode, fxRate }) {
                 {stock.bullishRatio}% Bullish
               </span>
             </div>
-            
-            <h3 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '8px' }}>
-              {stock.name} • {stock.sector}
-            </h3>
 
             {/* Trading App / Broker Availability Banner */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', background: 'rgba(0, 0, 0, 0.4)', padding: '6px 12px', borderRadius: 'var(--radius-md)', border: '1px solid rgba(255, 255, 255, 0.06)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', background: 'rgba(0, 0, 0, 0.4)', padding: '6px 12px', borderRadius: 'var(--radius-md)', border: '1px solid rgba(255, 255, 255, 0.06)', marginBottom: '6px' }}>
               <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <Smartphone size={13} color="var(--accent-cyan)" /> Trading App Availability:
+                <Smartphone size={13} color="var(--accent-cyan)" /> Trading App:
               </span>
               {brokersList.map((broker, idx) => (
                 <span
@@ -63,7 +59,28 @@ export default function TickerModal({ stock, onClose, currencyMode, fxRate }) {
               ))}
             </div>
 
+            {/* Value Signal + Reddit Sentiment Strip */}
+            {stock.valueSignal && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                {stock.valueSignal.valueBadge && (
+                  <span className={`badge ${stock.valueSignal.valueBadge.badgeClass}`} style={{ fontSize: '0.72rem' }}>
+                    {stock.valueSignal.valueBadge.label}
+                  </span>
+                )}
+                <span style={{ fontSize: '0.74rem', fontWeight: 700, color: stock.valueSignal.sentimentColor }}>
+                  {stock.valueSignal.sentimentEmoji} Reddit: {stock.valueSignal.sentimentLabel}
+                </span>
+                <span style={{ fontSize: '0.7rem', color: '#fbbf24', fontWeight: 600 }}>
+                  · {stock.mentionCount} posts · {stock.valueSignal.buzzTier}
+                </span>
+                {stock.valueSignal.isTech && (
+                  <span className="badge badge-tech-quality" style={{ fontSize: '0.66rem' }}>Tech-Adjusted Scoring</span>
+                )}
+              </div>
+            )}
+
           </div>
+
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             <div style={{ textAlign: 'right' }}>

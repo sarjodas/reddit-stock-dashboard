@@ -1,4 +1,5 @@
 // Stock Market Data Service, Valuation Engine, Risk Model, Timing Engine, News Stream, Finnhub Live Fetcher & Broker Availability (Scalable Capital, Trading 212, Revolut)
+import { computeValueSignal } from './valueSignal';
 
 export const DEFAULT_USD_EUR_RATE = 0.92; // 1 USD = 0.92 EUR
 export const DEFAULT_USD_INR_RATE = 84.50; // 1 USD = 84.50 INR
@@ -794,7 +795,7 @@ export function calculateMathematicalRisk(tickerData, postMetrics) {
     icon = '⚠️';
   } else {
     tier = 'Speculative / Extreme';
-    badgeClass = 'badge-risk-spec';
+    badgeClass = 'badge-risk-high';
     icon = '☣️';
   }
 
@@ -957,7 +958,7 @@ export function compileStockAnalytics(posts, finnhubApiKey = null) {
     const newsFeed = fetchStockNews(symbol);
     const upside = Math.round(((baseData.targetPrice - baseData.price) / baseData.price) * 100);
 
-    results.push({
+    const enriched = {
       ...baseData,
       mentionCount: totalMentions,
       mentionChange24h,
@@ -969,8 +970,10 @@ export function compileStockAnalytics(posts, finnhubApiKey = null) {
       riskModel,
       timingModel,
       newsFeed,
-      impliedUpside: upside
-    });
+      impliedUpside: upside,
+    };
+    enriched.valueSignal = computeValueSignal(enriched, postMetrics);
+    results.push(enriched);
   });
 
   return results.sort((a, b) => b.mentionCount - a.mentionCount);

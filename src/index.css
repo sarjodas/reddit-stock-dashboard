@@ -17,6 +17,7 @@
   --accent-purple: #c084fc;
   --accent-amber: #fbbf24;
   --accent-rose: #fb7185;
+  --accent-gold: #f59e0b;
 
   --radius-sm: 8px;
   --radius-md: 14px;
@@ -30,6 +31,8 @@
   --transition-normal: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
   --shadow-lg: 0 20px 45px -10px rgba(0, 0, 0, 0.6);
   --shadow-glow-cyan: 0 0 30px rgba(56, 189, 248, 0.22);
+  --shadow-glow-gold: 0 0 28px rgba(245, 158, 11, 0.2);
+  --shadow-glow-green: 0 0 28px rgba(52, 211, 153, 0.18);
 }
 
 * {
@@ -53,22 +56,12 @@ body {
 }
 
 /* Ergonomic Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: rgba(5, 8, 17, 0.95);
-}
-::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.18);
-  border-radius: var(--radius-full);
-}
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.35);
-}
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: rgba(5, 8, 17, 0.95); }
+::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.18); border-radius: var(--radius-full); }
+::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.35); }
 
-/* Glassmorphism Containers */
+/* ── Glassmorphism Panels ───────────────────────────────── */
 .glass-panel {
   background: var(--bg-card);
   backdrop-filter: blur(28px);
@@ -84,7 +77,22 @@ body {
   box-shadow: 0 24px 50px -8px rgba(0, 0, 0, 0.75);
 }
 
-/* Touch-Friendly Pill Buttons */
+/* Value Gem special panel — subtle gold glow */
+.value-gem-card {
+  border-color: rgba(245, 158, 11, 0.28) !important;
+  box-shadow: var(--shadow-lg), var(--shadow-glow-gold) !important;
+}
+.value-gem-card:hover {
+  border-color: rgba(245, 158, 11, 0.48) !important;
+}
+
+/* Conviction gem — emerald glow */
+.conviction-gem-card {
+  border-color: rgba(52, 211, 153, 0.28) !important;
+  box-shadow: var(--shadow-lg), var(--shadow-glow-green) !important;
+}
+
+/* ── Pill Buttons ─────────────────────────────────────────── */
 .pill-btn {
   display: inline-flex;
   align-items: center;
@@ -100,6 +108,7 @@ body {
   transition: var(--transition-fast);
   user-select: none;
   touch-action: manipulation;
+  white-space: nowrap;
 }
 
 .pill-btn:hover, .pill-btn:active {
@@ -115,75 +124,78 @@ body {
   box-shadow: 0 4px 16px rgba(2, 132, 199, 0.4);
 }
 
-/* Badges */
+.pill-btn.active-value {
+  background: linear-gradient(135deg, #b45309 0%, #92400e 100%);
+  color: #fef3c7;
+  border-color: rgba(245, 158, 11, 0.6);
+  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.35);
+}
+
+/* ── Badges ───────────────────────────────────────────────── */
 .badge {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
+  gap: 4px;
+  padding: 3px 9px;
   border-radius: var(--radius-full);
-  font-size: 0.75rem;
+  font-size: 0.74rem;
   font-weight: 700;
   letter-spacing: -0.01em;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
-.badge-bullish {
-  background: rgba(52, 211, 153, 0.15);
-  color: #34d399;
-  border: 1px solid rgba(52, 211, 153, 0.35);
-}
+.badge-bullish  { background: rgba(52, 211, 153, 0.15);  color: #34d399; border: 1px solid rgba(52, 211, 153, 0.35); }
+.badge-bearish  { background: rgba(251, 113, 133, 0.15); color: #fb7185; border: 1px solid rgba(251, 113, 133, 0.35); }
+.badge-neutral  { background: rgba(148, 163, 184, 0.15); color: #cbd5e1; border: 1px solid rgba(148, 163, 184, 0.25); }
+.badge-short-term { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.35); }
+.badge-long-term  { background: rgba(192, 132, 252, 0.15); color: #c084fc; border: 1px solid rgba(192, 132, 252, 0.35); }
+.badge-risk-low { background: rgba(52, 211, 153, 0.15);  color: #34d399; border: 1px solid rgba(52, 211, 153, 0.35); }
+.badge-risk-mod { background: rgba(251, 191, 36, 0.15);  color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.35); }
+.badge-risk-high { background: rgba(251, 113, 133, 0.15); color: #fb7185; border: 1px solid rgba(251, 113, 133, 0.35); }
+.badge-exchange { background: rgba(255, 255, 255, 0.06); color: #cbd5e1; border: 1px solid var(--border-color); font-family: var(--font-mono); }
 
-.badge-bearish {
-  background: rgba(251, 113, 133, 0.15);
-  color: #fb7185;
-  border: 1px solid rgba(251, 113, 133, 0.35);
-}
+/* ── Value Investing Signal Badges ───────────────────────── */
 
-.badge-neutral {
-  background: rgba(148, 163, 184, 0.15);
-  color: #cbd5e1;
-  border: 1px solid rgba(148, 163, 184, 0.25);
-}
-
-.badge-short-term {
-  background: rgba(56, 189, 248, 0.15);
-  color: #38bdf8;
-  border: 1px solid rgba(56, 189, 248, 0.35);
-}
-
-.badge-long-term {
-  background: rgba(192, 132, 252, 0.15);
-  color: #c084fc;
-  border: 1px solid rgba(192, 132, 252, 0.35);
-}
-
-.badge-risk-low {
-  background: rgba(52, 211, 153, 0.15);
-  color: #34d399;
-  border: 1px solid rgba(52, 211, 153, 0.35);
-}
-
-.badge-risk-mod {
-  background: rgba(251, 191, 36, 0.15);
+/* Graham Value — classic deep value screen (sector-adjusted) */
+.badge-graham {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(234, 179, 8, 0.12) 100%);
   color: #fbbf24;
-  border: 1px solid rgba(251, 191, 36, 0.35);
+  border: 1px solid rgba(245, 158, 11, 0.45);
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.15);
 }
 
-.badge-risk-high {
-  background: rgba(251, 113, 133, 0.15);
+/* Buffett Conviction — quality moat at fair tech price */
+.badge-conviction {
+  background: linear-gradient(135deg, rgba(52, 211, 153, 0.2) 0%, rgba(16, 185, 129, 0.12) 100%);
+  color: #34d399;
+  border: 1px solid rgba(52, 211, 153, 0.45);
+  box-shadow: 0 0 10px rgba(52, 211, 153, 0.15);
+}
+
+/* Tech Premium — Buffett-style updated for high-growth tech */
+.badge-tech-quality {
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.2) 0%, rgba(14, 165, 233, 0.12) 100%);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.45);
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.12);
+}
+
+/* Momentum Play */
+.badge-momentum {
+  background: linear-gradient(135deg, rgba(192, 132, 252, 0.2) 0%, rgba(139, 92, 246, 0.12) 100%);
+  color: #c084fc;
+  border: 1px solid rgba(192, 132, 252, 0.45);
+}
+
+/* Speculative / Avoid */
+.badge-speculative {
+  background: rgba(251, 113, 133, 0.12);
   color: #fb7185;
   border: 1px solid rgba(251, 113, 133, 0.35);
 }
 
-.badge-exchange {
-  background: rgba(255, 255, 255, 0.06);
-  color: #cbd5e1;
-  border: 1px solid var(--border-color);
-  font-family: var(--font-mono);
-}
-
-/* Touch Buttons */
+/* ── Buttons ──────────────────────────────────────────────── */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -206,107 +218,86 @@ body {
   color: #fff;
   box-shadow: 0 4px 16px rgba(2, 132, 199, 0.4);
 }
-
-.btn-primary:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(2, 132, 199, 0.5);
-}
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(2, 132, 199, 0.5); }
 
 .btn-secondary {
   background: rgba(255, 255, 255, 0.06);
   color: var(--text-primary);
   border: 1px solid var(--border-color);
 }
-
-.btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(255, 255, 255, 0.22);
-}
+.btn-secondary:hover { background: rgba(255, 255, 255, 0.12); border-color: rgba(255, 255, 255, 0.22); }
 
 .btn-icon {
-  width: 40px;
-  height: 40px;
+  width: 40px; height: 40px;
   border-radius: var(--radius-md);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: flex; align-items: center; justify-content: center;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid var(--border-color);
   color: var(--text-primary);
   cursor: pointer;
   transition: var(--transition-normal);
 }
+.btn-icon:hover { background: rgba(255, 255, 255, 0.12); }
 
-.btn-icon:hover {
-  background: rgba(255, 255, 255, 0.12);
-}
+/* ── Leaderboard Table ────────────────────────────────────── */
+.leaderboard-row:hover { background: rgba(56, 189, 248, 0.05) !important; }
+.leaderboard-row.value-row { background: rgba(245, 158, 11, 0.04); }
+.leaderboard-row.value-row:hover { background: rgba(245, 158, 11, 0.09) !important; }
 
-/* Table Ergonomics */
-.leaderboard-row:hover {
-  background: rgba(56, 189, 248, 0.05) !important;
-}
-
-/* Modal styling */
+/* ── Modal ────────────────────────────────────────────────── */
 .modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
   background: rgba(3, 7, 18, 0.88);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 999; padding: 16px;
+}
+.modal-content { width: 100%; max-height: 92vh; overflow-y: auto; }
+
+/* ── Value Intelligence Tooltip ───────────────────────────── */
+.value-score-bar {
+  height: 4px;
+  border-radius: var(--radius-full);
+  background: rgba(255,255,255,0.06);
+  overflow: hidden;
+}
+.value-score-bar-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ── Section Divider ──────────────────────────────────────── */
+.section-label {
   display: flex;
   align-items: center;
-  justify-content: center;
-  z-index: 999;
-  padding: 16px;
+  gap: 10px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border-color);
 }
 
-.modal-content {
-  width: 100%;
-  max-height: 92vh;
-  overflow-y: auto;
-}
-
-/* Mobile & Responsive Breakpoints */
+/* ── Mobile & Responsive ──────────────────────────────────── */
 @media (max-width: 768px) {
-  header {
-    padding: 12px 14px !important;
-  }
-
-  .glass-panel {
-    border-radius: var(--radius-md) !important;
-    padding: 16px !important;
-  }
-
-  .modal-overlay {
-    padding: 10px !important;
-  }
-
-  .modal-content {
-    padding: 16px !important;
-    border-radius: var(--radius-md) !important;
-    max-height: 96vh !important;
-  }
-
-  table {
-    min-width: 680px;
-  }
+  header { padding: 12px 14px !important; }
+  .glass-panel { border-radius: var(--radius-md) !important; }
+  .modal-overlay { padding: 10px !important; }
+  .modal-content { padding: 16px !important; border-radius: var(--radius-md) !important; max-height: 96vh !important; }
+  table { min-width: 700px; }
 }
 
 @media (max-width: 480px) {
-  h1 {
-    font-size: 1.15rem !important;
-  }
-
-  .btn {
-    padding: 8px 12px !important;
-    font-size: 0.8rem !important;
-  }
-
-  .pill-btn {
-    padding: 4px 8px !important;
-    font-size: 0.72rem !important;
-  }
+  h1 { font-size: 1.15rem !important; }
+  .btn { padding: 8px 12px !important; font-size: 0.8rem !important; }
+  .pill-btn { padding: 4px 8px !important; font-size: 0.72rem !important; }
 }
