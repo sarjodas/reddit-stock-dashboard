@@ -124,12 +124,10 @@ export const MOCK_REDDIT_POSTS = [
 ];
 
 export async function fetchSubredditPosts(selectedSubreddits = []) {
-  try {
-    const subsToFetch = selectedSubreddits.length > 0 ? selectedSubreddits : SUBREDDITS.map(s => s.id);
-    const mockFiltered = MOCK_REDDIT_POSTS.filter(p => subsToFetch.includes(p.subreddit));
-    return mockFiltered.length > 0 ? mockFiltered : MOCK_REDDIT_POSTS;
-  } catch (err) {
-    console.warn('Reddit API live fetch fallback used:', err.message);
+  if (!selectedSubreddits || selectedSubreddits.length === 0) {
     return MOCK_REDDIT_POSTS;
   }
+  
+  const lowerSelected = selectedSubreddits.map(s => s.toLowerCase());
+  return MOCK_REDDIT_POSTS.filter(post => lowerSelected.includes(post.subreddit.toLowerCase()));
 }
