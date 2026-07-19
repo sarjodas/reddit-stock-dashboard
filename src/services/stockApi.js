@@ -1197,8 +1197,28 @@ export function compileStockAnalytics(posts, finnhubApiKey = null, dynamicCacheU
       impliedUpside: upside,
     };
     enriched.valueSignal = computeValueSignal(enriched, postMetrics);
+
+    // Calculate Smart Potential Rank (Sentiment + Upside + Conviction)
+    const analystRatingWeight = (baseData.analystScore || 3.5) * 10;
+    const gemBonus = baseData.isEmergingGem ? 30 : 0;
+    const buffettBonus = enriched.valueSignal.buffettPasses ? 15 : 0;
+    const grahamBonus = enriched.valueSignal.grahamPasses ? 10 : 0;
+    
+    // Scale mentions logarithmically so mega-caps don't blindly dominate small caps
+    const mentionLog = totalMentions > 0 ? Math.log10(totalMentions) * 15 : 0;
+    const sentimentBonus = totalMentions > 0 ? (bullishRatio / 100) * 20 : 0;
+
+    enriched.smartRank = (upside * 0.45) 
+                       + (horizons.longTermScore * 0.25) 
+                       + analystRatingWeight 
+                       + gemBonus 
+                       + buffettBonus 
+                       + grahamBonus
+                       + mentionLog 
+                       + sentimentBonus;
+
     results.push(enriched);
   });
 
-  return results.sort((a, b) => b.mentionCount - a.mentionCount);
+  return results.sort((a, b) => b.smartRank - a.smartRank);
 }
