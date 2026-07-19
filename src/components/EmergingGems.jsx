@@ -2,10 +2,66 @@ import React from 'react';
 import { Rocket, TrendingUp, ShieldAlert, Sparkles, ArrowUpRight, Zap, ShieldCheck, MessageSquare } from 'lucide-react';
 import { formatCurrency } from '../services/stockApi';
 
+// Helper: Categorize market region for diversity
+function getMarketRegion(country = '') {
+  const c = country.toLowerCase();
+  if (c.includes('usa') || c.includes('us')) return 'US Market';
+  if (c.includes('india')) return 'Indian Market';
+  if (c.includes('taiwan') || c.includes('asia') || c.includes('china') || c.includes('japan')) return 'Asian / Global';
+  if (c.includes('europe') || c.includes('germany') || c.includes('netherlands') || c.includes('denmark') || c.includes('france') || c.includes('uk')) return 'European Market';
+  return 'Global Market';
+}
+
+// Helper: Calculate multi-factor Highest Potential Score
+function calculatePotentialScore(s) {
+  const upside = s.impliedUpside || 0;
+  const ltScore = s.longTermScore || 50;
+  const stScore = s.shortTermScore || 50;
+  const analystRatingWeight = (s.analystScore || 3.5) * 10;
+  const gemBonus = s.isEmergingGem ? 30 : 0;
+  const buffettBonus = s.valueSignal?.buffettPasses ? 15 : 0;
+  const grahamBonus = s.valueSignal?.grahamPasses ? 10 : 0;
+
+  return (upside * 0.45) + (ltScore * 0.25) + (stScore * 0.1) + analystRatingWeight + gemBonus + buffettBonus + grahamBonus;
+}
+
 export default function EmergingGems({ stocks, onSelectTicker, currencyMode, fxRate }) {
-  const gems = stocks
-    .filter(s => s.isEmergingGem || s.longTermScore >= 75 || s.mentionChange24h >= 40)
-    .slice(0, 4);
+  // 1. Filter candidate gems (marked as emerging gem, high conviction, or high analyst upside)
+  const candidates = stocks.filter(s =>
+    s.isEmergingGem ||
+    (s.impliedUpside || 0) >= 15 ||
+    (s.longTermScore || 0) >= 75 ||
+    (s.valueSignal && s.valueSignal.buffettPasses)
+  );
+
+  // 2. Rank candidate gems by calculated Potential Score
+  const ranked = [...candidates].sort((a, b) => calculatePotentialScore(b) - calculatePotentialScore(a));
+
+  // 3. Select top potential stocks ensuring cross-market regional diversity (US, Europe, Asia, India)
+  const selectedGems = [];
+  const selectedRegions = new Set();
+
+  // First pass: pick highest potential stock per region
+  for (const stock of ranked) {
+    const region = getMarketRegion(stock.country);
+    if (!selectedRegions.has(region)) {
+      selectedGems.push(stock);
+      selectedRegions.add(region);
+      if (selectedGems.length >= 4) break;
+    }
+  }
+
+  // Second pass: fill remaining slots with highest overall potential if needed
+  if (selectedGems.length < 4) {
+    for (const stock of ranked) {
+      if (!selectedGems.some(s => s.symbol === stock.symbol)) {
+        selectedGems.push(stock);
+        if (selectedGems.length >= 4) break;
+      }
+    }
+  }
+
+  const gems = selectedGems;
 
   if (gems.length === 0) return null;
 
@@ -60,13 +116,18 @@ export default function EmergingGems({ stocks, onSelectTicker, currencyMode, fxR
               {/* ── Row 1: Symbol + Name + Badges ── */}
               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px' }}>
                 <div style={{ minWidth: 0 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '3px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', marginBottom: '3px' }}>
                     <span style={{ fontSize: '1.2rem', fontWeight: 800, fontFamily: 'var(--font-mono)', color: '#fff', flexShrink: 0 }}>
                       ${stock.symbol}
                     </span>
                     <span className="badge badge-exchange" style={{ fontSize: '0.63rem', padding: '1px 6px' }}>
                       {stock.exchange?.split('/')[0]?.trim()}
                     </span>
+                    {stock.country && (
+                      <span className="badge" style={{ fontSize: '0.63rem', padding: '1px 6px', background: 'rgba(255,255,255,0.08)', color: '#cbd5e1' }}>
+                        {stock.country.split('/')[0]?.trim()}
+                      </span>
+                    )}
                   </div>
                   <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#f1f5f9', lineHeight: 1.3, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                     {stock.name}
