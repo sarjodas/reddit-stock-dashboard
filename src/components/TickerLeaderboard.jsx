@@ -1,12 +1,18 @@
 import React, { useState } from 'react';
-import { Flame, Star, ShieldAlert, TrendingUp, Compass, Globe, Sparkles, Filter } from 'lucide-react';
+import { Flame, Star, ShieldAlert, TrendingUp, Compass, Globe, Sparkles, Filter, CheckCircle2 } from 'lucide-react';
 import { formatCurrency } from '../services/stockApi';
 
 export default function TickerLeaderboard({ stocks, watchlist, onToggleWatchlist, onSelectTicker, currencyMode, fxRate }) {
   const [horizonFilter, setHorizonFilter] = useState('all');
   const [regionFilter, setRegionFilter] = useState('all');
+  const [brokerFilter, setBrokerFilter] = useState('all');
 
   let filteredStocks = [...stocks];
+
+  // Broker Platform Filter Logic
+  if (brokerFilter !== 'all') {
+    filteredStocks = filteredStocks.filter(s => s.brokers && s.brokers.includes(brokerFilter));
+  }
 
   // Region Filter Logic
   if (regionFilter === 'europe') {
@@ -38,16 +44,48 @@ export default function TickerLeaderboard({ stocks, watchlist, onToggleWatchlist
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px', marginBottom: '20px' }}>
         <div>
           <h2 style={{ fontSize: '1.25rem', fontWeight: 800, letterSpacing: '-0.02em', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Flame size={20} color="#f43f5e" /> Stock Leaderboard & Real-Time Intelligence
+            <Flame size={20} color="#f43f5e" /> Stock Leaderboard & Broker Platform Availability
           </h2>
           <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-            Mathematical risk rating, Wall Street upside, and dual investment horizons
+            Filter by European trading apps: Scalable Capital, Trading 212, and Revolut
           </p>
         </div>
 
-        {/* Region & Horizon Segmented Filters */}
+        {/* Region & Broker Segmented Filters */}
         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
           
+          {/* Broker Filter Pills */}
+          <div style={{ display: 'flex', background: 'rgba(0, 0, 0, 0.45)', padding: '3px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
+            <button
+              onClick={() => setBrokerFilter('all')}
+              className={`pill-btn ${brokerFilter === 'all' ? 'active' : ''}`}
+              style={{ padding: '4px 10px', fontSize: '0.74rem' }}
+            >
+              All Brokers
+            </button>
+            <button
+              onClick={() => setBrokerFilter('Scalable')}
+              className={`pill-btn ${brokerFilter === 'Scalable' ? 'active' : ''}`}
+              style={{ padding: '4px 10px', fontSize: '0.74rem' }}
+            >
+              ⚡ Scalable
+            </button>
+            <button
+              onClick={() => setBrokerFilter('Trading 212')}
+              className={`pill-btn ${brokerFilter === 'Trading 212' ? 'active' : ''}`}
+              style={{ padding: '4px 10px', fontSize: '0.74rem' }}
+            >
+              🌐 Trading 212
+            </button>
+            <button
+              onClick={() => setBrokerFilter('Revolut')}
+              className={`pill-btn ${brokerFilter === 'Revolut' ? 'active' : ''}`}
+              style={{ padding: '4px 10px', fontSize: '0.74rem' }}
+            >
+              💳 Revolut
+            </button>
+          </div>
+
           {/* Region Filter Pills */}
           <div style={{ display: 'flex', background: 'rgba(0, 0, 0, 0.45)', padding: '3px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
             <button
@@ -78,16 +116,9 @@ export default function TickerLeaderboard({ stocks, watchlist, onToggleWatchlist
             >
               🇺🇸 USA
             </button>
-            <button
-              onClick={() => setRegionFilter('asia')}
-              className={`pill-btn ${regionFilter === 'asia' ? 'active' : ''}`}
-              style={{ padding: '4px 10px', fontSize: '0.74rem' }}
-            >
-              🌏 Asia
-            </button>
           </div>
 
-          {/* Horizon & Discovery Pills */}
+          {/* Horizon Pills */}
           <div style={{ display: 'flex', background: 'rgba(0, 0, 0, 0.45)', padding: '3px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
             <button
               onClick={() => setHorizonFilter('all')}
@@ -101,21 +132,7 @@ export default function TickerLeaderboard({ stocks, watchlist, onToggleWatchlist
               className={`pill-btn ${horizonFilter === 'discovery' ? 'active' : ''}`}
               style={{ padding: '4px 10px', fontSize: '0.74rem' }}
             >
-              🔍 High-Risk Discovery
-            </button>
-            <button
-              onClick={() => setHorizonFilter('short')}
-              className={`pill-btn ${horizonFilter === 'short' ? 'active' : ''}`}
-              style={{ padding: '4px 10px', fontSize: '0.74rem' }}
-            >
-              ⚡ Short-Term
-            </button>
-            <button
-              onClick={() => setHorizonFilter('long')}
-              className={`pill-btn ${horizonFilter === 'long' ? 'active' : ''}`}
-              style={{ padding: '4px 10px', fontSize: '0.74rem' }}
-            >
-              💎 Long-Term
+              🔍 Discovery
             </button>
             <button
               onClick={() => setHorizonFilter('watchlist')}
@@ -135,6 +152,7 @@ export default function TickerLeaderboard({ stocks, watchlist, onToggleWatchlist
           <thead>
             <tr style={{ background: 'rgba(255, 255, 255, 0.03)', borderBottom: '1px solid var(--border-color)', color: 'var(--text-muted)' }}>
               <th style={{ padding: '14px 16px', fontWeight: 700 }}>Ticker & Company</th>
+              <th style={{ padding: '14px 16px', fontWeight: 700 }}>Broker Apps</th>
               <th style={{ padding: '14px 16px', fontWeight: 700 }}>Market Price</th>
               <th style={{ padding: '14px 16px', fontWeight: 700 }}>Reddit Hype & Bullish %</th>
               <th style={{ padding: '14px 16px', fontWeight: 700 }}>Horizon Scores</th>
@@ -191,6 +209,29 @@ export default function TickerLeaderboard({ stocks, watchlist, onToggleWatchlist
                           <span style={{ opacity: 0.8 }}>• {stock.country}</span>
                         </div>
                       </div>
+                    </div>
+                  </td>
+
+                  {/* Broker Platforms */}
+                  <td style={{ padding: '14px 16px' }}>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                      {stock.brokers ? stock.brokers.map((broker, idx) => (
+                        <span
+                          key={idx}
+                          className="badge"
+                          style={{
+                            fontSize: '0.64rem',
+                            padding: '1px 6px',
+                            background: broker === 'Scalable' ? 'rgba(16, 185, 129, 0.15)' : broker === 'Trading 212' ? 'rgba(56, 189, 248, 0.15)' : 'rgba(192, 132, 252, 0.15)',
+                            color: broker === 'Scalable' ? '#34d399' : broker === 'Trading 212' ? '#38bdf8' : '#c084fc',
+                            border: `1px solid ${broker === 'Scalable' ? 'rgba(16, 185, 129, 0.3)' : broker === 'Trading 212' ? 'rgba(56, 189, 248, 0.3)' : 'rgba(192, 132, 252, 0.3)'}`
+                          }}
+                        >
+                          {broker}
+                        </span>
+                      )) : (
+                        <span className="badge badge-neutral" style={{ fontSize: '0.64rem' }}>Standard Brokers</span>
+                      )}
                     </div>
                   </td>
 

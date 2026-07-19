@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ShieldCheck, AlertTriangle, TrendingUp, Compass, ArrowUpRight, ArrowDownRight, Layers, Coins, Lock, Zap, HelpCircle } from 'lucide-react';
+import { ShieldCheck, AlertTriangle, TrendingUp, Compass, ArrowUpRight, ArrowDownRight, Layers, Coins, Lock, Zap, HelpCircle, CheckCircle2 } from 'lucide-react';
 import { formatCurrency } from '../services/stockApi';
 
 export const ETF_DATABASE = [
@@ -11,6 +11,7 @@ export const ETF_DATABASE = [
     type: 'ETF',
     category: 'Global Core Equity',
     exchange: 'XETRA / Euronext',
+    brokers: ['Scalable', 'Trading 212', 'Revolut'],
     priceEur: 124.80,
     change24h: 0.65,
     ter: '0.22%',
@@ -32,6 +33,7 @@ export const ETF_DATABASE = [
     type: 'ETF',
     category: 'Developed Markets Core',
     exchange: 'Euronext Amsterdam / London',
+    brokers: ['Scalable', 'Trading 212', 'Revolut'],
     priceEur: 94.20,
     change24h: 0.55,
     ter: '0.20%',
@@ -53,6 +55,7 @@ export const ETF_DATABASE = [
     type: 'ETF',
     category: 'European & NATO Defense',
     exchange: 'XETRA / London',
+    brokers: ['Scalable', 'Trading 212', 'Revolut'],
     priceEur: 18.60,
     change24h: 3.20,
     ter: '0.49%',
@@ -74,6 +77,7 @@ export const ETF_DATABASE = [
     type: 'ETC',
     category: 'Precious Metals / Safe Haven',
     exchange: 'London / Euronext',
+    brokers: ['Scalable', 'Trading 212', 'Revolut'],
     priceEur: 42.10,
     change24h: 0.85,
     ter: '0.12%',
@@ -95,6 +99,7 @@ export const ETF_DATABASE = [
     type: 'ETC',
     category: 'Industrial Metals / EV Transition',
     exchange: 'XETRA / London',
+    brokers: ['Scalable', 'Trading 212'],
     priceEur: 32.50,
     change24h: 2.10,
     ter: '0.49%',
@@ -116,6 +121,7 @@ export const ETF_DATABASE = [
     type: 'ETF',
     category: 'Semiconductor Tech Megatrend',
     exchange: 'XETRA / London',
+    brokers: ['Scalable', 'Trading 212', 'Revolut'],
     priceEur: 41.80,
     change24h: 2.90,
     ter: '0.35%',
@@ -137,6 +143,7 @@ export const ETF_DATABASE = [
     type: 'ETF',
     category: 'Speculative Growth / Cathie Wood',
     exchange: 'NYSE Arca',
+    brokers: ['Trading 212', 'Revolut'],
     priceEur: 42.40,
     change24h: -2.15,
     ter: '0.75%',
@@ -158,6 +165,7 @@ export const ETF_DATABASE = [
     type: 'Leveraged ETF',
     category: '3x Bearish Inverse Leverage',
     exchange: 'NASDAQ',
+    brokers: ['Trading 212'],
     priceEur: 8.20,
     change24h: -6.40,
     ter: '0.95%',
@@ -174,13 +182,17 @@ export const ETF_DATABASE = [
 ];
 
 export default function EtfRadar({ currencyMode, fxRate }) {
-  const [filterType, setFilterType] = useState('all'); // 'all', 'optimal', 'buy', 'wait', 'avoid'
+  const [filterType, setFilterType] = useState('all');
+  const [brokerFilter, setBrokerFilter] = useState('all'); // 'all', 'Scalable', 'Trading 212', 'Revolut'
 
   const filteredEtfs = ETF_DATABASE.filter(etf => {
-    if (filterType === 'optimal') return etf.signalType === 'optimal';
-    if (filterType === 'buy') return etf.signalType === 'buy';
-    if (filterType === 'wait') return etf.signalType === 'wait';
-    if (filterType === 'avoid') return etf.signalType === 'avoid';
+    if (filterType === 'optimal' && etf.signalType !== 'optimal') return false;
+    if (filterType === 'buy' && etf.signalType !== 'buy') return false;
+    if (filterType === 'wait' && etf.signalType !== 'wait') return false;
+    if (filterType === 'avoid' && etf.signalType !== 'avoid') return false;
+
+    if (brokerFilter !== 'all' && (!etf.brokers || !etf.brokers.includes(brokerFilter))) return false;
+
     return true;
   });
 
@@ -194,44 +206,84 @@ export default function EtfRadar({ currencyMode, fxRate }) {
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
               <ShieldCheck size={24} color="#10b981" />
               <h2 style={{ fontSize: '1.35rem', fontWeight: 800, letterSpacing: '-0.02em', background: 'linear-gradient(90deg, #ffffff 0%, #cbd5e1 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                ETF & ETC Investment Radar & Risk Matrix
+                ETF & ETC Investment Radar & Broker Compatibility
               </h2>
             </div>
             <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', maxWidth: '720px' }}>
-              Curated selection of premier European UCITS ETFs & Physical ETCs. Evaluated by expense ratio (TER), structural liquidity, volatility risk factor, and long-term compounding viability.
+              Curated selection of premier European UCITS ETFs & Physical ETCs tagged with live trading platform availability for <strong>Scalable Capital</strong>, <strong>Trading 212</strong>, and <strong>Revolut</strong>.
             </p>
           </div>
 
-          {/* Signal Filter Buttons */}
-          <div style={{ display: 'flex', background: 'rgba(0, 0, 0, 0.45)', padding: '4px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', flexWrap: 'wrap', gap: '2px' }}>
-            <button
-              onClick={() => setFilterType('all')}
-              className={`pill-btn ${filterType === 'all' ? 'active' : ''}`}
-              style={{ padding: '4px 10px', fontSize: '0.75rem' }}
-            >
-              All Funds ({ETF_DATABASE.length})
-            </button>
-            <button
-              onClick={() => setFilterType('optimal')}
-              className={`pill-btn ${filterType === 'optimal' ? 'active' : ''}`}
-              style={{ padding: '4px 10px', fontSize: '0.75rem' }}
-            >
-              ⭐ Core Optimal ({ETF_DATABASE.filter(e => e.signalType === 'optimal').length})
-            </button>
-            <button
-              onClick={() => setFilterType('buy')}
-              className={`pill-btn ${filterType === 'buy' ? 'active' : ''}`}
-              style={{ padding: '4px 10px', fontSize: '0.75rem' }}
-            >
-              🛒 Strong Buy ({ETF_DATABASE.filter(e => e.signalType === 'buy').length})
-            </button>
-            <button
-              onClick={() => setFilterType('avoid')}
-              className={`pill-btn ${filterType === 'avoid' ? 'active' : ''}`}
-              style={{ padding: '4px 10px', fontSize: '0.75rem' }}
-            >
-              ⛔ Avoid / High Risk ({ETF_DATABASE.filter(e => e.signalType === 'avoid').length})
-            </button>
+          {/* Broker & Signal Filter Toolbar */}
+          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
+            
+            {/* Broker Platform Filter */}
+            <div style={{ display: 'flex', background: 'rgba(0, 0, 0, 0.45)', padding: '4px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
+              <span style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-muted)', padding: '0 8px', display: 'flex', alignItems: 'center' }}>
+                Broker:
+              </span>
+              <button
+                onClick={() => setBrokerFilter('all')}
+                className={`pill-btn ${brokerFilter === 'all' ? 'active' : ''}`}
+                style={{ padding: '4px 8px', fontSize: '0.73rem' }}
+              >
+                All Brokers
+              </button>
+              <button
+                onClick={() => setBrokerFilter('Scalable')}
+                className={`pill-btn ${brokerFilter === 'Scalable' ? 'active' : ''}`}
+                style={{ padding: '4px 8px', fontSize: '0.73rem' }}
+              >
+                ⚡ Scalable
+              </button>
+              <button
+                onClick={() => setBrokerFilter('Trading 212')}
+                className={`pill-btn ${brokerFilter === 'Trading 212' ? 'active' : ''}`}
+                style={{ padding: '4px 8px', fontSize: '0.73rem' }}
+              >
+                🌐 Trading 212
+              </button>
+              <button
+                onClick={() => setBrokerFilter('Revolut')}
+                className={`pill-btn ${brokerFilter === 'Revolut' ? 'active' : ''}`}
+                style={{ padding: '4px 8px', fontSize: '0.73rem' }}
+              >
+                💳 Revolut
+              </button>
+            </div>
+
+            {/* Signal Filter Buttons */}
+            <div style={{ display: 'flex', background: 'rgba(0, 0, 0, 0.45)', padding: '4px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
+              <button
+                onClick={() => setFilterType('all')}
+                className={`pill-btn ${filterType === 'all' ? 'active' : ''}`}
+                style={{ padding: '4px 8px', fontSize: '0.73rem' }}
+              >
+                All Signals
+              </button>
+              <button
+                onClick={() => setFilterType('optimal')}
+                className={`pill-btn ${filterType === 'optimal' ? 'active' : ''}`}
+                style={{ padding: '4px 8px', fontSize: '0.73rem' }}
+              >
+                ⭐ Core Optimal
+              </button>
+              <button
+                onClick={() => setFilterType('buy')}
+                className={`pill-btn ${filterType === 'buy' ? 'active' : ''}`}
+                style={{ padding: '4px 8px', fontSize: '0.73rem' }}
+              >
+                🛒 Strong Buy
+              </button>
+              <button
+                onClick={() => setFilterType('avoid')}
+                className={`pill-btn ${filterType === 'avoid' ? 'active' : ''}`}
+                style={{ padding: '4px 8px', fontSize: '0.73rem' }}
+              >
+                ⛔ Avoid
+              </button>
+            </div>
+
           </div>
         </div>
       </div>
@@ -269,9 +321,29 @@ export default function EtfRadar({ currencyMode, fxRate }) {
               <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#fff', marginBottom: '4px', lineHeight: 1.3 }}>
                 {etf.name}
               </h3>
-              <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <span style={{ fontWeight: 700, color: 'var(--accent-cyan)' }}>${etf.symbol}</span>
                 <span>• {etf.category}</span>
+              </div>
+
+              {/* Broker Availability Badges */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', marginBottom: '14px' }}>
+                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 700 }}>Trading App:</span>
+                {etf.brokers && etf.brokers.map((broker, idx) => (
+                  <span
+                    key={idx}
+                    className="badge"
+                    style={{
+                      fontSize: '0.66rem',
+                      padding: '2px 7px',
+                      background: broker === 'Scalable' ? 'rgba(16, 185, 129, 0.15)' : broker === 'Trading 212' ? 'rgba(56, 189, 248, 0.15)' : 'rgba(192, 132, 252, 0.15)',
+                      color: broker === 'Scalable' ? '#34d399' : broker === 'Trading 212' ? '#38bdf8' : '#c084fc',
+                      border: `1px solid ${broker === 'Scalable' ? 'rgba(16, 185, 129, 0.3)' : broker === 'Trading 212' ? 'rgba(56, 189, 248, 0.3)' : 'rgba(192, 132, 252, 0.3)'}`
+                    }}
+                  >
+                    <CheckCircle2 size={10} /> {broker}
+                  </span>
+                ))}
               </div>
 
               {/* Price & TER Stats Box */}

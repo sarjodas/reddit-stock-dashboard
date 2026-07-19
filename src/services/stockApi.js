@@ -1,4 +1,4 @@
-// Stock Market Data Service, Valuation Engine, Risk Model, Timing Engine, News Stream, Finnhub Live Fetcher & FX Converter (Native Currency + Euro)
+// Stock Market Data Service, Valuation Engine, Risk Model, Timing Engine, News Stream, Finnhub Live Fetcher & Broker Availability (Scalable Capital, Trading 212, Revolut)
 
 export const DEFAULT_USD_EUR_RATE = 0.92; // 1 USD = 0.92 EUR
 export const DEFAULT_USD_INR_RATE = 84.50; // 1 USD = 84.50 INR
@@ -38,7 +38,6 @@ export function formatCurrency(usdAmount, currencyMode = 'DUAL', fxRates = { eur
   if (currencyMode === 'INR') return inrStr;
   if (currencyMode === 'USD') return usdStr;
 
-  // DUAL / Native + EUR Mode (e.g. €26.40 for DHER, $128.45 (€118.17) for US, ₹2,890 (€31.40) for India)
   if (nativeCurrency === 'EUR') return eurStr;
   if (nativeCurrency === 'INR') return `${inrStr} (${eurStr})`;
   if (nativeCurrency === 'GBP') return `£${(usdAmount * 0.79).toFixed(2)} (${eurStr})`;
@@ -90,14 +89,15 @@ export const MASTER_STOCKS_DATABASE = {
     exchange: 'XETRA / Frankfurt (DHER.DE)',
     country: '🇩🇪 Germany / Europe',
     nativeCurrency: 'EUR',
-    price: 28.70, // Yields exact €26.40 EUR quote
+    brokers: ['Scalable', 'Trading 212', 'Revolut'],
+    price: 28.70,
     change24h: 4.20,
     marketCap: '€7.2 Billion ($7.8B)',
     peRatio: -15.4,
     pbRatio: 2.8,
     eps: -1.72,
-    week52High: 43.25, // €39.80
-    week52Low: 16.20,  // €14.90
+    week52High: 43.25,
+    week52Low: 16.20,
     beta: 1.85,
     volatility: 52.0,
     sparkline: [22, 23.5, 24, 25, 24.8, 25.5, 26.40],
@@ -107,9 +107,9 @@ export const MASTER_STOCKS_DATABASE = {
     downsideRisk: 'European tech delivery price competition & quick-commerce debt obligations',
     analystRating: 'Buy',
     analystScore: 4.3,
-    targetPrice: 41.30, // Yields €38.00 EUR target
-    targetLow: 23.90,   // €22.00
-    targetHigh: 54.35,  // €50.00
+    targetPrice: 41.30,
+    targetLow: 23.90,
+    targetHigh: 54.35,
     buyCount: 16,
     holdCount: 5,
     sellCount: 1
@@ -121,14 +121,15 @@ export const MASTER_STOCKS_DATABASE = {
     exchange: 'XETRA / Frankfurt (ZAL.DE)',
     country: '🇩🇪 Germany / Europe',
     nativeCurrency: 'EUR',
-    price: 31.00, // Yields €28.50 EUR
+    brokers: ['Scalable', 'Trading 212', 'Revolut'],
+    price: 31.00,
     change24h: 3.40,
     marketCap: '€7.5 Billion ($8.2B)',
     peRatio: 32.4,
     pbRatio: 3.1,
     eps: 0.88,
-    week52High: 36.10, // €33.20
-    week52Low: 17.30,  // €15.95
+    week52High: 36.10,
+    week52Low: 17.30,
     beta: 1.75,
     volatility: 46.0,
     sparkline: [24, 25, 26, 25.8, 27, 27.8, 28.50],
@@ -138,7 +139,7 @@ export const MASTER_STOCKS_DATABASE = {
     downsideRisk: 'European consumer apparel spending discretion',
     analystRating: 'Buy',
     analystScore: 4.4,
-    targetPrice: 39.10, // €36.00
+    targetPrice: 39.10,
     targetLow: 26.10,
     targetHigh: 48.90,
     buyCount: 18,
@@ -152,14 +153,15 @@ export const MASTER_STOCKS_DATABASE = {
     exchange: 'XETRA / Frankfurt (HFG.DE)',
     country: '🇩🇪 Germany / Europe',
     nativeCurrency: 'EUR',
-    price: 12.15, // Yields €11.20 EUR
+    brokers: ['Scalable', 'Trading 212', 'Revolut'],
+    price: 12.15,
     change24h: -1.85,
     marketCap: '€1.9 Billion ($2.1B)',
     peRatio: 18.5,
     pbRatio: 1.4,
     eps: 0.61,
-    week52High: 30.85, // €28.40
-    week52Low: 5.85,   // €5.40
+    week52High: 30.85,
+    week52Low: 5.85,
     beta: 2.10,
     volatility: 68.0,
     sparkline: [8.5, 9.2, 10, 10.5, 11, 11.5, 11.20],
@@ -169,7 +171,7 @@ export const MASTER_STOCKS_DATABASE = {
     downsideRisk: 'Legacy meal-kit customer acquisition marketing cost inflation',
     analystRating: 'Moderate Buy',
     analystScore: 3.8,
-    targetPrice: 17.95, // €16.50
+    targetPrice: 17.95,
     targetLow: 8.70,
     targetHigh: 26.10,
     buyCount: 10,
@@ -183,6 +185,7 @@ export const MASTER_STOCKS_DATABASE = {
     exchange: 'NASDAQ / Euronext (ASML.AS)',
     country: '🇳🇱 Netherlands / Europe',
     nativeCurrency: 'EUR',
+    brokers: ['Scalable', 'Trading 212', 'Revolut'],
     price: 845.20,
     change24h: 2.10,
     marketCap: '$338 Billion',
@@ -213,14 +216,15 @@ export const MASTER_STOCKS_DATABASE = {
     exchange: 'XETRA / Frankfurt (RHM.DE)',
     country: '🇩🇪 Germany / Europe',
     nativeCurrency: 'EUR',
-    price: 582.00, // Yields €535.40 EUR
+    brokers: ['Scalable', 'Trading 212'],
+    price: 582.00,
     change24h: 3.85,
     marketCap: '€23.2 Billion ($25.2B)',
     peRatio: 38.2,
     pbRatio: 7.4,
     eps: 14.01,
-    week52High: 620.65, // €571.00
-    week52Low: 252.15,  // €232.00
+    week52High: 620.65,
+    week52Low: 252.15,
     beta: 1.25,
     volatility: 42.0,
     sparkline: [480, 500, 510, 520, 515, 528, 535.40],
@@ -230,7 +234,7 @@ export const MASTER_STOCKS_DATABASE = {
     downsideRisk: 'Defense procurement timing shifts & supply chain material constraints',
     analystRating: 'Strong Buy',
     analystScore: 4.9,
-    targetPrice: 695.65, // €640.00
+    targetPrice: 695.65,
     targetLow: 565.20,
     targetHigh: 782.60,
     buyCount: 20,
@@ -244,6 +248,7 @@ export const MASTER_STOCKS_DATABASE = {
     exchange: 'NYSE / Euronext Copenhagen',
     country: '🇩🇰 Denmark / Europe',
     nativeCurrency: 'EUR',
+    brokers: ['Scalable', 'Trading 212', 'Revolut'],
     price: 132.40,
     change24h: 1.85,
     marketCap: '$592 Billion',
@@ -274,14 +279,15 @@ export const MASTER_STOCKS_DATABASE = {
     exchange: 'NYSE / XETRA (SAP.DE)',
     country: '🇩🇪 Germany / Europe',
     nativeCurrency: 'EUR',
-    price: 233.50, // Yields €214.80 EUR
+    brokers: ['Scalable', 'Trading 212', 'Revolut'],
+    price: 233.50,
     change24h: 1.25,
     marketCap: '$252 Billion',
     peRatio: 45.2,
     pbRatio: 5.8,
     eps: 4.75,
-    week52High: 241.85, // €222.50
-    week52Low: 143.60,  // €132.10
+    week52High: 241.85,
+    week52Low: 143.60,
     beta: 1.08,
     volatility: 22.5,
     sparkline: [202, 206, 208, 210, 212, 213.5, 214.80],
@@ -290,7 +296,7 @@ export const MASTER_STOCKS_DATABASE = {
     downsideRisk: 'Macro corporate IT spending deceleration',
     analystRating: 'Buy',
     analystScore: 4.4,
-    targetPrice: 260.85, // €240.00
+    targetPrice: 260.85,
     targetLow: 211.95,
     targetHigh: 293.50,
     buyCount: 21,
@@ -298,7 +304,7 @@ export const MASTER_STOCKS_DATABASE = {
     sellCount: 0
   },
 
-  // --- INDIAN MARKET GIANTS (Native INR ₹) ---
+  // --- INDIAN MARKET GIANTS ---
   RELIANCE: {
     symbol: 'RELIANCE',
     name: 'Reliance Industries Limited',
@@ -306,6 +312,7 @@ export const MASTER_STOCKS_DATABASE = {
     exchange: 'NSE / BSE India (RIGD)',
     country: '🇮🇳 India / Asia',
     nativeCurrency: 'INR',
+    brokers: ['Interactive Brokers', 'Trading 212 (GDR)'],
     price: 34.20,
     change24h: 3.15,
     marketCap: '₹20 Lakh Cr ($242B)',
@@ -337,6 +344,7 @@ export const MASTER_STOCKS_DATABASE = {
     exchange: 'NSE / BSE India (TTNQY)',
     country: '🇮🇳 India / Asia',
     nativeCurrency: 'INR',
+    brokers: ['Interactive Brokers', 'Trading 212 (ADR)'],
     price: 52.40,
     change24h: 1.85,
     marketCap: '₹15 Lakh Cr ($188B)',
@@ -367,6 +375,7 @@ export const MASTER_STOCKS_DATABASE = {
     exchange: 'NSE / BSE India (TTM)',
     country: '🇮🇳 India / Asia',
     nativeCurrency: 'INR',
+    brokers: ['Scalable', 'Trading 212', 'Revolut'],
     price: 11.80,
     change24h: 4.50,
     marketCap: '₹3.6 Lakh Cr ($44.5B)',
@@ -400,6 +409,7 @@ export const MASTER_STOCKS_DATABASE = {
     exchange: 'NYSE / TAIEX',
     country: '🇹🇼 Taiwan / Asia',
     nativeCurrency: 'USD',
+    brokers: ['Scalable', 'Trading 212', 'Revolut'],
     price: 186.50,
     change24h: 4.15,
     marketCap: '$967 Billion',
@@ -433,6 +443,7 @@ export const MASTER_STOCKS_DATABASE = {
     exchange: 'NASDAQ',
     country: '🇺🇸 USA',
     nativeCurrency: 'USD',
+    brokers: ['Scalable', 'Trading 212', 'Revolut'],
     price: 128.45,
     change24h: 3.82,
     marketCap: '$3.15 Trillion',
@@ -463,6 +474,7 @@ export const MASTER_STOCKS_DATABASE = {
     exchange: 'NASDAQ',
     country: '🇺🇸 USA',
     nativeCurrency: 'USD',
+    brokers: ['Scalable', 'Trading 212', 'Revolut'],
     price: 248.80,
     change24h: 5.14,
     marketCap: '$792 Billion',
@@ -493,6 +505,7 @@ export const MASTER_STOCKS_DATABASE = {
     exchange: 'NYSE',
     country: '🇺🇸 USA',
     nativeCurrency: 'USD',
+    brokers: ['Scalable', 'Trading 212', 'Revolut'],
     price: 44.20,
     change24h: 6.45,
     marketCap: '$98.5 Billion',
@@ -524,6 +537,7 @@ export const MASTER_STOCKS_DATABASE = {
     exchange: 'NASDAQ',
     country: '🇺🇸 USA',
     nativeCurrency: 'USD',
+    brokers: ['Scalable', 'Trading 212', 'Revolut'],
     price: 156.30,
     change24h: -1.82,
     marketCap: '$253 Billion',
@@ -554,6 +568,7 @@ export const MASTER_STOCKS_DATABASE = {
     exchange: 'NASDAQ',
     country: '🇺🇸 USA',
     nativeCurrency: 'USD',
+    brokers: ['Scalable', 'Trading 212', 'Revolut'],
     price: 224.50,
     change24h: 0.85,
     marketCap: '$3.42 Trillion',
@@ -584,6 +599,7 @@ export const MASTER_STOCKS_DATABASE = {
     exchange: 'NASDAQ',
     country: '🇺🇸 USA',
     nativeCurrency: 'USD',
+    brokers: ['Scalable', 'Trading 212', 'Revolut'],
     price: 442.10,
     change24h: -0.45,
     marketCap: '$3.28 Trillion',
@@ -614,6 +630,7 @@ export const MASTER_STOCKS_DATABASE = {
     exchange: 'NASDAQ',
     country: '🇺🇸 USA',
     nativeCurrency: 'USD',
+    brokers: ['Scalable', 'Trading 212', 'Revolut'],
     price: 19.85,
     change24h: 14.30,
     marketCap: '$5.2 Billion',
@@ -645,6 +662,7 @@ export const MASTER_STOCKS_DATABASE = {
     exchange: 'NASDAQ',
     country: '🇺🇸 USA',
     nativeCurrency: 'USD',
+    brokers: ['Scalable', 'Trading 212', 'Revolut'],
     price: 48.60,
     change24h: -4.12,
     marketCap: '$28.4 Billion',
@@ -675,6 +693,7 @@ export const MASTER_STOCKS_DATABASE = {
     exchange: 'NYSE',
     country: '🇺🇸 USA',
     nativeCurrency: 'USD',
+    brokers: ['Scalable', 'Trading 212', 'Revolut'],
     price: 22.40,
     change24h: -1.85,
     marketCap: '$9.6 Billion',
@@ -891,6 +910,7 @@ export function compileStockAnalytics(posts, finnhubApiKey = null) {
       exchange: 'NASDAQ',
       country: '🌐 International',
       nativeCurrency: 'USD',
+      brokers: ['Scalable', 'Trading 212', 'Revolut'],
       price: 45.20,
       change24h: 1.5,
       marketCap: '$12.5 Billion',
