@@ -4,7 +4,7 @@ import { formatCurrency } from '../services/stockApi';
 
 export default function TickerLeaderboard({ stocks, watchlist, onToggleWatchlist, onSelectTicker, currencyMode, fxRate }) {
   const [horizonFilter, setHorizonFilter] = useState('all');
-  const [regionFilter, setRegionFilter] = useState('all'); // 'all', 'europe', 'india', 'us', 'asia'
+  const [regionFilter, setRegionFilter] = useState('all');
 
   let filteredStocks = [...stocks];
 
@@ -58,18 +58,18 @@ export default function TickerLeaderboard({ stocks, watchlist, onToggleWatchlist
               🌐 Global
             </button>
             <button
-              onClick={() => setRegionFilter('india')}
-              className={`pill-btn ${regionFilter === 'india' ? 'active' : ''}`}
-              style={{ padding: '4px 10px', fontSize: '0.74rem' }}
-            >
-              🇮🇳 India
-            </button>
-            <button
               onClick={() => setRegionFilter('europe')}
               className={`pill-btn ${regionFilter === 'europe' ? 'active' : ''}`}
               style={{ padding: '4px 10px', fontSize: '0.74rem' }}
             >
               🇪🇺 Europe & UK
+            </button>
+            <button
+              onClick={() => setRegionFilter('india')}
+              className={`pill-btn ${regionFilter === 'india' ? 'active' : ''}`}
+              style={{ padding: '4px 10px', fontSize: '0.74rem' }}
+            >
+              🇮🇳 India
             </button>
             <button
               onClick={() => setRegionFilter('us')}
@@ -197,7 +197,7 @@ export default function TickerLeaderboard({ stocks, watchlist, onToggleWatchlist
                   {/* Price & 24h Change */}
                   <td style={{ padding: '14px 16px', fontFamily: 'var(--font-mono)' }}>
                     <div style={{ fontWeight: 700, fontSize: '0.92rem', color: '#fff' }}>
-                      {formatCurrency(stock.price, currencyMode, fxRate)}
+                      {formatCurrency(stock.price, currencyMode, fxRate, stock.nativeCurrency)}
                     </div>
                     <div style={{ fontSize: '0.76rem', color: isPos ? '#34d399' : '#fb7185', fontWeight: 600 }}>
                       {isPos ? '+' : ''}{stock.change24h}%
@@ -242,7 +242,7 @@ export default function TickerLeaderboard({ stocks, watchlist, onToggleWatchlist
                   {/* Wall St Target Price */}
                   <td style={{ padding: '14px 16px', fontFamily: 'var(--font-mono)' }}>
                     <div style={{ fontWeight: 700, color: stock.impliedUpside >= 0 ? '#34d399' : '#fb7185' }}>
-                      {formatCurrency(stock.targetPrice, currencyMode, fxRate)}
+                      {formatCurrency(stock.targetPrice, currencyMode, fxRate, stock.nativeCurrency)}
                     </div>
                     <div style={{ fontSize: '0.72rem', color: stock.impliedUpside >= 0 ? '#34d399' : '#fb7185', fontWeight: 600 }}>
                       {stock.impliedUpside >= 0 ? '+' : ''}{stock.impliedUpside}% Implied

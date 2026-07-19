@@ -1,4 +1,4 @@
-// Stock Market Data Service, Valuation Engine, Risk Model, Timing Engine, News Stream, Finnhub Live Fetcher & FX Converter (USD, EUR, INR)
+// Stock Market Data Service, Valuation Engine, Risk Model, Timing Engine, News Stream, Finnhub Live Fetcher & FX Converter (Native Currency + Euro)
 
 export const DEFAULT_USD_EUR_RATE = 0.92; // 1 USD = 0.92 EUR
 export const DEFAULT_USD_INR_RATE = 84.50; // 1 USD = 84.50 INR
@@ -21,8 +21,8 @@ export async function fetchUSDEURRate() {
   return { eur: DEFAULT_USD_EUR_RATE, inr: DEFAULT_USD_INR_RATE };
 }
 
-export function formatCurrency(usdAmount, currencyMode = 'DUAL', fxRates = { eur: DEFAULT_USD_EUR_RATE, inr: DEFAULT_USD_INR_RATE }) {
-  if (typeof usdAmount !== 'number' || isNaN(usdAmount)) return '$0.00';
+export function formatCurrency(usdAmount, currencyMode = 'DUAL', fxRates = { eur: DEFAULT_USD_EUR_RATE, inr: DEFAULT_USD_INR_RATE }, nativeCurrency = 'USD') {
+  if (typeof usdAmount !== 'number' || isNaN(usdAmount)) return '€0.00';
   
   const eurRate = typeof fxRates === 'object' ? (fxRates.eur || DEFAULT_USD_EUR_RATE) : fxRates;
   const inrRate = typeof fxRates === 'object' ? (fxRates.inr || DEFAULT_USD_INR_RATE) : DEFAULT_USD_INR_RATE;
@@ -30,21 +30,25 @@ export function formatCurrency(usdAmount, currencyMode = 'DUAL', fxRates = { eur
   const eurAmount = usdAmount * eurRate;
   const inrAmount = usdAmount * inrRate;
 
-  const usdStr = `$${usdAmount.toFixed(2)}`;
   const eurStr = `€${eurAmount.toFixed(2)}`;
+  const usdStr = `$${usdAmount.toFixed(2)}`;
   const inrStr = `₹${inrAmount.toFixed(2)}`;
 
   if (currencyMode === 'EUR') return eurStr;
   if (currencyMode === 'INR') return inrStr;
   if (currencyMode === 'USD') return usdStr;
-  return `${eurStr} (${usdStr})`;
+
+  // DUAL / Native + EUR Mode (e.g. €26.40 for DHER, $128.45 (€118.17) for US, ₹2,890 (€31.40) for India)
+  if (nativeCurrency === 'EUR') return eurStr;
+  if (nativeCurrency === 'INR') return `${inrStr} (${eurStr})`;
+  if (nativeCurrency === 'GBP') return `£${(usdAmount * 0.79).toFixed(2)} (${eurStr})`;
+  return `${usdStr} (${eurStr})`;
 }
 
 // Live Finnhub Quote Fetcher
 export async function fetchFinnhubQuote(symbol, apiKey) {
   if (!apiKey) return null;
   
-  // Map European symbols to Finnhub XETRA/Euronext tickers if applicable
   const finnhubSymbolMap = {
     DHER: 'DHER.DE',
     RHM: 'RHM.DE',
@@ -78,14 +82,15 @@ export async function fetchFinnhubQuote(symbol, apiKey) {
 }
 
 export const MASTER_STOCKS_DATABASE = {
-  // --- EUROPEAN STOCKS ---
+  // --- EUROPEAN STOCKS (Native EUR €) ---
   DHER: {
     symbol: 'DHER',
     name: 'Delivery Hero SE',
     sector: 'Consumer Discretionary / Online Delivery',
     exchange: 'XETRA / Frankfurt (DHER.DE)',
     country: '🇩🇪 Germany / Europe',
-    price: 28.70, // Base USD value so eurAmount (price * 0.92) yields exact XETRA quote €26.40
+    nativeCurrency: 'EUR',
+    price: 28.70, // Yields exact €26.40 EUR quote
     change24h: 4.20,
     marketCap: '€7.2 Billion ($7.8B)',
     peRatio: -15.4,
@@ -115,6 +120,7 @@ export const MASTER_STOCKS_DATABASE = {
     sector: 'Consumer Discretionary / E-Commerce & Fashion',
     exchange: 'XETRA / Frankfurt (ZAL.DE)',
     country: '🇩🇪 Germany / Europe',
+    nativeCurrency: 'EUR',
     price: 31.00, // Yields €28.50 EUR
     change24h: 3.40,
     marketCap: '€7.5 Billion ($8.2B)',
@@ -145,6 +151,7 @@ export const MASTER_STOCKS_DATABASE = {
     sector: 'Consumer Staples / Ready-to-Eat Delivery',
     exchange: 'XETRA / Frankfurt (HFG.DE)',
     country: '🇩🇪 Germany / Europe',
+    nativeCurrency: 'EUR',
     price: 12.15, // Yields €11.20 EUR
     change24h: -1.85,
     marketCap: '€1.9 Billion ($2.1B)',
@@ -175,6 +182,7 @@ export const MASTER_STOCKS_DATABASE = {
     sector: 'Technology / Semiconductor Equipment',
     exchange: 'NASDAQ / Euronext (ASML.AS)',
     country: '🇳🇱 Netherlands / Europe',
+    nativeCurrency: 'EUR',
     price: 845.20,
     change24h: 2.10,
     marketCap: '$338 Billion',
@@ -204,6 +212,7 @@ export const MASTER_STOCKS_DATABASE = {
     sector: 'Industrials / European Defense & Ammunition',
     exchange: 'XETRA / Frankfurt (RHM.DE)',
     country: '🇩🇪 Germany / Europe',
+    nativeCurrency: 'EUR',
     price: 582.00, // Yields €535.40 EUR
     change24h: 3.85,
     marketCap: '€23.2 Billion ($25.2B)',
@@ -234,6 +243,7 @@ export const MASTER_STOCKS_DATABASE = {
     sector: 'Healthcare / Pharmaceuticals',
     exchange: 'NYSE / Euronext Copenhagen',
     country: '🇩🇰 Denmark / Europe',
+    nativeCurrency: 'EUR',
     price: 132.40,
     change24h: 1.85,
     marketCap: '$592 Billion',
@@ -263,6 +273,7 @@ export const MASTER_STOCKS_DATABASE = {
     sector: 'Technology / Enterprise ERP Software',
     exchange: 'NYSE / XETRA (SAP.DE)',
     country: '🇩🇪 Germany / Europe',
+    nativeCurrency: 'EUR',
     price: 233.50, // Yields €214.80 EUR
     change24h: 1.25,
     marketCap: '$252 Billion',
@@ -287,13 +298,14 @@ export const MASTER_STOCKS_DATABASE = {
     sellCount: 0
   },
 
-  // --- INDIAN MARKET GIANTS ---
+  // --- INDIAN MARKET GIANTS (Native INR ₹) ---
   RELIANCE: {
     symbol: 'RELIANCE',
     name: 'Reliance Industries Limited',
     sector: 'Conglomerate / Telecom Jio, Retail & Energy',
     exchange: 'NSE / BSE India (RIGD)',
     country: '🇮🇳 India / Asia',
+    nativeCurrency: 'INR',
     price: 34.20,
     change24h: 3.15,
     marketCap: '₹20 Lakh Cr ($242B)',
@@ -324,6 +336,7 @@ export const MASTER_STOCKS_DATABASE = {
     sector: 'Technology / Global IT Services & Cloud',
     exchange: 'NSE / BSE India (TTNQY)',
     country: '🇮🇳 India / Asia',
+    nativeCurrency: 'INR',
     price: 52.40,
     change24h: 1.85,
     marketCap: '₹15 Lakh Cr ($188B)',
@@ -353,6 +366,7 @@ export const MASTER_STOCKS_DATABASE = {
     sector: 'Consumer Discretionary / EV & Jaguar Land Rover',
     exchange: 'NSE / BSE India (TTM)',
     country: '🇮🇳 India / Asia',
+    nativeCurrency: 'INR',
     price: 11.80,
     change24h: 4.50,
     marketCap: '₹3.6 Lakh Cr ($44.5B)',
@@ -385,6 +399,7 @@ export const MASTER_STOCKS_DATABASE = {
     sector: 'Technology / Foundry Semiconductors',
     exchange: 'NYSE / TAIEX',
     country: '🇹🇼 Taiwan / Asia',
+    nativeCurrency: 'USD',
     price: 186.50,
     change24h: 4.15,
     marketCap: '$967 Billion',
@@ -417,6 +432,7 @@ export const MASTER_STOCKS_DATABASE = {
     sector: 'Technology / Semiconductors',
     exchange: 'NASDAQ',
     country: '🇺🇸 USA',
+    nativeCurrency: 'USD',
     price: 128.45,
     change24h: 3.82,
     marketCap: '$3.15 Trillion',
@@ -446,6 +462,7 @@ export const MASTER_STOCKS_DATABASE = {
     sector: 'Consumer Discretionary / EV',
     exchange: 'NASDAQ',
     country: '🇺🇸 USA',
+    nativeCurrency: 'USD',
     price: 248.80,
     change24h: 5.14,
     marketCap: '$792 Billion',
@@ -475,6 +492,7 @@ export const MASTER_STOCKS_DATABASE = {
     sector: 'Technology / Enterprise Software',
     exchange: 'NYSE',
     country: '🇺🇸 USA',
+    nativeCurrency: 'USD',
     price: 44.20,
     change24h: 6.45,
     marketCap: '$98.5 Billion',
@@ -505,6 +523,7 @@ export const MASTER_STOCKS_DATABASE = {
     sector: 'Technology / Semiconductors',
     exchange: 'NASDAQ',
     country: '🇺🇸 USA',
+    nativeCurrency: 'USD',
     price: 156.30,
     change24h: -1.82,
     marketCap: '$253 Billion',
@@ -534,6 +553,7 @@ export const MASTER_STOCKS_DATABASE = {
     sector: 'Technology / Consumer Electronics',
     exchange: 'NASDAQ',
     country: '🇺🇸 USA',
+    nativeCurrency: 'USD',
     price: 224.50,
     change24h: 0.85,
     marketCap: '$3.42 Trillion',
@@ -563,6 +583,7 @@ export const MASTER_STOCKS_DATABASE = {
     sector: 'Technology / Cloud & AI Software',
     exchange: 'NASDAQ',
     country: '🇺🇸 USA',
+    nativeCurrency: 'USD',
     price: 442.10,
     change24h: -0.45,
     marketCap: '$3.28 Trillion',
@@ -592,6 +613,7 @@ export const MASTER_STOCKS_DATABASE = {
     sector: 'Telecommunications / Satellite',
     exchange: 'NASDAQ',
     country: '🇺🇸 USA',
+    nativeCurrency: 'USD',
     price: 19.85,
     change24h: 14.30,
     marketCap: '$5.2 Billion',
@@ -622,6 +644,7 @@ export const MASTER_STOCKS_DATABASE = {
     sector: 'Technology / Server Systems',
     exchange: 'NASDAQ',
     country: '🇺🇸 USA',
+    nativeCurrency: 'USD',
     price: 48.60,
     change24h: -4.12,
     marketCap: '$28.4 Billion',
@@ -651,6 +674,7 @@ export const MASTER_STOCKS_DATABASE = {
     sector: 'Consumer Discretionary / Specialty Retail',
     exchange: 'NYSE',
     country: '🇺🇸 USA',
+    nativeCurrency: 'USD',
     price: 22.40,
     change24h: -1.85,
     marketCap: '$9.6 Billion',
@@ -866,6 +890,7 @@ export function compileStockAnalytics(posts, finnhubApiKey = null) {
       sector: 'General Equities',
       exchange: 'NASDAQ',
       country: '🌐 International',
+      nativeCurrency: 'USD',
       price: 45.20,
       change24h: 1.5,
       marketCap: '$12.5 Billion',
