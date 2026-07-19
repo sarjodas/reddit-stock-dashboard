@@ -26,10 +26,10 @@ export default function MetricsOverview({ stocks, totalPostsCount, selectedSubre
       marginBottom: '24px'
     }}>
 
-      {/* 24h Discussion Volume */}
+      {/* 60-Day Discussion Volume */}
       <div className="glass-panel" style={{ padding: '18px 20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-          <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>24h Discussion</span>
+          <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>60-Day Discussion</span>
           <div style={{ padding: '6px', borderRadius: 'var(--radius-sm)', background: 'rgba(56,189,248,0.1)', color: '#38bdf8' }}>
             <MessageSquare size={16} />
           </div>

@@ -6,15 +6,15 @@ import {
 import { PieChart as PieIcon, Activity, BarChart3, Target } from 'lucide-react';
 
 export default function AnalyticsCharts({ stocks }) {
-  // 1. Time-series mention volume (Simulated 24h timeline points)
+  // 1. Time-series mention volume (Simulated 60-Day timeline points)
   const timeSeriesData = [
-    { time: '00:00', NVDA: 18, TSLA: 25, PLTR: 10, AMD: 12 },
-    { time: '04:00', NVDA: 22, TSLA: 30, PLTR: 14, AMD: 15 },
-    { time: '08:00', NVDA: 45, TSLA: 58, PLTR: 28, AMD: 32 },
-    { time: '12:00', NVDA: 85, TSLA: 92, PLTR: 48, AMD: 42 },
-    { time: '16:00', NVDA: 110, TSLA: 125, PLTR: 62, AMD: 58 },
-    { time: '20:00', NVDA: 135, TSLA: 110, PLTR: 75, AMD: 64 },
-    { time: '24:00', NVDA: 142, TSLA: 120, PLTR: 88, AMD: 70 }
+    { time: 'Day 1',  NVDA: 18, TSLA: 25, PLTR: 10, AMD: 12 },
+    { time: 'Day 10', NVDA: 22, TSLA: 30, PLTR: 14, AMD: 15 },
+    { time: 'Day 20', NVDA: 45, TSLA: 58, PLTR: 28, AMD: 32 },
+    { time: 'Day 30', NVDA: 85, TSLA: 92, PLTR: 48, AMD: 42 },
+    { time: 'Day 40', NVDA: 110, TSLA: 125, PLTR: 62, AMD: 58 },
+    { time: 'Day 50', NVDA: 135, TSLA: 110, PLTR: 75, AMD: 64 },
+    { time: 'Day 60', NVDA: 142, TSLA: 120, PLTR: 88, AMD: 70 }
   ];
 
   // 2. Sentiment Donut Distribution
@@ -51,7 +51,7 @@ export default function AnalyticsCharts({ stocks }) {
       <div className="glass-panel" style={{ padding: '20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
           <Activity size={18} color="#06b6d4" />
-          <h3 style={{ fontSize: '0.95rem', fontWeight: 700 }}>24h Discussion Velocity Spikes</h3>
+          <h3 style={{ fontSize: '0.95rem', fontWeight: 700 }}>60-Day Discussion Velocity Spikes</h3>
         </div>
         <div style={{ height: '240px', width: '100%' }}>
           <ResponsiveContainer width="100%" height="100%">

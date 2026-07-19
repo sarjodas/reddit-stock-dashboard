@@ -27,7 +27,7 @@ export const MOCK_REDDIT_POSTS = [
     subreddit: 'IndianStreetBets',
     score: 1850,
     numComments: 420,
-    createdUtc: Date.now() - 3600 * 1000 * 2,
+    createdUtc: Date.now() - 24 * 3600 * 1000 * 45, // 45 days ago
     url: 'https://reddit.com/r/IndianStreetBets',
     tickers: ['RELIANCE', 'TATAMOTORS'],
     sentiment: { score: 0.94, label: 'Bullish', confidence: 'High' },
@@ -40,7 +40,7 @@ export const MOCK_REDDIT_POSTS = [
     subreddit: 'IndiaInvestments',
     score: 1240,
     numComments: 290,
-    createdUtc: Date.now() - 3600 * 1000 * 4,
+    createdUtc: Date.now() - 24 * 3600 * 1000 * 12, // 12 days ago
     url: 'https://reddit.com/r/IndiaInvestments',
     tickers: ['HDB', 'IBN'],
     sentiment: { score: 0.91, label: 'Bullish', confidence: 'High' },
@@ -53,7 +53,7 @@ export const MOCK_REDDIT_POSTS = [
     subreddit: 'EATinvesting',
     score: 1420,
     numComments: 340,
-    createdUtc: Date.now() - 3600 * 1000 * 2,
+    createdUtc: Date.now() - 24 * 3600 * 1000 * 55, // 55 days ago
     url: 'https://reddit.com/r/EATinvesting',
     tickers: ['DHER', 'RHM'],
     sentiment: { score: 0.92, label: 'Bullish', confidence: 'High' },
@@ -66,7 +66,7 @@ export const MOCK_REDDIT_POSTS = [
     subreddit: 'Finanzen',
     score: 1100,
     numComments: 210,
-    createdUtc: Date.now() - 3600 * 1000 * 3,
+    createdUtc: Date.now() - 24 * 3600 * 1000 * 3, // 3 days ago
     url: 'https://reddit.com/r/Finanzen',
     tickers: ['ZAL', 'HFG'],
     sentiment: { score: 0.88, label: 'Bullish', confidence: 'High' },
@@ -79,7 +79,7 @@ export const MOCK_REDDIT_POSTS = [
     subreddit: 'wallstreetbets',
     score: 4200,
     numComments: 980,
-    createdUtc: Date.now() - 3600 * 1000 * 1,
+    createdUtc: Date.now() - 24 * 3600 * 1000 * 22, // 22 days ago
     url: 'https://reddit.com/r/wallstreetbets',
     tickers: ['NVDA', 'SMCI'],
     sentiment: { score: 0.96, label: 'Bullish', confidence: 'High' },
@@ -92,7 +92,7 @@ export const MOCK_REDDIT_POSTS = [
     subreddit: 'ValueInvesting',
     score: 2150,
     numComments: 410,
-    createdUtc: Date.now() - 3600 * 1000 * 5,
+    createdUtc: Date.now() - 24 * 3600 * 1000 * 5, // 5 days ago
     url: 'https://reddit.com/r/ValueInvesting',
     tickers: ['PLTR'],
     sentiment: { score: 0.89, label: 'Bullish', confidence: 'High' },
@@ -105,7 +105,7 @@ export const MOCK_REDDIT_POSTS = [
     subreddit: 'investing',
     score: 3500,
     numComments: 820,
-    createdUtc: Date.now() - 3600 * 1000 * 2,
+    createdUtc: Date.now() - 24 * 3600 * 1000 * 38, // 38 days ago
     url: 'https://reddit.com/r/investing',
     tickers: ['SPCX'],
     sentiment: { score: 0.95, label: 'Bullish', confidence: 'High' },
@@ -118,7 +118,7 @@ export const MOCK_REDDIT_POSTS = [
     subreddit: 'investing',
     score: 1200,
     numComments: 340,
-    createdUtc: Date.now() - 3600 * 1000 * 1,
+    createdUtc: Date.now() - 24 * 3600 * 1000 * 18, // 18 days ago
     url: 'https://reddit.com/r/investing',
     tickers: ['RKLB'],
     sentiment: { score: 0.88, label: 'Bullish', confidence: 'High' },
