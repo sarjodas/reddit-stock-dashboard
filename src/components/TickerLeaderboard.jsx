@@ -4,13 +4,15 @@ import { formatCurrency } from '../services/stockApi';
 
 export default function TickerLeaderboard({ stocks, watchlist, onToggleWatchlist, onSelectTicker, currencyMode, fxRate }) {
   const [horizonFilter, setHorizonFilter] = useState('all');
-  const [regionFilter, setRegionFilter] = useState('all'); // 'all', 'europe', 'us', 'asia'
+  const [regionFilter, setRegionFilter] = useState('all'); // 'all', 'europe', 'india', 'us', 'asia'
 
   let filteredStocks = [...stocks];
 
   // Region Filter Logic
   if (regionFilter === 'europe') {
     filteredStocks = filteredStocks.filter(s => s.country && (s.country.includes('Europe') || s.country.includes('Germany') || s.country.includes('Netherlands') || s.country.includes('Denmark') || s.country.includes('France') || s.country.includes('UK') || s.country.includes('Switzerland') || s.country.includes('Sweden')));
+  } else if (regionFilter === 'india') {
+    filteredStocks = filteredStocks.filter(s => s.country && s.country.includes('India'));
   } else if (regionFilter === 'us') {
     filteredStocks = filteredStocks.filter(s => s.country && s.country.includes('USA'));
   } else if (regionFilter === 'asia') {
@@ -54,6 +56,13 @@ export default function TickerLeaderboard({ stocks, watchlist, onToggleWatchlist
               style={{ padding: '4px 10px', fontSize: '0.74rem' }}
             >
               🌐 Global
+            </button>
+            <button
+              onClick={() => setRegionFilter('india')}
+              className={`pill-btn ${regionFilter === 'india' ? 'active' : ''}`}
+              style={{ padding: '4px 10px', fontSize: '0.74rem' }}
+            >
+              🇮🇳 India
             </button>
             <button
               onClick={() => setRegionFilter('europe')}

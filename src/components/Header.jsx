@@ -68,7 +68,7 @@ export default function Header({
           <Search size={16} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
           <input
             type="text"
-            placeholder="Search symbol (e.g. NVDA, TSLA)..."
+            placeholder="Search symbol (e.g. NVDA, RELIANCE)..."
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
             style={{
@@ -127,7 +127,7 @@ export default function Header({
             </button>
           </div>
 
-          {/* Currency Switcher Segmented Control */}
+          {/* Currency Switcher Segmented Control (USD / EUR / INR / Dual) */}
           <div style={{ display: 'flex', background: 'rgba(0, 0, 0, 0.45)', padding: '3px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
             <button
               onClick={() => onChangeCurrency('USD')}
@@ -144,11 +144,18 @@ export default function Header({
               EUR (€)
             </button>
             <button
+              onClick={() => onChangeCurrency('INR')}
+              className={`pill-btn ${currencyMode === 'INR' ? 'active' : ''}`}
+              style={{ padding: '3px 8px', fontSize: '0.72rem' }}
+            >
+              INR (₹)
+            </button>
+            <button
               onClick={() => onChangeCurrency('DUAL')}
               className={`pill-btn ${currencyMode === 'DUAL' ? 'active' : ''}`}
               style={{ padding: '3px 8px', fontSize: '0.72rem' }}
             >
-              Dual ($/€)
+              Dual
             </button>
           </div>
 

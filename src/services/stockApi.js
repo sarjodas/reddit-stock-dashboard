@@ -1,32 +1,43 @@
-// Stock Market Data Service, Valuation Engine, Risk Model, Timing Engine, News Stream, Finnhub Live Fetcher & FX Converter
+// Stock Market Data Service, Valuation Engine, Risk Model, Timing Engine, News Stream, Finnhub Live Fetcher & FX Converter (USD, EUR, INR)
 
 export const DEFAULT_USD_EUR_RATE = 0.92; // 1 USD = 0.92 EUR
+export const DEFAULT_USD_INR_RATE = 84.50; // 1 USD = 84.50 INR
 
 export async function fetchUSDEURRate() {
   try {
     const res = await fetch('https://open.er-api.com/v6/latest/USD');
     if (res.ok) {
       const data = await res.json();
-      if (data && data.rates && data.rates.EUR) {
-        return parseFloat(data.rates.EUR.toFixed(4));
+      if (data && data.rates) {
+        return {
+          eur: parseFloat((data.rates.EUR || DEFAULT_USD_EUR_RATE).toFixed(4)),
+          inr: parseFloat((data.rates.INR || DEFAULT_USD_INR_RATE).toFixed(2))
+        };
       }
     }
   } catch (err) {
     console.warn('FX rate live fetch fallback used:', err.message);
   }
-  return DEFAULT_USD_EUR_RATE;
+  return { eur: DEFAULT_USD_EUR_RATE, inr: DEFAULT_USD_INR_RATE };
 }
 
-export function formatCurrency(usdAmount, currencyMode = 'DUAL', fxRate = DEFAULT_USD_EUR_RATE) {
+export function formatCurrency(usdAmount, currencyMode = 'DUAL', fxRates = { eur: DEFAULT_USD_EUR_RATE, inr: DEFAULT_USD_INR_RATE }) {
   if (typeof usdAmount !== 'number' || isNaN(usdAmount)) return '$0.00';
   
-  const eurAmount = usdAmount * fxRate;
+  const eurRate = typeof fxRates === 'object' ? (fxRates.eur || DEFAULT_USD_EUR_RATE) : fxRates;
+  const inrRate = typeof fxRates === 'object' ? (fxRates.inr || DEFAULT_USD_INR_RATE) : DEFAULT_USD_INR_RATE;
+
+  const eurAmount = usdAmount * eurRate;
+  const inrAmount = usdAmount * inrRate;
+
   const usdStr = `$${usdAmount.toFixed(2)}`;
   const eurStr = `€${eurAmount.toFixed(2)}`;
+  const inrStr = `₹${inrAmount.toFixed(2)}`;
 
   if (currencyMode === 'EUR') return eurStr;
+  if (currencyMode === 'INR') return inrStr;
   if (currencyMode === 'USD') return usdStr;
-  return `${usdStr} (${eurStr})`;
+  return `${usdStr} (${eurStr} / ${inrStr})`;
 }
 
 // Live Finnhub Quote Fetcher
@@ -53,69 +64,96 @@ export async function fetchFinnhubQuote(symbol, apiKey) {
 }
 
 export const MASTER_STOCKS_DATABASE = {
-  // --- EUROPEAN E-COMMERCE & TECH ---
-  ZAL: {
-    symbol: 'ZAL',
-    name: 'Zalando SE',
-    sector: 'Consumer Discretionary / E-Commerce & Fashion',
-    exchange: 'XETRA / Frankfurt',
-    country: '🇩🇪 Germany / Europe',
-    price: 28.50,
-    change24h: 3.40,
-    marketCap: '$8.2 Billion (€7.5B)',
-    peRatio: 32.4,
-    pbRatio: 3.1,
-    eps: 0.88,
-    week52High: 33.20,
-    week52Low: 15.95,
-    beta: 1.75,
-    volatility: 46.0,
-    sparkline: [24, 25, 26, 25.8, 27, 27.8, 28.50],
+  // --- INDIAN MARKET GIANTS (NIFTY 50 & SENSEX) ---
+  RELIANCE: {
+    symbol: 'RELIANCE',
+    name: 'Reliance Industries Limited',
+    sector: 'Conglomerate / Telecom Jio, Retail & Energy',
+    exchange: 'NSE / BSE India (RIGD)',
+    country: '🇮🇳 India / Asia',
+    price: 34.20,
+    change24h: 3.15,
+    marketCap: '$242 Billion (₹20 Lakh Cr)',
+    peRatio: 24.8,
+    pbRatio: 2.2,
+    eps: 1.38,
+    week52High: 38.50,
+    week52Low: 26.40,
+    beta: 0.92,
+    volatility: 22.5,
+    sparkline: [30, 31.5, 32, 32.8, 33, 33.6, 34.20],
     isEmergingGem: true,
-    gemReason: 'Europe #1 online fashion platform expanding B2B logistics & partner ecosystem margins',
-    catalyst: 'B2B logistics ecosystem launch & active customer order recovery across Western Europe',
-    downsideRisk: 'European consumer apparel spending discretion',
+    gemReason: 'India #1 mega-conglomerate driving Telecom Jio 5G, Retail network expansion & New Energy solar mega-fabs',
+    catalyst: 'Jio Telecom & Reliance Retail upcoming IPO value-unlocking spin-offs',
+    downsideRisk: 'Oil-to-chemicals (O2C) refining margin cyclicality',
+    analystRating: 'Strong Buy',
+    analystScore: 4.9,
+    targetPrice: 42.00,
+    targetLow: 32.00,
+    targetHigh: 50.00,
+    buyCount: 36,
+    holdCount: 3,
+    sellCount: 0
+  },
+  TCS: {
+    symbol: 'TCS',
+    name: 'Tata Consultancy Services',
+    sector: 'Technology / Global IT Services & Cloud',
+    exchange: 'NSE / BSE India (TTNQY)',
+    country: '🇮🇳 India / Asia',
+    price: 52.40,
+    change24h: 1.85,
+    marketCap: '$188 Billion (₹15 Lakh Cr)',
+    peRatio: 31.2,
+    pbRatio: 12.4,
+    eps: 1.68,
+    week52High: 56.80,
+    week52Low: 42.10,
+    beta: 0.76,
+    volatility: 19.5,
+    sparkline: [47, 48.5, 49, 50.2, 51, 51.8, 52.40],
+    isEmergingGem: false,
+    catalyst: 'Industry-best operating margins (25%+) & $10B+ annual TCV deal wins across US & Europe',
+    downsideRisk: 'Global BFSI discretionary IT budget allocation slowdown',
     analystRating: 'Buy',
-    analystScore: 4.4,
-    targetPrice: 36.00,
-    targetLow: 24.00,
-    targetHigh: 45.00,
-    buyCount: 18,
-    holdCount: 4,
+    analystScore: 4.6,
+    targetPrice: 62.00,
+    targetLow: 50.00,
+    targetHigh: 70.00,
+    buyCount: 29,
+    holdCount: 7,
     sellCount: 1
   },
-  HFG: {
-    symbol: 'HFG',
-    name: 'HelloFresh SE',
-    sector: 'Consumer Staples / Ready-to-Eat Delivery',
-    exchange: 'XETRA / Frankfurt',
-    country: '🇩🇪 Germany / Europe',
-    price: 11.20,
-    change24h: -1.85,
-    marketCap: '$2.1 Billion (€1.9B)',
-    peRatio: 18.5,
-    pbRatio: 1.4,
-    eps: 0.61,
-    week52High: 28.40,
-    week52Low: 5.40,
-    beta: 2.10,
-    volatility: 68.0,
-    sparkline: [8.5, 9.2, 10, 10.5, 11, 11.5, 11.20],
+  TATAMOTORS: {
+    symbol: 'TATAMOTORS',
+    name: 'Tata Motors Limited',
+    sector: 'Consumer Discretionary / EV & Jaguar Land Rover',
+    exchange: 'NSE / BSE India (TTM)',
+    country: '🇮🇳 India / Asia',
+    price: 11.80,
+    change24h: 4.50,
+    marketCap: '$44.5 Billion (₹3.6 Lakh Cr)',
+    peRatio: 11.4,
+    pbRatio: 2.8,
+    eps: 1.03,
+    week52High: 14.20,
+    week52Low: 7.20,
+    beta: 1.65,
+    volatility: 38.0,
+    sparkline: [9.2, 9.8, 10.2, 10.8, 11.1, 11.5, 11.80],
     isEmergingGem: true,
-    gemReason: 'Deep turn-around value play: Factor ready-to-eat meals rapidly replacing traditional meal kits',
-    catalyst: 'Factor ready-to-eat division scaling to $2B+ annual revenue',
-    downsideRisk: 'Legacy meal-kit customer acquisition marketing cost inflation',
-    analystRating: 'Moderate Buy',
-    analystScore: 3.8,
-    targetPrice: 16.50,
-    targetLow: 8.00,
-    targetHigh: 24.00,
-    buyCount: 10,
-    holdCount: 8,
-    sellCount: 3
+    gemReason: '70%+ EV market share in India combined with Jaguar Land Rover free cash flow record highs',
+    catalyst: 'India EV passenger vehicle market surge & commercial vehicle de-merger unlock',
+    downsideRisk: 'UK/Europe Jaguar Land Rover luxury export macro demand',
+    analystRating: 'Strong Buy',
+    analystScore: 4.8,
+    targetPrice: 15.50,
+    targetLow: 10.50,
+    targetHigh: 18.00,
+    buyCount: 24,
+    holdCount: 3,
+    sellCount: 0
   },
-
-  // --- MAJOR INDIAN GROWTH & TECH GIANTS ---
   INFY: {
     symbol: 'INFY',
     name: 'Infosys Limited',
@@ -174,35 +212,6 @@ export const MASTER_STOCKS_DATABASE = {
     holdCount: 2,
     sellCount: 0
   },
-  WIT: {
-    symbol: 'WIT',
-    name: 'Wipro Limited',
-    sector: 'Technology / IT Consulting & Cloud Systems',
-    exchange: 'NYSE / NSE India',
-    country: '🇮🇳 India / Asia',
-    price: 6.45,
-    change24h: 1.20,
-    marketCap: '$33.8 Billion',
-    peRatio: 23.5,
-    pbRatio: 3.4,
-    eps: 0.27,
-    week52High: 6.95,
-    week52Low: 4.50,
-    beta: 0.95,
-    volatility: 26.0,
-    sparkline: [5.6, 5.8, 6.0, 6.1, 6.3, 6.4, 6.45],
-    isEmergingGem: false,
-    catalyst: 'Capco financial services integration & cloud transformation deals',
-    downsideRisk: 'Consulting margin competition',
-    analystRating: 'Hold',
-    analystScore: 3.5,
-    targetPrice: 7.50,
-    targetLow: 5.50,
-    targetHigh: 9.00,
-    buyCount: 11,
-    holdCount: 14,
-    sellCount: 5
-  },
   HDB: {
     symbol: 'HDB',
     name: 'HDFC Bank Limited',
@@ -232,154 +241,64 @@ export const MASTER_STOCKS_DATABASE = {
     holdCount: 3,
     sellCount: 0
   },
+  WIT: {
+    symbol: 'WIT',
+    name: 'Wipro Limited',
+    sector: 'Technology / IT Consulting & Cloud Systems',
+    exchange: 'NYSE / NSE India',
+    country: '🇮🇳 India / Asia',
+    price: 6.45,
+    change24h: 1.20,
+    marketCap: '$33.8 Billion',
+    peRatio: 23.5,
+    pbRatio: 3.4,
+    eps: 0.27,
+    week52High: 6.95,
+    week52Low: 4.50,
+    beta: 0.95,
+    volatility: 26.0,
+    sparkline: [5.6, 5.8, 6.0, 6.1, 6.3, 6.4, 6.45],
+    isEmergingGem: false,
+    catalyst: 'Capco financial services integration & cloud transformation deals',
+    downsideRisk: 'Consulting margin competition',
+    analystRating: 'Hold',
+    analystScore: 3.5,
+    targetPrice: 7.50,
+    targetLow: 5.50,
+    targetHigh: 9.00,
+    buyCount: 11,
+    holdCount: 14,
+    sellCount: 5
+  },
 
-  // --- EUROPEAN DEFENSE GIANTS ---
-  RHM: {
-    symbol: 'RHM',
-    name: 'Rheinmetall AG',
-    sector: 'Industrials / European Defense & Ammunition',
+  // --- EUROPEAN GIANTS ---
+  DHER: {
+    symbol: 'DHER',
+    name: 'Delivery Hero SE',
+    sector: 'Consumer Discretionary / Online Delivery',
     exchange: 'XETRA / Frankfurt',
     country: '🇩🇪 Germany / Europe',
-    price: 535.40,
-    change24h: 3.85,
-    marketCap: '$25.2 Billion (€23.2B)',
-    peRatio: 38.2,
-    pbRatio: 7.4,
-    eps: 14.01,
-    week52High: 571.00,
-    week52Low: 232.00,
-    beta: 1.25,
-    volatility: 42.0,
-    sparkline: [480, 500, 510, 520, 515, 528, 535.40],
+    price: 26.40,
+    change24h: 4.20,
+    marketCap: '$7.8 Billion (€7.2B)',
+    peRatio: -15.4,
+    pbRatio: 2.8,
+    eps: -1.72,
+    week52High: 39.80,
+    week52Low: 14.90,
+    beta: 1.85,
+    volatility: 52.0,
+    sparkline: [22, 23.5, 24, 25, 24.8, 25.5, 26.40],
     isEmergingGem: true,
-    gemReason: 'Europe #1 defense contractor surge driven by NATO 2%+ GDP defense spend mandates',
-    catalyst: 'Ammunition & Panther tank backlog expansion & European defense re-armament',
-    downsideRisk: 'Defense procurement timing shifts & supply chain material constraints',
-    analystRating: 'Strong Buy',
-    analystScore: 4.9,
-    targetPrice: 640.00,
-    targetLow: 520.00,
-    targetHigh: 720.00,
-    buyCount: 20,
-    holdCount: 2,
-    sellCount: 0
-  },
-  BAESY: {
-    symbol: 'BAESY',
-    name: 'BAE Systems plc',
-    sector: 'Industrials / Defense & Aerospace',
-    exchange: 'OTC / LSE (BA)',
-    country: '🇬🇧 UK / Europe',
-    price: 68.50,
-    change24h: 1.45,
-    marketCap: '$52.4 Billion (£41B)',
-    peRatio: 19.8,
-    pbRatio: 3.6,
-    eps: 3.46,
-    week52High: 74.20,
-    week52Low: 48.90,
-    beta: 0.72,
-    volatility: 21.5,
-    sparkline: [63, 64.5, 65, 66.2, 67, 67.8, 68.50],
-    isEmergingGem: false,
-    catalyst: 'Global AUKUS submarine program & European combat air system backlog',
-    downsideRisk: 'UK government budget allocation changes',
+    gemReason: 'Leading European & Asian food delivery network with free cash flow inflection',
+    catalyst: 'Glovo & Foodpanda market expansion and positive adjusted EBITDA acceleration',
+    downsideRisk: 'European tech delivery price competition & quick-commerce debt obligations',
     analystRating: 'Buy',
-    analystScore: 4.6,
-    targetPrice: 82.00,
-    targetLow: 65.00,
-    targetHigh: 92.00,
-    buyCount: 18,
-    holdCount: 3,
-    sellCount: 0
-  },
-  SAAB: {
-    symbol: 'SAAB',
-    name: 'Saab AB',
-    sector: 'Industrials / Aerospace & Defense Systems',
-    exchange: 'Nasdaq Stockholm (SAAB-B)',
-    country: '🇸🇪 Sweden / Europe',
-    price: 228.60,
-    change24h: 4.10,
-    marketCap: '$14.5 Billion (SEK 152B)',
-    peRatio: 34.2,
-    pbRatio: 4.8,
-    eps: 6.68,
-    week52High: 254.00,
-    week52Low: 118.00,
-    beta: 1.12,
-    volatility: 38.0,
-    sparkline: [205, 210, 215, 220, 218, 224, 228.60],
-    isEmergingGem: true,
-    gemReason: 'Sweden NATO accession driving massive order backlog for Gripen fighter jets & NLAW systems',
-    catalyst: 'NATO Nordic defense integration & anti-tank missile exports',
-    downsideRisk: 'Production capacity scaling constraints',
-    analystRating: 'Strong Buy',
-    analystScore: 4.7,
-    targetPrice: 275.00,
-    targetLow: 210.00,
-    targetHigh: 310.00,
-    buyCount: 15,
-    holdCount: 2,
-    sellCount: 0
-  },
-
-  // --- SWISS PHARMA GIANTS ---
-  RHHBY: {
-    symbol: 'RHHBY',
-    name: 'Roche Holding AG',
-    sector: 'Healthcare / Pharmaceuticals & Diagnostics',
-    exchange: 'OTC / SIX Swiss Exchange (ROG)',
-    country: '🇨🇭 Switzerland / Europe',
-    price: 36.80,
-    change24h: 1.15,
-    marketCap: '$242 Billion (CHF 215B)',
-    peRatio: 17.2,
-    pbRatio: 6.4,
-    eps: 2.14,
-    week52High: 41.50,
-    week52Low: 29.80,
-    beta: 0.52,
-    volatility: 19.5,
-    sparkline: [33.5, 34, 35, 35.8, 36, 36.4, 36.80],
-    isEmergingGem: false,
-    catalyst: 'Oncology pipeline & Vabysmo eye disease drug blockbuster acceleration',
-    downsideRisk: 'Biosimilar competition for legacy oncology drugs',
-    analystRating: 'Buy',
-    analystScore: 4.4,
-    targetPrice: 44.00,
-    targetLow: 35.00,
+    analystScore: 4.3,
+    targetPrice: 38.00,
+    targetLow: 22.00,
     targetHigh: 50.00,
-    buyCount: 19,
-    holdCount: 7,
-    sellCount: 0
-  },
-  NVO: {
-    symbol: 'NVO',
-    name: 'Novo Nordisk A/S',
-    sector: 'Healthcare / Pharmaceuticals',
-    exchange: 'NYSE / Euronext Copenhagen',
-    country: '🇩🇰 Denmark / Europe',
-    price: 132.40,
-    change24h: 1.85,
-    marketCap: '$592 Billion',
-    peRatio: 38.6,
-    pbRatio: 32.1,
-    eps: 3.43,
-    week52High: 147.15,
-    week52Low: 88.50,
-    beta: 0.65,
-    volatility: 24.0,
-    sparkline: [124, 126, 128, 127, 130, 131, 132.40],
-    isEmergingGem: false,
-    catalyst: 'Ozempic & Wegovy GLP-1 weight-loss drug monopoly expansion',
-    downsideRisk: 'Compounding pharmacy competition & Medicare price negotiations',
-    analystRating: 'Buy',
-    analystScore: 4.6,
-    targetPrice: 158.00,
-    targetLow: 125.00,
-    targetHigh: 180.00,
-    buyCount: 24,
+    buyCount: 16,
     holdCount: 5,
     sellCount: 1
   },
@@ -412,35 +331,64 @@ export const MASTER_STOCKS_DATABASE = {
     holdCount: 3,
     sellCount: 0
   },
-  LVMUY: {
-    symbol: 'LVMUY',
-    name: 'LVMH Moët Hennessy Louis Vuitton',
-    sector: 'Consumer Discretionary / Luxury Goods',
-    exchange: 'OTC / Euronext Paris (MC)',
-    country: '🇫🇷 France / Europe',
-    price: 138.50,
-    change24h: 2.85,
-    marketCap: '$345 Billion (€318B)',
-    peRatio: 22.4,
-    pbRatio: 5.6,
-    eps: 6.18,
-    week52High: 182.00,
-    week52Low: 118.40,
-    beta: 0.98,
-    volatility: 28.0,
-    sparkline: [126, 128, 131, 133, 135, 137, 138.50],
+  RHM: {
+    symbol: 'RHM',
+    name: 'Rheinmetall AG',
+    sector: 'Industrials / European Defense & Ammunition',
+    exchange: 'XETRA / Frankfurt',
+    country: '🇩🇪 Germany / Europe',
+    price: 535.40,
+    change24h: 3.85,
+    marketCap: '$25.2 Billion (€23.2B)',
+    peRatio: 38.2,
+    pbRatio: 7.4,
+    eps: 14.01,
+    week52High: 571.00,
+    week52Low: 232.00,
+    beta: 1.25,
+    volatility: 42.0,
+    sparkline: [480, 500, 510, 520, 515, 528, 535.40],
     isEmergingGem: true,
-    gemReason: 'World #1 luxury conglomerate with iconic brands (Louis Vuitton, Dior, Tiffany)',
-    catalyst: 'China stimulus rebound in high-end luxury spending & European tourism',
-    downsideRisk: 'Aspirational consumer slowdown & FX rate headwinds',
+    gemReason: 'Europe #1 defense contractor surge driven by NATO 2%+ GDP defense spend mandates',
+    catalyst: 'Ammunition & Panther tank backlog expansion & European defense re-armament',
+    downsideRisk: 'Defense procurement timing shifts & supply chain material constraints',
     analystRating: 'Strong Buy',
-    analystScore: 4.8,
-    targetPrice: 175.00,
-    targetLow: 130.00,
-    targetHigh: 200.00,
-    buyCount: 29,
-    holdCount: 4,
+    analystScore: 4.9,
+    targetPrice: 640.00,
+    targetLow: 520.00,
+    targetHigh: 720.00,
+    buyCount: 20,
+    holdCount: 2,
     sellCount: 0
+  },
+  NVO: {
+    symbol: 'NVO',
+    name: 'Novo Nordisk A/S',
+    sector: 'Healthcare / Pharmaceuticals',
+    exchange: 'NYSE / Euronext Copenhagen',
+    country: '🇩🇰 Denmark / Europe',
+    price: 132.40,
+    change24h: 1.85,
+    marketCap: '$592 Billion',
+    peRatio: 38.6,
+    pbRatio: 32.1,
+    eps: 3.43,
+    week52High: 147.15,
+    week52Low: 88.50,
+    beta: 0.65,
+    volatility: 24.0,
+    sparkline: [124, 126, 128, 127, 130, 131, 132.40],
+    isEmergingGem: false,
+    catalyst: 'Ozempic & Wegovy GLP-1 weight-loss drug monopoly expansion',
+    downsideRisk: 'Compounding pharmacy competition & Medicare price negotiations',
+    analystRating: 'Buy',
+    analystScore: 4.6,
+    targetPrice: 158.00,
+    targetLow: 125.00,
+    targetHigh: 180.00,
+    buyCount: 24,
+    holdCount: 5,
+    sellCount: 1
   },
   SAP: {
     symbol: 'SAP',
@@ -470,64 +418,6 @@ export const MASTER_STOCKS_DATABASE = {
     buyCount: 21,
     holdCount: 6,
     sellCount: 0
-  },
-  SIEGY: {
-    symbol: 'SIEGY',
-    name: 'Siemens AG',
-    sector: 'Industrials / Automation & Smart Infrastructure',
-    exchange: 'OTC / XETRA (SIE)',
-    country: '🇩🇪 Germany / Europe',
-    price: 98.40,
-    change24h: 1.60,
-    marketCap: '$158 Billion',
-    peRatio: 17.5,
-    pbRatio: 2.4,
-    eps: 5.62,
-    week52High: 108.00,
-    week52Low: 72.50,
-    beta: 1.15,
-    volatility: 23.5,
-    sparkline: [91, 93, 94, 95.5, 96, 97.2, 98.40],
-    isEmergingGem: false,
-    catalyst: 'Industrial software, grid electrification & factory automation backlog',
-    downsideRisk: 'Global industrial manufacturing order slowdown',
-    analystRating: 'Buy',
-    analystScore: 4.5,
-    targetPrice: 118.00,
-    targetLow: 90.00,
-    targetHigh: 135.00,
-    buyCount: 18,
-    holdCount: 4,
-    sellCount: 0
-  },
-  AIR: {
-    symbol: 'AIR',
-    name: 'Airbus SE',
-    sector: 'Industrials / Commercial Aviation & Defense',
-    exchange: 'Euronext Paris / XETRA',
-    country: '🇫🇷 France / Europe',
-    price: 142.10,
-    change24h: -0.75,
-    marketCap: '$122 Billion (€112B)',
-    peRatio: 28.2,
-    pbRatio: 6.8,
-    eps: 5.04,
-    week52High: 172.00,
-    week52Low: 124.00,
-    beta: 1.25,
-    volatility: 29.0,
-    sparkline: [148, 146, 145, 144, 143, 142.5, 142.10],
-    isEmergingGem: false,
-    catalyst: 'A320neo order backlog expansion while Boeing faces supply issues',
-    downsideRisk: 'Supply chain engine bottlenecks & commercial delivery delays',
-    analystRating: 'Buy',
-    analystScore: 4.4,
-    targetPrice: 165.00,
-    targetLow: 135.00,
-    targetHigh: 190.00,
-    buyCount: 22,
-    holdCount: 6,
-    sellCount: 1
   },
 
   // --- ASIAN GIANTS ---
@@ -591,35 +481,6 @@ export const MASTER_STOCKS_DATABASE = {
     holdCount: 2,
     sellCount: 0
   },
-  TM: {
-    symbol: 'TM',
-    name: 'Toyota Motor Corporation',
-    sector: 'Consumer Discretionary / Automotive & Hybrids',
-    exchange: 'NYSE / Tokyo (7203)',
-    country: '🇯🇵 Japan / Asia',
-    price: 178.60,
-    change24h: 1.80,
-    marketCap: '$242 Billion',
-    peRatio: 7.8,
-    pbRatio: 0.95,
-    eps: 22.90,
-    week52High: 254.00,
-    week52Low: 162.00,
-    beta: 0.78,
-    volatility: 24.5,
-    sparkline: [168, 170, 173, 172, 175, 177, 178.60],
-    isEmergingGem: false,
-    catalyst: 'Global consumer preference shift toward Hybrid vehicles & deep value P/E of 7.8x',
-    downsideRisk: 'Japan Yen exchange rate fluctuations & EV transition capex',
-    analystRating: 'Buy',
-    analystScore: 4.4,
-    targetPrice: 215.00,
-    targetLow: 170.00,
-    targetHigh: 250.00,
-    buyCount: 17,
-    holdCount: 4,
-    sellCount: 0
-  },
   BABA: {
     symbol: 'BABA',
     name: 'Alibaba Group Holding Ltd.',
@@ -649,36 +510,6 @@ export const MASTER_STOCKS_DATABASE = {
     buyCount: 26,
     holdCount: 8,
     sellCount: 1
-  },
-  TCEHY: {
-    symbol: 'TCEHY',
-    name: 'Tencent Holdings Ltd.',
-    sector: 'Communication Services / Gaming & WeChat',
-    exchange: 'OTC / HKEX (0700)',
-    country: '🇨🇳 China / Asia',
-    price: 52.80,
-    change24h: 2.70,
-    marketCap: '$485 Billion',
-    peRatio: 21.6,
-    pbRatio: 3.8,
-    eps: 2.44,
-    week52High: 62.00,
-    week52Low: 34.50,
-    beta: 0.88,
-    volatility: 38.0,
-    sparkline: [46, 48, 49, 50.5, 51, 52, 52.80],
-    isEmergingGem: true,
-    gemReason: 'World #1 video game publisher with WeChat ecosystem monetization',
-    catalyst: 'New flagship game approvals & AI cloud advertising efficiency',
-    downsideRisk: 'China gaming time regulation & macroeconomic consumer spending',
-    analystRating: 'Strong Buy',
-    analystScore: 4.8,
-    targetPrice: 68.00,
-    targetLow: 50.00,
-    targetHigh: 82.00,
-    buyCount: 32,
-    holdCount: 3,
-    sellCount: 0
   },
 
   // --- US GIANTS ---
@@ -1090,14 +921,14 @@ export function calculateTimingScore(tickerData, postMetrics) {
 }
 
 export const STOCK_NEWS_DATABASE = {
-  ZAL: [
-    { id: 'zal1', title: 'Zalando Partner Program Revenue Grows as Active Customers Rebound', source: 'Handelsblatt', time: '1 hour ago', impact: 'Positive', impactText: 'European fashion e-commerce margin expansion', url: 'https://finance.yahoo.com' }
+  RELIANCE: [
+    { id: 'rel1', title: 'Reliance Jio 5G Subscribers Reach 150M Benchmark Across India', source: 'Economic Times', time: '1 hour ago', impact: 'Positive', impactText: 'ARPU tariff increases accelerating telecom free cash flow', url: 'https://finance.yahoo.com' }
   ],
-  HFG: [
-    { id: 'hfg1', title: 'HelloFresh Factor Ready-To-Eat Division Reaches $2B Revenue Benchmark', source: 'FAZ Germany', time: '2 hours ago', impact: 'Positive', impactText: 'Ready-to-eat meals driving US and European profitability turnaround', url: 'https://finance.yahoo.com' }
+  TATAMOTORS: [
+    { id: 'tmot1', title: 'Tata Motors EV Sales Surge 45% YoY as Punch EV and Nexon EV Lead India', source: 'Mint', time: '2 hours ago', impact: 'Positive', impactText: 'Jaguar Land Rover order book maintains record £4B value', url: 'https://finance.yahoo.com' }
   ],
-  INFY: [
-    { id: 'infy1', title: 'Infosys Signs $1.5B Generative AI Enterprise Cloud Agreement', source: 'Economic Times India', time: '2 hours ago', impact: 'Positive', impactText: 'Topaz AI platform adoption driving multi-year IT services deals', url: 'https://finance.yahoo.com' }
+  TCS: [
+    { id: 'tcs1', title: 'TCS Signs $1.2B Enterprise Cloud & AI Deal with European Bank', source: 'Business Standard', time: '3 hours ago', impact: 'Positive', impactText: 'Tata Consultancy Services operating margins hit 25.4%', url: 'https://finance.yahoo.com' }
   ]
 };
 
