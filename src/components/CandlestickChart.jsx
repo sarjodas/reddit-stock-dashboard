@@ -382,7 +382,11 @@ export default function CandlestickChart({ symbol, basePrice, currencyMode, fxRa
           {/* X-Axis Date / Time Axis Labels */}
           {candles.map((candle, idx) => {
             const step = Math.max(1, Math.floor(candles.length / 5));
-            if (idx % step !== 0 && idx !== candles.length - 1) return null;
+            const isLast = idx === candles.length - 1;
+            const isStep = idx % step === 0;
+            const isTooCloseToEnd = !isLast && (candles.length - 1 - idx) < (step * 0.7);
+
+            if ((!isStep || isTooCloseToEnd) && !isLast) return null;
 
             const xCenter = idx * candleGap + candleGap / 2;
             const isHovered = hoveredCandle && hoveredCandle.id === candle.id;
