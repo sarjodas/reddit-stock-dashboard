@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, TrendingUp, TrendingDown, ShieldCheck, AlertTriangle, Zap, DollarSign, ExternalLink, MessageSquare, Globe, Building2, BarChart2, Newspaper, Clock, ShoppingCart, Target, Award, Activity } from 'lucide-react';
+import { X, TrendingUp, TrendingDown, ShieldCheck, AlertTriangle, Zap, DollarSign, ExternalLink, MessageSquare, Globe, Building2, BarChart2, Newspaper, Clock, ShoppingCart, Target, Award, Activity, CheckCircle2, Smartphone } from 'lucide-react';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip } from 'recharts';
 import { formatCurrency } from '../services/stockApi';
 import CandlestickChart from './CandlestickChart';
@@ -17,6 +17,8 @@ export default function TickerModal({ stock, onClose, currencyMode, fxRate }) {
     socialBuzz: Math.round(val * 1.8 + idx * 5)
   }));
 
+  const brokersList = stock.brokers || ['Scalable', 'Trading 212', 'Revolut'];
+
   return (
     <div className="modal-overlay">
       <div className="modal-content glass-panel" style={{ maxWidth: '880px', padding: '28px' }}>
@@ -24,7 +26,7 @@ export default function TickerModal({ stock, onClose, currencyMode, fxRate }) {
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '16px', paddingBottom: '14px', borderBottom: '1px solid var(--border-color)' }}>
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px', flexWrap: 'wrap' }}>
               <h2 style={{ fontSize: '1.75rem', fontWeight: 800, fontFamily: 'var(--font-mono)', color: '#fff' }}>
                 ${stock.symbol}
               </h2>
@@ -34,13 +36,39 @@ export default function TickerModal({ stock, onClose, currencyMode, fxRate }) {
                 {stock.bullishRatio}% Bullish
               </span>
             </div>
-            <h3 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text-secondary)' }}>{stock.name} • {stock.sector}</h3>
+            
+            <h3 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '8px' }}>
+              {stock.name} • {stock.sector}
+            </h3>
+
+            {/* Trading App / Broker Availability Banner */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', background: 'rgba(0, 0, 0, 0.4)', padding: '6px 12px', borderRadius: 'var(--radius-md)', border: '1px solid rgba(255, 255, 255, 0.06)' }}>
+              <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <Smartphone size={13} color="var(--accent-cyan)" /> Trading App Availability:
+              </span>
+              {brokersList.map((broker, idx) => (
+                <span
+                  key={idx}
+                  className="badge"
+                  style={{
+                    fontSize: '0.7rem',
+                    padding: '2px 8px',
+                    background: broker === 'Scalable' ? 'rgba(16, 185, 129, 0.15)' : broker === 'Trading 212' ? 'rgba(56, 189, 248, 0.15)' : 'rgba(192, 132, 252, 0.15)',
+                    color: broker === 'Scalable' ? '#34d399' : broker === 'Trading 212' ? '#38bdf8' : '#c084fc',
+                    border: `1px solid ${broker === 'Scalable' ? 'rgba(16, 185, 129, 0.35)' : broker === 'Trading 212' ? 'rgba(56, 189, 248, 0.35)' : 'rgba(192, 132, 252, 0.35)'}`
+                  }}
+                >
+                  <CheckCircle2 size={11} /> {broker}
+                </span>
+              ))}
+            </div>
+
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             <div style={{ textAlign: 'right' }}>
               <div style={{ fontSize: '1.4rem', fontWeight: 800, fontFamily: 'var(--font-mono)', color: '#fff' }}>
-                {formatCurrency(stock.price, currencyMode, fxRate)}
+                {formatCurrency(stock.price, currencyMode, fxRate, stock.nativeCurrency)}
               </div>
               <div style={{ fontSize: '0.85rem', fontWeight: 700, color: stock.change24h >= 0 ? '#10b981' : '#ef4444' }}>
                 {stock.change24h >= 0 ? `+${stock.change24h}%` : `${stock.change24h}%`} (24h)
@@ -138,64 +166,66 @@ export default function TickerModal({ stock, onClose, currencyMode, fxRate }) {
               padding: '16px',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'space-between'
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '12px',
+              marginTop: '16px'
             }}>
               <div>
-                <span className={`badge ${timing.badgeClass}`} style={{ fontSize: '0.8rem', padding: '4px 12px', marginBottom: '4px' }}>
-                  {timing.icon} {timing.signal} ({timing.timingScore}/100)
-                </span>
-                <p style={{ fontSize: '0.8rem', color: '#e2e8f0', marginTop: '4px' }}>
+                <div style={{ fontSize: '0.78rem', fontWeight: 800, color: '#10b981', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '2px' }}>
+                  <span>{timing.icon}</span> Market Entry Timing Signal: {timing.signal}
+                </div>
+                <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
                   {timing.reasoning}
                 </p>
               </div>
-              <div style={{ textAlign: 'right', minWidth: '130px' }}>
-                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Target Upside:</span>
-                <div style={{ fontSize: '1rem', fontWeight: 800, color: stock.impliedUpside >= 0 ? '#10b981' : '#ef4444', fontFamily: 'var(--font-mono)' }}>
-                  {stock.impliedUpside >= 0 ? `+${stock.impliedUpside}%` : `${stock.impliedUpside}%`}
-                </div>
+              <div style={{ textAlign: 'right' }}>
+                <span className={`badge ${timing.badgeClass}`} style={{ fontSize: '0.8rem', padding: '4px 12px' }}>
+                  Score: {timing.timingScore}/99
+                </span>
               </div>
             </div>
           </div>
         )}
 
+        {/* Tab: Overview & Analytics */}
         {activeTab === 'overview' && (
-          <>
-            {/* Top Grid: Timing Signal & Wall Street Price Target */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '16px', marginBottom: '20px' }}>
+          <div>
+            
+            {/* Timing Engine & Wall St Target Header Box */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '16px', marginBottom: '20px' }}>
               
-              {/* Timing Entry Banner */}
+              {/* Timing Engine Card */}
               <div style={{
                 background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(2, 132, 199, 0.1) 100%)',
                 border: '1px solid rgba(16, 185, 129, 0.25)',
                 borderRadius: 'var(--radius-md)',
-                padding: '16px',
-                display: 'flex',
-                flexDirection: 'column',
-                justify: 'space-between'
+                padding: '16px'
               }}>
-                <div>
-                  <span className={`badge ${timing.badgeClass}`} style={{ fontSize: '0.8rem', padding: '4px 12px', marginBottom: '8px' }}>
-                    {timing.icon} {timing.signal} ({timing.timingScore}/100)
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                  <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <ShoppingCart size={14} color="#10b981" /> Timing Engine Signal
                   </span>
-                  <p style={{ fontSize: '0.8rem', color: '#e2e8f0', marginTop: '6px' }}>
-                    <strong>Entry Recommendation:</strong> {timing.reasoning}
-                  </p>
+                  <span className={`badge ${timing.badgeClass}`} style={{ fontSize: '0.75rem' }}>
+                    {timing.icon} {timing.timingScore}/99
+                  </span>
                 </div>
-                <div style={{ marginTop: '10px', paddingTop: '8px', borderTop: '1px solid rgba(255,255,255,0.06)', display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem' }}>
-                  <span style={{ color: 'var(--text-muted)' }}>52-Wk Channel Position:</span>
-                  <strong style={{ color: '#38bdf8', fontFamily: 'var(--font-mono)' }}>{timing.channelPos}% Range</strong>
-                </div>
+                
+                <h4 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#10b981', marginBottom: '4px' }}>
+                  {timing.signal}
+                </h4>
+                
+                <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', lineHeight: 1.4 }}>
+                  {timing.reasoning}
+                </p>
               </div>
 
-              {/* Wall Street Analyst Target & Upside Card */}
+              {/* Wall St Analyst Price Target */}
               <div style={{
                 background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%)',
                 border: '1px solid rgba(56, 189, 248, 0.25)',
                 borderRadius: 'var(--radius-md)',
-                padding: '16px',
-                display: 'flex',
-                flexDirection: 'column',
-                justify: 'space-between'
+                padding: '16px'
               }}>
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
@@ -209,7 +239,7 @@ export default function TickerModal({ stock, onClose, currencyMode, fxRate }) {
                   
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '4px' }}>
                     <span style={{ fontSize: '1.25rem', fontWeight: 800, fontFamily: 'var(--font-mono)', color: '#38bdf8' }}>
-                      {formatCurrency(stock.targetPrice, currencyMode, fxRate)}
+                      {formatCurrency(stock.targetPrice, currencyMode, fxRate, stock.nativeCurrency)}
                     </span>
                     <span style={{ fontSize: '0.85rem', fontWeight: 700, color: stock.impliedUpside >= 0 ? '#10b981' : '#ef4444' }}>
                       {stock.impliedUpside >= 0 ? `+${stock.impliedUpside}% Upside` : `${stock.impliedUpside}%`}
@@ -217,7 +247,7 @@ export default function TickerModal({ stock, onClose, currencyMode, fxRate }) {
                   </div>
                   
                   <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                    Target Range: Low <strong>{formatCurrency(stock.targetLow, currencyMode, fxRate)}</strong> — High <strong>{formatCurrency(stock.targetHigh, currencyMode, fxRate)}</strong>
+                    Target Range: Low <strong>{formatCurrency(stock.targetLow, currencyMode, fxRate, stock.nativeCurrency)}</strong> — High <strong>{formatCurrency(stock.targetHigh, currencyMode, fxRate, stock.nativeCurrency)}</strong>
                   </div>
                 </div>
 
@@ -259,7 +289,7 @@ export default function TickerModal({ stock, onClose, currencyMode, fxRate }) {
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <span style={{ color: 'var(--text-secondary)' }}>52-Wk Range:</span>
                     <strong style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem' }}>
-                      {formatCurrency(stock.week52Low, currencyMode, fxRate)} - {formatCurrency(stock.week52High, currencyMode, fxRate)}
+                      {formatCurrency(stock.week52Low, currencyMode, fxRate, stock.nativeCurrency)} - {formatCurrency(stock.week52High, currencyMode, fxRate, stock.nativeCurrency)}
                     </strong>
                   </div>
                 </div>
@@ -322,49 +352,59 @@ export default function TickerModal({ stock, onClose, currencyMode, fxRate }) {
                 </ResponsiveContainer>
               </div>
             </div>
-          </>
-        )}
 
-        {/* Tab 2: Impact News */}
-        {activeTab === 'news' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            {stock.newsFeed && stock.newsFeed.length > 0 ? (
-              stock.newsFeed.map(news => (
-                <div key={news.id} style={{ padding: '14px', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                    <span className={`badge ${news.impact === 'Positive' ? 'badge-bullish' : 'badge-neutral'}`}>
-                      {news.impact} Impact
-                    </span>
-                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{news.source} • {news.time}</span>
-                  </div>
-                  <h4 style={{ fontSize: '0.92rem', fontWeight: 700, marginBottom: '4px' }}>{news.title}</h4>
-                  <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{news.impactText}</p>
-                </div>
-              ))
-            ) : (
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>No major breaking catalyst news reported in past 24 hours.</p>
-            )}
           </div>
         )}
 
-        {/* Tab 3: Reddit Threads */}
-        {activeTab === 'threads' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '350px', overflowY: 'auto' }}>
-            {stock.posts && stock.posts.length > 0 ? (
-              stock.posts.map(p => (
-                <div key={p.id} style={{ padding: '10px 14px', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.85rem' }}>
-                  <div>
-                    <span className="badge badge-exchange" style={{ background: 'rgba(2, 132, 199, 0.15)', color: '#38bdf8', marginRight: '8px' }}>r/{p.subreddit}</span>
-                    <span>{p.title}</span>
+        {/* Tab: News Feed */}
+        {activeTab === 'news' && (
+          <div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {stock.newsFeed && stock.newsFeed.length > 0 ? (
+                stock.newsFeed.map(news => (
+                  <div key={news.id} style={{ background: 'rgba(255,255,255,0.03)', padding: '14px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--accent-cyan)', fontWeight: 700 }}>{news.source} • {news.time}</span>
+                      <span className={`badge ${news.impact === 'Positive' ? 'badge-bullish' : news.impact === 'Negative' ? 'badge-bearish' : 'badge-neutral'}`}>
+                        {news.impact} Impact
+                      </span>
+                    </div>
+                    <h4 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#fff', marginBottom: '4px' }}>{news.title}</h4>
+                    <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{news.impactText}</p>
                   </div>
-                  <a href={p.permalink} target="_blank" rel="noreferrer" style={{ color: '#38bdf8', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px', whiteSpace: 'nowrap' }}>
-                    Open <ExternalLink size={12} />
-                  </a>
-                </div>
-              ))
-            ) : (
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Discussion threads active across r/stocks & r/wallstreetbets.</p>
-            )}
+                ))
+              ) : (
+                <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>No recent breaking news feeds available.</div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Tab: Reddit Threads */}
+        {activeTab === 'threads' && (
+          <div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {stock.posts && stock.posts.length > 0 ? (
+                stock.posts.map(post => (
+                  <div key={post.id} style={{ background: 'rgba(255,255,255,0.03)', padding: '14px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>r/{post.subreddit} • by u/{post.author}</span>
+                      <span className={`badge ${post.sentiment.label === 'Bullish' ? 'badge-bullish' : 'badge-bearish'}`}>
+                        {post.sentiment.label} ({Math.round(post.sentiment.score * 100)}%)
+                      </span>
+                    </div>
+                    <h4 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#fff', marginBottom: '4px' }}>{post.title}</h4>
+                    <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '8px' }}>{post.summary}</p>
+                    <div style={{ display: 'flex', gap: '12px', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                      <span>▲ {post.score} Upvotes</span>
+                      <span>💬 {post.numComments} Comments</span>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>No direct community posts captured in current sample interval.</div>
+              )}
+            </div>
           </div>
         )}
 
