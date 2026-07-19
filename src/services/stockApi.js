@@ -1325,8 +1325,8 @@ export function compileStockAnalytics(posts, finnhubApiKey = null, dynamicCacheU
     const hasLowChatter = totalMentions < 5 || mentionChange24h <= 0;
     const isAnalystBearish = (baseData.analystScore || 3.5) < 3.5 || ['Sell', 'Strong Sell', 'Underperform'].includes(baseData.analystRating);
 
-    // Flag as dead stock instead of dropping it entirely, so UI can toggle
-    enriched.isDeadStock = isSmallCap && hasLowChatter && isAnalystBearish;
+    // Flag as dead stock if it has NO mentions in the active Subreddit stream, OR if it's a failing small cap
+    enriched.isDeadStock = (totalMentions === 0) || (isSmallCap && hasLowChatter && isAnalystBearish);
 
     results.push(enriched);
   });
