@@ -279,8 +279,6 @@ export default function TickerModal({ stock, onClose, currencyMode, fxRate }) {
 
             </div>
 
-            </div>
-
             {/* NEW: API Data Integration - Technicals & DCF */}
             {(stock.technicals || stock.dcfValuation) && (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '16px', marginBottom: '20px' }}>
