@@ -44,14 +44,12 @@ export default function App() {
       apiMode: 'custom',
       redditClientId: '',
       redditClientSecret: '',
-      finnhubApiKey: '',
+      finnhubApiKey: '***REMOVED***',
       refreshInterval: 5
     };
     if (!saved) return defaultSettings;
     const parsed = JSON.parse(saved);
-    // If the saved key is the old demo key, clear it so sandbox prices don't override database
-    const cleanKey = (parsed.finnhubApiKey === '***REMOVED***') ? '' : (parsed.finnhubApiKey || '');
-    return { ...defaultSettings, ...parsed, finnhubApiKey: cleanKey };
+    return { ...defaultSettings, ...parsed, finnhubApiKey: parsed.finnhubApiKey || '***REMOVED***' };
   });
 
   const handleToggleWatchlist = (symbol) => {
@@ -133,9 +131,8 @@ export default function App() {
         }
       });
 
-      if (settings.finnhubApiKey && settings.finnhubApiKey !== '***REMOVED***') {
-        const topSymbols = compiled.slice(0, 5).map(s => s.symbol);
-        const quotePromises = topSymbols.map(sym => fetchFinnhubQuote(sym, settings.finnhubApiKey));
+      if (settings.finnhubApiKey) {
+        const quotePromises = compiled.map(s => fetchFinnhubQuote(s.symbol, settings.finnhubApiKey));
         const quotes = await Promise.all(quotePromises);
 
         quotes.forEach((q, idx) => {
