@@ -53,6 +53,7 @@ export async function fetchFinnhubQuote(symbol, apiKey) {
 }
 
 export const MASTER_STOCKS_DATABASE = {
+  // --- EUROPEAN GIANTS ---
   DHER: {
     symbol: 'DHER',
     name: 'Delivery Hero SE',
@@ -110,6 +111,36 @@ export const MASTER_STOCKS_DATABASE = {
     targetHigh: 1200.00,
     buyCount: 28,
     holdCount: 3,
+    sellCount: 0
+  },
+  LVMUY: {
+    symbol: 'LVMUY',
+    name: 'LVMH Moët Hennessy Louis Vuitton',
+    sector: 'Consumer Discretionary / Luxury Goods',
+    exchange: 'OTC / Euronext Paris (MC)',
+    country: '🇫🇷 France / Europe',
+    price: 138.50,
+    change24h: 2.85,
+    marketCap: '$345 Billion (€318B)',
+    peRatio: 22.4,
+    pbRatio: 5.6,
+    eps: 6.18,
+    week52High: 182.00,
+    week52Low: 118.40,
+    beta: 0.98,
+    volatility: 28.0,
+    sparkline: [126, 128, 131, 133, 135, 137, 138.50],
+    isEmergingGem: true,
+    gemReason: 'World #1 luxury conglomerate with iconic brands (Louis Vuitton, Dior, Tiffany)',
+    catalyst: 'China stimulus rebound in high-end luxury spending & European tourism',
+    downsideRisk: 'Aspirational consumer slowdown & FX rate headwinds',
+    analystRating: 'Strong Buy',
+    analystScore: 4.8,
+    targetPrice: 175.00,
+    targetLow: 130.00,
+    targetHigh: 200.00,
+    buyCount: 29,
+    holdCount: 4,
     sellCount: 0
   },
   NVO: {
@@ -170,6 +201,95 @@ export const MASTER_STOCKS_DATABASE = {
     holdCount: 6,
     sellCount: 0
   },
+  SIEGY: {
+    symbol: 'SIEGY',
+    name: 'Siemens AG',
+    sector: 'Industrials / Automation & Smart Infrastructure',
+    exchange: 'OTC / XETRA (SIE)',
+    country: '🇩🇪 Germany / Europe',
+    price: 98.40,
+    change24h: 1.60,
+    marketCap: '$158 Billion',
+    peRatio: 17.5,
+    pbRatio: 2.4,
+    eps: 5.62,
+    week52High: 108.00,
+    week52Low: 72.50,
+    beta: 1.15,
+    volatility: 23.5,
+    sparkline: [91, 93, 94, 95.5, 96, 97.2, 98.40],
+    isEmergingGem: false,
+    catalyst: 'Industrial software, grid electrification & factory automation backlog',
+    downsideRisk: 'Global industrial manufacturing order slowdown',
+    analystRating: 'Buy',
+    analystScore: 4.5,
+    targetPrice: 118.00,
+    targetLow: 90.00,
+    targetHigh: 135.00,
+    buyCount: 18,
+    holdCount: 4,
+    sellCount: 0
+  },
+  AIR: {
+    symbol: 'AIR',
+    name: 'Airbus SE',
+    sector: 'Industrials / Commercial Aviation & Defense',
+    exchange: 'Euronext Paris / XETRA',
+    country: '🇫🇷 France / Europe',
+    price: 142.10,
+    change24h: -0.75,
+    marketCap: '$122 Billion (€112B)',
+    peRatio: 28.2,
+    pbRatio: 6.8,
+    eps: 5.04,
+    week52High: 172.00,
+    week52Low: 124.00,
+    beta: 1.25,
+    volatility: 29.0,
+    sparkline: [148, 146, 145, 144, 143, 142.5, 142.10],
+    isEmergingGem: false,
+    catalyst: 'A320neo order backlog expansion while Boeing faces supply issues',
+    downsideRisk: 'Supply chain engine bottlenecks & commercial delivery delays',
+    analystRating: 'Buy',
+    analystScore: 4.4,
+    targetPrice: 165.00,
+    targetLow: 135.00,
+    targetHigh: 190.00,
+    buyCount: 22,
+    holdCount: 6,
+    sellCount: 1
+  },
+  AZN: {
+    symbol: 'AZN',
+    name: 'AstraZeneca PLC',
+    sector: 'Healthcare / Pharmaceuticals',
+    exchange: 'NASDAQ / LSE',
+    country: '🇬🇧 UK / Europe',
+    price: 76.80,
+    change24h: 0.95,
+    marketCap: '$238 Billion',
+    peRatio: 36.4,
+    pbRatio: 6.1,
+    eps: 2.11,
+    week52High: 87.65,
+    week52Low: 61.50,
+    beta: 0.58,
+    volatility: 21.0,
+    sparkline: [73, 74, 75, 74.5, 75.5, 76, 76.80],
+    isEmergingGem: false,
+    catalyst: 'Enhertu antibody-drug conjugate oncology blockbuster growth',
+    downsideRisk: 'China investigation inquiries & R&D trial outcomes',
+    analystRating: 'Buy',
+    analystScore: 4.5,
+    targetPrice: 92.00,
+    targetLow: 75.00,
+    targetHigh: 105.00,
+    buyCount: 22,
+    holdCount: 4,
+    sellCount: 0
+  },
+
+  // --- ASIAN GIANTS ---
   TSM: {
     symbol: 'TSM',
     name: 'Taiwan Semiconductor Manufacturing',
@@ -230,6 +350,35 @@ export const MASTER_STOCKS_DATABASE = {
     holdCount: 2,
     sellCount: 0
   },
+  TM: {
+    symbol: 'TM',
+    name: 'Toyota Motor Corporation',
+    sector: 'Consumer Discretionary / Automotive & Hybrids',
+    exchange: 'NYSE / Tokyo (7203)',
+    country: '🇯🇵 Japan / Asia',
+    price: 178.60,
+    change24h: 1.80,
+    marketCap: '$242 Billion',
+    peRatio: 7.8,
+    pbRatio: 0.95,
+    eps: 22.90,
+    week52High: 254.00,
+    week52Low: 162.00,
+    beta: 0.78,
+    volatility: 24.5,
+    sparkline: [168, 170, 173, 172, 175, 177, 178.60],
+    isEmergingGem: false,
+    catalyst: 'Global consumer preference shift toward Hybrid vehicles & deep value P/E of 7.8x',
+    downsideRisk: 'Japan Yen exchange rate fluctuations & EV transition capex',
+    analystRating: 'Buy',
+    analystScore: 4.4,
+    targetPrice: 215.00,
+    targetLow: 170.00,
+    targetHigh: 250.00,
+    buyCount: 17,
+    holdCount: 4,
+    sellCount: 0
+  },
   BABA: {
     symbol: 'BABA',
     name: 'Alibaba Group Holding Ltd.',
@@ -260,35 +409,67 @@ export const MASTER_STOCKS_DATABASE = {
     holdCount: 8,
     sellCount: 1
   },
-  AZN: {
-    symbol: 'AZN',
-    name: 'AstraZeneca PLC',
-    sector: 'Healthcare / Pharmaceuticals',
-    exchange: 'NASDAQ / LSE',
-    country: '🇬🇧 UK / Europe',
-    price: 76.80,
-    change24h: 0.95,
-    marketCap: '$238 Billion',
-    peRatio: 36.4,
-    pbRatio: 6.1,
-    eps: 2.11,
-    week52High: 87.65,
-    week52Low: 61.50,
-    beta: 0.58,
-    volatility: 21.0,
-    sparkline: [73, 74, 75, 74.5, 75.5, 76, 76.80],
-    isEmergingGem: false,
-    catalyst: 'Enhertu antibody-drug conjugate oncology blockbuster growth',
-    downsideRisk: 'China investigation inquiries & R&D trial outcomes',
-    analystRating: 'Buy',
-    analystScore: 4.5,
-    targetPrice: 92.00,
-    targetLow: 75.00,
-    targetHigh: 105.00,
-    buyCount: 22,
-    holdCount: 4,
+  TCEHY: {
+    symbol: 'TCEHY',
+    name: 'Tencent Holdings Ltd.',
+    sector: 'Communication Services / Gaming & WeChat',
+    exchange: 'OTC / HKEX (0700)',
+    country: '🇨🇳 China / Asia',
+    price: 52.80,
+    change24h: 2.70,
+    marketCap: '$485 Billion',
+    peRatio: 21.6,
+    pbRatio: 3.8,
+    eps: 2.44,
+    week52High: 62.00,
+    week52Low: 34.50,
+    beta: 0.88,
+    volatility: 38.0,
+    sparkline: [46, 48, 49, 50.5, 51, 52, 52.80],
+    isEmergingGem: true,
+    gemReason: 'World #1 video game publisher with WeChat ecosystem monetization',
+    catalyst: 'New flagship game approvals & AI cloud advertising efficiency',
+    downsideRisk: 'China gaming time regulation & macroeconomic consumer spending',
+    analystRating: 'Strong Buy',
+    analystScore: 4.8,
+    targetPrice: 68.00,
+    targetLow: 50.00,
+    targetHigh: 82.00,
+    buyCount: 32,
+    holdCount: 3,
     sellCount: 0
   },
+  HDB: {
+    symbol: 'HDB',
+    name: 'HDFC Bank Limited',
+    sector: 'Financials / Banking',
+    exchange: 'NYSE / NSE India',
+    country: '🇮🇳 India / Asia',
+    price: 64.20,
+    change24h: 1.45,
+    marketCap: '$162 Billion',
+    peRatio: 18.5,
+    pbRatio: 2.6,
+    eps: 3.47,
+    week52High: 71.00,
+    week52Low: 52.80,
+    beta: 0.92,
+    volatility: 22.0,
+    sparkline: [59, 60.5, 61, 62, 63, 63.8, 64.20],
+    isEmergingGem: false,
+    catalyst: 'India GDP 7%+ economic growth & credit expansion supercycle',
+    downsideRisk: 'Post-merger deposit growth cost stabilization',
+    analystRating: 'Buy',
+    analystScore: 4.6,
+    targetPrice: 78.00,
+    targetLow: 62.00,
+    targetHigh: 90.00,
+    buyCount: 25,
+    holdCount: 3,
+    sellCount: 0
+  },
+
+  // --- US GIANTS ---
   NVDA: {
     symbol: 'NVDA',
     name: 'NVIDIA Corporation',
@@ -700,27 +881,17 @@ export const STOCK_NEWS_DATABASE = {
   DHER: [
     { id: 'dher1', title: 'Delivery Hero Glovo Revenue Surges Across European & Asian Markets', source: 'Handelsblatt', time: '1 hour ago', impact: 'Positive', impactText: 'Free cash flow breakeven milestones reached in Q3', url: 'https://finance.yahoo.com' }
   ],
+  LVMUY: [
+    { id: 'lvm1', title: 'LVMH Reports Resilient Fashion & Leather Goods Revenues', source: 'Le Figaro', time: '2 hours ago', impact: 'Positive', impactText: 'Louis Vuitton and Christian Dior demand accelerates in Asia', url: 'https://finance.yahoo.com' }
+  ],
+  TCEHY: [
+    { id: 'tce1', title: 'Tencent Games Division Launch Boosts Overseas Revenues 29%', source: 'South China Morning Post', time: '1 hour ago', impact: 'Positive', impactText: 'WeChat Mini Games and AI cloud ecosystem expansion', url: 'https://finance.yahoo.com' }
+  ],
+  TM: [
+    { id: 'tm1', title: 'Toyota Hybrid Sales Hit All-Time High Across Global Markets', source: 'Nikkei Asia', time: '3 hours ago', impact: 'Positive', impactText: 'Consumer demand for hybrid powertrains outpaces full EVs', url: 'https://finance.yahoo.com' }
+  ],
   NVDA: [
-    { id: 'n1', title: 'NVIDIA Blackwell Ultra AI GPU Shipping Schedules Accelerated', source: 'Bloomberg Markets', time: '2 hours ago', impact: 'Positive', impactText: 'Hyperscaler demand exceeding 2025 supply capacity', url: 'https://finance.yahoo.com' },
-    { id: 'n2', title: 'Morgan Stanley Elevates NVDA Price Target to $160', source: 'Wall Street Journal', time: '5 hours ago', impact: 'Positive', impactText: 'Analyst cites enterprise AI software acceleration', url: 'https://finance.yahoo.com' }
-  ],
-  TSM: [
-    { id: 'tsm1', title: 'TSMC Reports Record Monthly Revenue on 3nm AI Chip Demand', source: 'Reuters Asia', time: '1 hour ago', impact: 'Positive', impactText: 'Apple & NVIDIA wafer orders running at 100% capacity utilization', url: 'https://finance.yahoo.com' }
-  ],
-  ASML: [
-    { id: 'asml1', title: 'ASML High-NA EUV Machine Shipments Reach Key Milestones', source: 'Financial Times Europe', time: '3 hours ago', impact: 'Positive', impactText: 'Next-gen 2nm semiconductor lithography dominance confirmed', url: 'https://finance.yahoo.com' }
-  ],
-  NVO: [
-    { id: 'nvo1', title: 'Novo Nordisk Expands Wegovy Weight Loss Drug Production Fabs', source: 'Bloomberg Europe', time: '2 hours ago', impact: 'Positive', impactText: 'Supply capacity expansion to meet global European & US demand', url: 'https://finance.yahoo.com' }
-  ],
-  SAP: [
-    { id: 'sap1', title: 'SAP Cloud ERP Migration Revenues Surge 25% YoY', source: 'Handelsblatt', time: '4 hours ago', impact: 'Positive', impactText: 'Enterprise AI integration driving European tech leadership', url: 'https://finance.yahoo.com' }
-  ],
-  SONY: [
-    { id: 'sony1', title: 'Sony PlayStation 5 Pro Launch Drives Gaming Division Upgrades', source: 'Nikkei Asia', time: '2 hours ago', impact: 'Positive', impactText: 'Image sensor division expands supply deals with mobile OEMs', url: 'https://finance.yahoo.com' }
-  ],
-  BABA: [
-    { id: 'baba1', title: 'Alibaba Cloud AI Revenue Grows at Triple-Digit Pace', source: 'South China Morning Post', time: '1 hour ago', impact: 'Positive', impactText: 'China stimulus packages accelerating e-commerce consumer spending', url: 'https://finance.yahoo.com' }
+    { id: 'n1', title: 'NVIDIA Blackwell Ultra AI GPU Shipping Schedules Accelerated', source: 'Bloomberg Markets', time: '2 hours ago', impact: 'Positive', impactText: 'Hyperscaler demand exceeding 2025 supply capacity', url: 'https://finance.yahoo.com' }
   ]
 };
 
