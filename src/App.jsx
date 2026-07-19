@@ -314,7 +314,7 @@ export default function App() {
             />
 
             {/* Top Metrics Overview Banner */}
-            <MetricsOverview stocks={filteredStocks} totalPostsCount={posts.length} />
+            <MetricsOverview stocks={filteredStocks} totalPostsCount={posts.length} selectedSubreddits={selectedSubreddits} />
 
             {/* Emerging Gems Spotlight */}
             <EmergingGems

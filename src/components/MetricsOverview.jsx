@@ -1,7 +1,7 @@
 import React from 'react';
 import { MessageSquare, TrendingUp, Flame, Users, ShieldAlert } from 'lucide-react';
 
-export default function MetricsOverview({ stocks, totalPostsCount }) {
+export default function MetricsOverview({ stocks, totalPostsCount, selectedSubreddits }) {
   const totalMentions = stocks.reduce((acc, curr) => acc + curr.mentionCount, 0);
   
   const totalBullish = stocks.reduce((acc, curr) => acc + (curr.bullishRatio * curr.mentionCount) / 100, 0);
@@ -74,10 +74,10 @@ export default function MetricsOverview({ stocks, totalPostsCount }) {
           </div>
         </div>
         <div style={{ fontSize: '1.75rem', fontWeight: 800, fontFamily: 'var(--font-mono)', color: '#8b5cf6' }}>
-          8 <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>Subreddits</span>
+          {selectedSubreddits ? selectedSubreddits.length : 16} <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>Subreddits</span>
         </div>
         <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '4px' }}>
-          WSB, r/stocks, ValueInvesting & Options
+          WSB, Stocks, Finanzen, IndianStreetBets & more
         </p>
       </div>
 
