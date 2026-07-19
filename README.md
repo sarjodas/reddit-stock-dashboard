@@ -63,13 +63,26 @@ Calculates daily market entry suitability:
 - Header Currency Selector: `USD ($)`, `EUR (€)`, or `Dual ($ / €)`.
 - All prices, targets, and 52-week channels format dynamically.
 
-### 8. 🔍 "High-Risk, High-Upside Discovery Radar"
+### 8. 🌐 Dynamic Global Stock Firehose (Finnhub API)
+- Real-time resolution of any ticker via Finnhub API, allowing discovery beyond the curated list.
+- Automatically compiles fundamental data and computes sentiment/analytics on the fly.
+
+### 9. 📈 Interactive SVG Candlestick & Line Charting
+- Switch seamlessly between Candlestick and Line graph visualizations.
+- Interactive crosshairs and hover-based tooltips showing price values in both native currency and EUR.
+- Accurately labeled X-axis date tracking.
+
+### 10. 🏦 Graham/Buffett Value Signals
+- Identifies undervalued stocks based on Benjamin Graham & Warren Buffett's foundational value investing principles.
+- Evaluates metrics like margin of safety and PE ratio against intrinsic value.
+
+### 11. 🔍 "High-Risk, High-Upside Discovery Radar"
 - Dedicated leaderboard tab filtering cheap/small-cap stocks featuring **huge implied upside (>30–100%+)** coupled with **elevated risk ratings**.
 
-### 9. 📰 Live Stock Impact News Stream
+### 12. 📰 Live Stock Impact News Stream
 - Breaking headlines, analyst price target changes, SEC filings, and corporate catalysts with impact ratings (Positive 🟢, Neutral 🟡, Negative 🔴).
 
-### 10. 📊 Recharts Analytics Suite
+### 13. 📊 Recharts Analytics Suite
 - 24h Discussion Velocity Area Chart.
 - Bull vs. Bear Sentiment Ratio Donut Chart.
 - Subreddit Mention Heatmap Bar Chart.
