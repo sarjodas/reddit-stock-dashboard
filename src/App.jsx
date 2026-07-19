@@ -41,7 +41,7 @@ export default function App() {
       apiMode: 'custom',
       redditClientId: '',
       redditClientSecret: '',
-      finnhubApiKey: '***REMOVED***', // Pre-filled active Finnhub key!
+      finnhubApiKey: '***REMOVED***',
       refreshInterval: 5
     };
     if (!saved) return defaultSettings;
@@ -99,7 +99,6 @@ export default function App() {
 
       const compiled = compileStockAnalytics(fetchedPosts, settings.finnhubApiKey);
 
-      // Live Finnhub Quote Updates for Top Tickers if Finnhub Key is provided
       if (settings.finnhubApiKey) {
         const topSymbols = compiled.slice(0, 5).map(s => s.symbol);
         const quotePromises = topSymbols.map(sym => fetchFinnhubQuote(sym, settings.finnhubApiKey));
@@ -133,10 +132,27 @@ export default function App() {
     }
   }, [selectedSubreddits, settings.refreshInterval, settings.finnhubApiKey]);
 
+  // Robust Search Filter (Handles $NVDA, ticker, company, country, sector)
+  const cleanQuery = searchTerm.replace(/[\$\#]/g, '').trim().toLowerCase();
+
   const filteredStocks = stocks.filter(stock => {
-    if (!searchTerm.trim()) return true;
-    const q = searchTerm.toLowerCase();
-    return stock.symbol.toLowerCase().includes(q) || stock.name.toLowerCase().includes(q) || stock.sector.toLowerCase().includes(q);
+    if (!cleanQuery) return true;
+    return (
+      stock.symbol.toLowerCase().includes(cleanQuery) ||
+      stock.name.toLowerCase().includes(cleanQuery) ||
+      stock.sector.toLowerCase().includes(cleanQuery) ||
+      (stock.exchange && stock.exchange.toLowerCase().includes(cleanQuery)) ||
+      (stock.country && stock.country.toLowerCase().includes(cleanQuery)) ||
+      (stock.catalyst && stock.catalyst.toLowerCase().includes(cleanQuery))
+    );
+  });
+
+  const filteredPosts = posts.filter(post => {
+    if (!cleanQuery) return true;
+    const titleMatch = post.title.toLowerCase().includes(cleanQuery);
+    const tickerMatch = post.tickers.some(t => t.toLowerCase().includes(cleanQuery));
+    const subMatch = post.subreddit.toLowerCase().includes(cleanQuery);
+    return titleMatch || tickerMatch || subMatch;
   });
 
   return (
@@ -237,6 +253,11 @@ export default function App() {
           </div>
 
           <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', paddingRight: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            {cleanQuery && (
+              <span className="badge badge-short-term" style={{ fontSize: '0.72rem' }}>
+                Search Result: {filteredStocks.length} tickers found
+              </span>
+            )}
             <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981' }}></span>
             Finnhub Key: <strong style={{ color: '#10b981' }}>Active 🟢</strong>
           </div>
@@ -253,11 +274,11 @@ export default function App() {
             />
 
             {/* Top Metrics Overview Banner */}
-            <MetricsOverview stocks={stocks} totalPostsCount={posts.length} />
+            <MetricsOverview stocks={filteredStocks} totalPostsCount={posts.length} />
 
             {/* Emerging Gems Spotlight */}
             <EmergingGems
-              stocks={stocks}
+              stocks={filteredStocks}
               onSelectTicker={(s) => setSelectedTickerModal(s)}
               currencyMode={currencyMode}
               fxRate={fxRate}
@@ -277,14 +298,14 @@ export default function App() {
 
         {/* Tab 2: Visual Analytics & Risk Matrix */}
         {activeTab === 'analytics' && (
-          <AnalyticsCharts stocks={stocks} />
+          <AnalyticsCharts stocks={filteredStocks} />
         )}
 
         {/* Tab 3: News & Live Reddit Threads */}
         {activeTab === 'news' && (
           <>
-            <StockNewsFeed stocks={stocks} />
-            <PostsFeed posts={posts} selectedSubreddits={selectedSubreddits} />
+            <StockNewsFeed stocks={filteredStocks} />
+            <PostsFeed posts={filteredPosts} selectedSubreddits={selectedSubreddits} />
           </>
         )}
 
