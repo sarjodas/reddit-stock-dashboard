@@ -40,7 +40,7 @@ export default function App() {
       redditClientId: '',
       redditClientSecret: '',
       finnhubApiKey: '',
-      refreshInterval: 10 // High-speed default: Every 10 seconds!
+      refreshInterval: 5 // Ultra Fast: Every 5 seconds!
     };
   });
 
