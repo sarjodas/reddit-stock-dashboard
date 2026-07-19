@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { X, TrendingUp, TrendingDown, ShieldCheck, AlertTriangle, Zap, DollarSign, ExternalLink, MessageSquare, Globe, Building2, BarChart2, Newspaper, Clock, ShoppingCart, Target, Award } from 'lucide-react';
+import { X, TrendingUp, TrendingDown, ShieldCheck, AlertTriangle, Zap, DollarSign, ExternalLink, MessageSquare, Globe, Building2, BarChart2, Newspaper, Clock, ShoppingCart, Target, Award, Activity } from 'lucide-react';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip } from 'recharts';
 import { formatCurrency } from '../services/stockApi';
+import CandlestickChart from './CandlestickChart';
 
 export default function TickerModal({ stock, onClose, currencyMode, fxRate }) {
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState('candles'); // Default to interactive Candlesticks!
 
   if (!stock) return null;
 
@@ -52,7 +53,26 @@ export default function TickerModal({ stock, onClose, currencyMode, fxRate }) {
         </div>
 
         {/* Modal Navigation Tabs */}
-        <div style={{ display: 'flex', gap: '10px', marginBottom: '20px', borderBottom: '1px solid var(--border-color)', paddingBottom: '10px' }}>
+        <div style={{ display: 'flex', gap: '10px', marginBottom: '20px', borderBottom: '1px solid var(--border-color)', paddingBottom: '10px', flexWrap: 'wrap' }}>
+          <button
+            onClick={() => setActiveTab('candles')}
+            style={{
+              padding: '6px 14px',
+              borderRadius: 'var(--radius-sm)',
+              fontSize: '0.82rem',
+              fontWeight: 700,
+              border: 'none',
+              cursor: 'pointer',
+              background: activeTab === 'candles' ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.25) 0%, rgba(56, 189, 248, 0.25) 100%)' : 'transparent',
+              color: activeTab === 'candles' ? '#10b981' : 'var(--text-muted)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px'
+            }}
+          >
+            <Activity size={15} color="#10b981" /> 📈 Live Candlesticks (OHLC)
+          </button>
+
           <button
             onClick={() => setActiveTab('overview')}
             style={{
@@ -99,6 +119,44 @@ export default function TickerModal({ stock, onClose, currencyMode, fxRate }) {
             💬 Reddit Threads ({stock.posts ? stock.posts.length : 0})
           </button>
         </div>
+
+        {/* Tab: Real-Time Candlestick Chart */}
+        {activeTab === 'candles' && (
+          <div>
+            <CandlestickChart
+              symbol={stock.symbol}
+              basePrice={stock.price}
+              currencyMode={currencyMode}
+              fxRate={fxRate}
+            />
+
+            {/* Timing Banner below Candlestick Chart */}
+            <div style={{
+              background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(2, 132, 199, 0.1) 100%)',
+              border: '1px solid rgba(16, 185, 129, 0.25)',
+              borderRadius: 'var(--radius-md)',
+              padding: '16px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between'
+            }}>
+              <div>
+                <span className={`badge ${timing.badgeClass}`} style={{ fontSize: '0.8rem', padding: '4px 12px', marginBottom: '4px' }}>
+                  {timing.icon} {timing.signal} ({timing.timingScore}/100)
+                </span>
+                <p style={{ fontSize: '0.8rem', color: '#e2e8f0', marginTop: '4px' }}>
+                  {timing.reasoning}
+                </p>
+              </div>
+              <div style={{ textAlign: 'right', minWidth: '130px' }}>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Target Upside:</span>
+                <div style={{ fontSize: '1rem', fontWeight: 800, color: stock.impliedUpside >= 0 ? '#10b981' : '#ef4444', fontFamily: 'var(--font-mono)' }}>
+                  {stock.impliedUpside >= 0 ? `+${stock.impliedUpside}%` : `${stock.impliedUpside}%`}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {activeTab === 'overview' && (
           <>
