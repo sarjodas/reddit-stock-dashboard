@@ -2,13 +2,14 @@ import React, { useState, useEffect, useRef } from 'react';
 import { TrendingUp, TrendingDown, Clock, Activity } from 'lucide-react';
 import { formatCurrency } from '../services/stockApi';
 
-export default function CandlestickChart({ symbol, basePrice, currencyMode, fxRate }) {
+export default function CandlestickChart({ symbol, basePrice, currencyMode, fxRate, nativeCurrency = 'USD' }) {
   const [timeframe, setTimeframe] = useState('1D'); // '1D', '1W', '1M', '1Y'
   const [chartType, setChartType] = useState('candlestick'); // 'candlestick' or 'line'
   const [hoveredCandle, setHoveredCandle] = useState(null);
   const [livePrice, setLivePrice] = useState(basePrice);
   const [isTickUp, setIsTickUp] = useState(true);
   const [candles, setCandles] = useState([]);
+  const svgRef = useRef(null);
 
   // Generate realistic OHLC candles based on timeframe & basePrice (walk backwards to avoid end-of-chart jumps)
   const generateCandleData = (tf, price) => {
@@ -118,6 +119,31 @@ export default function CandlestickChart({ symbol, basePrice, currencyMode, fxRa
 
   const activeCandle = hoveredCandle || candles[candles.length - 1];
 
+  // Mouse move handler over entire SVG canvas
+  const handleMouseMove = (e) => {
+    if (!svgRef.current || candles.length === 0) return;
+    const rect = svgRef.current.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const scaleX = width / rect.width;
+    const canvasX = mouseX * scaleX;
+
+    const idx = Math.min(candles.length - 1, Math.max(0, Math.floor(canvasX / candleGap)));
+    setHoveredCandle(candles[idx]);
+  };
+
+  // Hover point coordinates
+  const hoverIdx = hoveredCandle ? candles.findIndex(c => c.id === hoveredCandle.id) : -1;
+  const hoverX = hoverIdx >= 0 ? hoverIdx * candleGap + candleGap / 2 : 0;
+  const hoverY = hoveredCandle
+    ? chartPaddingTop + ((maxPrice - hoveredCandle.close) / priceRange) * (height - chartPaddingBottom - chartPaddingTop)
+    : 0;
+
+  // FX conversion for hover display
+  const eurRate = typeof fxRate === 'object' ? (fxRate.eur || 0.92) : (fxRate || 0.92);
+  const activePriceEUR = nativeCurrency === 'EUR'
+    ? activeCandle.close
+    : activeCandle.close * eurRate;
+
   return (
     <div style={{
       background: 'rgba(10, 13, 20, 0.75)',
@@ -131,15 +157,15 @@ export default function CandlestickChart({ symbol, basePrice, currencyMode, fxRa
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px', flexWrap: 'wrap', gap: '10px' }}>
         
         {/* Live Price Header */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
           <div>
             <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <Activity size={14} color="#10b981" /> Real-Time OHLC Candlesticks
+              <Activity size={14} color="#10b981" /> {chartType === 'candlestick' ? 'Real-Time OHLC Candlesticks' : 'Real-Time Price Line'}
               <span className="pulse-dot" style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', background: isTickUp ? '#10b981' : '#ef4444', boxShadow: isTickUp ? '0 0 8px #10b981' : '0 0 8px #ef4444' }}></span>
             </div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
               <span style={{ fontSize: '1.4rem', fontWeight: 800, fontFamily: 'var(--font-mono)', color: isTickUp ? '#10b981' : '#ef4444', transition: 'color 0.3s' }}>
-                {formatCurrency(livePrice, currencyMode, fxRate)}
+                {formatCurrency(livePrice, currencyMode, fxRate, nativeCurrency)}
               </span>
               <span style={{ fontSize: '0.78rem', fontWeight: 700, color: livePrice >= basePrice ? '#10b981' : '#ef4444' }}>
                 {livePrice >= basePrice ? `+${(((livePrice - basePrice) / basePrice) * 100).toFixed(2)}%` : `${(((livePrice - basePrice) / basePrice) * 100).toFixed(2)}%`}
@@ -147,13 +173,27 @@ export default function CandlestickChart({ symbol, basePrice, currencyMode, fxRa
             </div>
           </div>
 
-          {/* Active Hover Inspection Bar */}
+          {/* Active Hover Inspection Bar (Shows Native Currency AND EUR) */}
           {activeCandle && (
-            <div style={{ background: 'rgba(255, 255, 255, 0.04)', padding: '6px 12px', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(255,255,255,0.06)', fontSize: '0.75rem', fontFamily: 'var(--font-mono)', display: 'flex', gap: '10px', color: 'var(--text-secondary)' }}>
-              <span>O: <strong style={{ color: '#fff' }}>{formatCurrency(activeCandle.open, currencyMode, fxRate)}</strong></span>
-              <span>H: <strong style={{ color: '#10b981' }}>{formatCurrency(activeCandle.high, currencyMode, fxRate)}</strong></span>
-              <span>L: <strong style={{ color: '#ef4444' }}>{formatCurrency(activeCandle.low, currencyMode, fxRate)}</strong></span>
-              <span>C: <strong style={{ color: activeCandle.isBullish ? '#10b981' : '#ef4444' }}>{formatCurrency(activeCandle.close, currencyMode, fxRate)}</strong></span>
+            <div style={{
+              background: hoveredCandle ? 'rgba(56, 189, 248, 0.12)' : 'rgba(255, 255, 255, 0.04)',
+              padding: '6px 14px',
+              borderRadius: 'var(--radius-sm)',
+              border: `1px solid ${hoveredCandle ? 'rgba(56, 189, 248, 0.3)' : 'rgba(255,255,255,0.06)'}`,
+              fontSize: '0.75rem',
+              fontFamily: 'var(--font-mono)',
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: '12px',
+              color: 'var(--text-secondary)',
+              alignItems: 'center'
+            }}>
+              <span style={{ color: '#38bdf8', fontWeight: 800 }}>📅 {activeCandle.label}:</span>
+              <span>Stock: <strong style={{ color: '#fff' }}>{formatCurrency(activeCandle.close, 'USD', fxRate, nativeCurrency)}</strong></span>
+              <span>EUR: <strong style={{ color: '#34d399' }}>€{activePriceEUR.toFixed(2)}</strong></span>
+              <span>O: <strong style={{ color: 'var(--text-muted)' }}>{activeCandle.open}</strong></span>
+              <span>H: <strong style={{ color: '#10b981' }}>{activeCandle.high}</strong></span>
+              <span>L: <strong style={{ color: '#ef4444' }}>{activeCandle.low}</strong></span>
             </div>
           )}
         </div>
@@ -201,8 +241,10 @@ export default function CandlestickChart({ symbol, basePrice, currencyMode, fxRa
       {/* SVG Candlestick & Volume Canvas */}
       <div style={{ position: 'relative', width: '100%', overflowX: 'auto' }}>
         <svg
+          ref={svgRef}
           viewBox={`0 0 ${width} ${height}`}
-          style={{ width: '100%', height: 'auto', display: 'block' }}
+          style={{ width: '100%', height: 'auto', display: 'block', cursor: 'crosshair' }}
+          onMouseMove={handleMouseMove}
           onMouseLeave={() => setHoveredCandle(null)}
         >
           {/* Horizontal Price Grid Lines */}
@@ -233,7 +275,7 @@ export default function CandlestickChart({ symbol, basePrice, currencyMode, fxRa
             />
           )}
 
-          {/* Render Candlesticks & Volume Histogram */}
+          {/* Render Candlesticks, Volume & Transparent Hitboxes */}
           {candles.map((candle, idx) => {
             const xCenter = idx * candleGap + candleGap / 2;
             const xLeft = xCenter - candleWidth / 2;
@@ -249,14 +291,19 @@ export default function CandlestickChart({ symbol, basePrice, currencyMode, fxRa
 
             const color = candle.isBullish ? '#10b981' : '#ef4444';
             const volumeBarHeight = (candle.volume / maxVolume) * volumeHeight;
-            const volumeY = height - volumeBarHeight - 15;
+            const volumeY = height - volumeBarHeight - 25;
 
             return (
-              <g
-                key={candle.id}
-                onMouseEnter={() => setHoveredCandle(candle)}
-                style={{ cursor: 'pointer' }}
-              >
+              <g key={candle.id}>
+                {/* Transparent Mouse Hitbox for seamless cursor hover on line/candlestick */}
+                <rect
+                  x={idx * candleGap}
+                  y={0}
+                  width={candleGap}
+                  height={height}
+                  fill="transparent"
+                />
+
                 {/* Volume Bar */}
                 <rect
                   x={xLeft}
@@ -294,12 +341,52 @@ export default function CandlestickChart({ symbol, basePrice, currencyMode, fxRa
             );
           })}
 
+          {/* Interactive Hover Crosshairs & Point Marker */}
+          {hoveredCandle && hoverIdx >= 0 && (
+            <g>
+              {/* Vertical Crosshair Line */}
+              <line
+                x1={hoverX}
+                y1={0}
+                x2={hoverX}
+                y2={height - 25}
+                stroke="#38bdf8"
+                strokeDasharray="3 3"
+                strokeWidth="1.2"
+                opacity="0.75"
+              />
+              {/* Horizontal Price Crosshair Line */}
+              <line
+                x1={0}
+                y1={hoverY}
+                x2={width}
+                y2={hoverY}
+                stroke="#38bdf8"
+                strokeDasharray="3 3"
+                strokeWidth="1"
+                opacity="0.5"
+              />
+              {/* Glowing Point Marker Circle */}
+              <circle
+                cx={hoverX}
+                cy={hoverY}
+                r="5"
+                fill="#38bdf8"
+                stroke="#0f172a"
+                strokeWidth="2"
+                style={{ filter: 'drop-shadow(0 0 6px #38bdf8)' }}
+              />
+            </g>
+          )}
+
           {/* X-Axis Date / Time Axis Labels */}
           {candles.map((candle, idx) => {
             const step = Math.max(1, Math.floor(candles.length / 5));
             if (idx % step !== 0 && idx !== candles.length - 1) return null;
 
             const xCenter = idx * candleGap + candleGap / 2;
+            const isHovered = hoveredCandle && hoveredCandle.id === candle.id;
+
             return (
               <g key={`x-label-${idx}`}>
                 <line
@@ -307,14 +394,14 @@ export default function CandlestickChart({ symbol, basePrice, currencyMode, fxRa
                   y1={height - 22}
                   x2={xCenter}
                   y2={height - 18}
-                  stroke="rgba(255, 255, 255, 0.2)"
+                  stroke={isHovered ? '#38bdf8' : 'rgba(255, 255, 255, 0.2)'}
                 />
                 <text
                   x={xCenter}
                   y={height - 4}
-                  fill="#94a3b8"
+                  fill={isHovered ? '#38bdf8' : '#94a3b8'}
                   fontSize="9.5"
-                  fontWeight="600"
+                  fontWeight={isHovered ? '800' : '600'}
                   textAnchor="middle"
                   fontFamily="var(--font-mono)"
                 >

@@ -173,6 +173,7 @@ export default function TickerModal({ stock, onClose, currencyMode, fxRate }) {
               basePrice={stock.price}
               currencyMode={currencyMode}
               fxRate={fxRate}
+              nativeCurrency={stock.nativeCurrency}
             />
 
             {/* Timing Banner below Candlestick Chart */}
