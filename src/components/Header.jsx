@@ -1,5 +1,5 @@
 import React from 'react';
-import { Flame, RefreshCw, Search, Sliders, Lock, TrendingUp, DollarSign, Euro } from 'lucide-react';
+import { Flame, RefreshCw, Search, Sliders, TrendingUp } from 'lucide-react';
 
 export default function Header({
   searchTerm,
@@ -7,7 +7,6 @@ export default function Header({
   onRefresh,
   isLoading,
   onOpenSettings,
-  onLock,
   lastUpdated,
   currencyMode,
   onChangeCurrency
@@ -153,10 +152,6 @@ export default function Header({
 
           <button onClick={onOpenSettings} className="btn-icon" title="API Settings">
             <Sliders size={18} />
-          </button>
-
-          <button onClick={onLock} className="btn-icon" title="Lock Dashboard">
-            <Lock size={18} />
           </button>
         </div>
 

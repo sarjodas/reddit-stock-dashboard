@@ -9,13 +9,12 @@ import StockNewsFeed from './components/StockNewsFeed';
 import PostsFeed from './components/PostsFeed';
 import TickerModal from './components/TickerModal';
 import SettingsModal from './components/SettingsModal';
-import PasscodeGuard from './components/PasscodeGuard';
 
 import { fetchSubredditPosts, SUBREDDITS } from './services/redditApi';
 import { compileStockAnalytics, fetchUSDEURRate, DEFAULT_USD_EUR_RATE } from './services/stockApi';
 
 export default function App() {
-  const [isLocked, setIsLocked] = useState(true);
+  // Passcode guard removed — dashboard opens directly
   const [selectedSubreddits, setSelectedSubreddits] = useState(SUBREDDITS.map(s => s.id));
   const [searchTerm, setSearchTerm] = useState('');
   const [posts, setPosts] = useState([]);
@@ -24,7 +23,7 @@ export default function App() {
   const [lastUpdated, setLastUpdated] = useState(null);
   
   // FX Currency State
-  const [currencyMode, setCurrencyMode] = useState('DUAL'); // 'DUAL', 'USD', 'EUR'
+  const [currencyMode, setCurrencyMode] = useState('DUAL');
   const [fxRate, setFxRate] = useState(DEFAULT_USD_EUR_RATE);
 
   const [selectedTickerModal, setSelectedTickerModal] = useState(null);
@@ -42,7 +41,6 @@ export default function App() {
       redditClientId: '',
       redditClientSecret: '',
       finnhubApiKey: '',
-      passcode: '1234',
       refreshInterval: 60
     };
   });
@@ -83,11 +81,9 @@ export default function App() {
   const loadData = async () => {
     setIsLoading(true);
     try {
-      // Fetch live FX rate
       const rate = await fetchUSDEURRate();
       setFxRate(rate);
 
-      // Fetch Reddit posts & compile stocks
       const fetchedPosts = await fetchSubredditPosts(selectedSubreddits);
       setPosts(fetchedPosts);
 
@@ -121,87 +117,75 @@ export default function App() {
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg-primary)' }}>
       
-      {/* Passcode Lock Guard */}
-      <PasscodeGuard
-        isLocked={isLocked}
-        onUnlock={() => setIsLocked(false)}
-        savedPasscode={settings.passcode}
+      <Header
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        onRefresh={loadData}
+        isLoading={isLoading}
+        onOpenSettings={() => setIsSettingsOpen(true)}
+        lastUpdated={lastUpdated}
+        currencyMode={currencyMode}
+        onChangeCurrency={setCurrencyMode}
       />
 
-      {!isLocked && (
-        <>
-          <Header
-            searchTerm={searchTerm}
-            onSearchChange={setSearchTerm}
-            onRefresh={loadData}
-            isLoading={isLoading}
-            onOpenSettings={() => setIsSettingsOpen(true)}
-            onLock={() => setIsLocked(true)}
-            lastUpdated={lastUpdated}
-            currencyMode={currencyMode}
-            onChangeCurrency={setCurrencyMode}
-          />
+      <main style={{ maxWidth: '1400px', margin: '0 auto', padding: '24px 20px 60px' }}>
+        
+        {/* Top Metrics Banner */}
+        <MetricsOverview stocks={stocks} totalPostsCount={posts.length} />
 
-          <main style={{ maxWidth: '1400px', margin: '0 auto', padding: '24px 20px 60px' }}>
-            
-            {/* Top Metrics Banner */}
-            <MetricsOverview stocks={stocks} totalPostsCount={posts.length} />
+        {/* Subreddit Filter Buttons */}
+        <SubredditFilter
+          selectedSubreddits={selectedSubreddits}
+          onToggleSubreddit={handleToggleSubreddit}
+          onSelectAll={handleSelectAllSubreddits}
+        />
 
-            {/* Subreddit Filter Buttons */}
-            <SubredditFilter
-              selectedSubreddits={selectedSubreddits}
-              onToggleSubreddit={handleToggleSubreddit}
-              onSelectAll={handleSelectAllSubreddits}
-            />
+        {/* Emerging Gems Spotlight */}
+        <EmergingGems
+          stocks={stocks}
+          onSelectTicker={(s) => setSelectedTickerModal(s)}
+          currencyMode={currencyMode}
+          fxRate={fxRate}
+        />
 
-            {/* Emerging Gems Spotlight */}
-            <EmergingGems
-              stocks={stocks}
-              onSelectTicker={(s) => setSelectedTickerModal(s)}
-              currencyMode={currencyMode}
-              fxRate={fxRate}
-            />
+        {/* Main Stock Leaderboard */}
+        <TickerLeaderboard
+          stocks={filteredStocks}
+          watchlist={watchlist}
+          onToggleWatchlist={handleToggleWatchlist}
+          onSelectTicker={(s) => setSelectedTickerModal(s)}
+          currencyMode={currencyMode}
+          fxRate={fxRate}
+        />
 
-            {/* Main Stock Leaderboard */}
-            <TickerLeaderboard
-              stocks={filteredStocks}
-              watchlist={watchlist}
-              onToggleWatchlist={handleToggleWatchlist}
-              onSelectTicker={(s) => setSelectedTickerModal(s)}
-              currencyMode={currencyMode}
-              fxRate={fxRate}
-            />
+        {/* Live Financial News Stream */}
+        <StockNewsFeed stocks={stocks} />
 
-            {/* Live Financial News Stream */}
-            <StockNewsFeed stocks={stocks} />
+        {/* Visual Analytics & Charts Suite */}
+        <AnalyticsCharts stocks={stocks} />
 
-            {/* Visual Analytics & Charts Suite */}
-            <AnalyticsCharts stocks={stocks} />
+        {/* Live Reddit Discussion Posts Reader */}
+        <PostsFeed posts={posts} selectedSubreddits={selectedSubreddits} />
 
-            {/* Live Reddit Discussion Posts Reader */}
-            <PostsFeed posts={posts} selectedSubreddits={selectedSubreddits} />
+      </main>
 
-          </main>
-
-          {/* Deep-Dive Ticker Detail Modal */}
-          {selectedTickerModal && (
-            <TickerModal
-              stock={selectedTickerModal}
-              onClose={() => setSelectedTickerModal(null)}
-              currencyMode={currencyMode}
-              fxRate={fxRate}
-            />
-          )}
-
-          {/* API & Security Settings Modal */}
-          <SettingsModal
-            isOpen={isSettingsOpen}
-            onClose={() => setIsSettingsOpen(false)}
-            settings={settings}
-            onSaveSettings={handleSaveSettings}
-          />
-        </>
+      {/* Deep-Dive Ticker Detail Modal */}
+      {selectedTickerModal && (
+        <TickerModal
+          stock={selectedTickerModal}
+          onClose={() => setSelectedTickerModal(null)}
+          currencyMode={currencyMode}
+          fxRate={fxRate}
+        />
       )}
+
+      {/* API Settings Modal */}
+      <SettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        settings={settings}
+        onSaveSettings={handleSaveSettings}
+      />
 
     </div>
   );
