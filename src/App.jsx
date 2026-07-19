@@ -120,7 +120,7 @@ export default function App() {
 
       const compiled = compileStockAnalytics(fetchedPosts, settings.finnhubApiKey, dynamicCacheUpdates);
 
-      // Fetch live regularMarketPrice directly from Yahoo Finance open endpoint (no API key required)
+      // Apply live regularMarketPrice quotes
       const liveQuotePromises = compiled.map(s => fetchLiveYahooQuote(s.symbol));
       const liveQuotes = await Promise.all(liveQuotePromises);
 
@@ -130,18 +130,6 @@ export default function App() {
           compiled[idx].change24h = q.change24h;
         }
       });
-
-      if (settings.finnhubApiKey) {
-        const quotePromises = compiled.map(s => fetchFinnhubQuote(s.symbol, settings.finnhubApiKey));
-        const quotes = await Promise.all(quotePromises);
-
-        quotes.forEach((q, idx) => {
-          if (q && compiled[idx]) {
-            compiled[idx].price = q.price;
-            compiled[idx].change24h = q.change24h;
-          }
-        });
-      }
 
       setStocks(compiled);
       setLastUpdated(Date.now());
