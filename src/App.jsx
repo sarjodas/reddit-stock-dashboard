@@ -16,7 +16,6 @@ import { fetchSubredditPosts, SUBREDDITS } from './services/redditApi';
 import { compileStockAnalytics, fetchUSDEURRate, fetchLiveYahooQuote, fetchLiveStockNews, DEFAULT_USD_EUR_RATE, DEFAULT_USD_INR_RATE, MASTER_STOCKS_DATABASE } from './services/stockApi';
 import { fetchDynamicStockInfo } from './services/dynamicStockFetcher';
 import { fetchTechnicalIndicators } from './services/twelveDataApi';
-import { fetchDCFValuation, fetchEarningsCalendar } from './services/fmpApi';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('leaderboard');
@@ -154,27 +153,6 @@ export default function App() {
         });
       }
 
-      // Fetch DCF Valuations (FMP)
-      if (settings.fmpApiKey) {
-        const dcfPromises = topSymbols.map(s => fetchDCFValuation(s.symbol, settings.fmpApiKey));
-        const dcfResults = await Promise.all(dcfPromises);
-        dcfResults.forEach((dcf, idx) => {
-          if (dcf && compiled[idx]) {
-            compiled[idx].dcfValuation = dcf;
-          }
-        });
-
-        // Fetch earnings calendar
-        const calendar = await fetchEarningsCalendar(settings.fmpApiKey);
-        if (calendar) {
-          compiled.forEach(stock => {
-            if (calendar[stock.symbol]) {
-              stock.earningsData = calendar[stock.symbol];
-            }
-          });
-        }
-      }
-
       setStocks(compiled);
       setLastUpdated(Date.now());
     } catch (err) {
@@ -193,7 +171,7 @@ export default function App() {
       }, settings.refreshInterval * 1000);
       return () => clearInterval(interval);
     }
-  }, [selectedSubreddits, settings.refreshInterval, settings.finnhubApiKey, settings.twelveDataApiKey, settings.fmpApiKey]);
+  }, [selectedSubreddits, settings.refreshInterval, settings.finnhubApiKey, settings.twelveDataApiKey]);
 
   // Robust Multi-Filter (Search Term + Broker App Compatibility)
   const cleanQuery = searchTerm.replace(/[\$\#]/g, '').trim().toLowerCase();

@@ -279,8 +279,8 @@ export default function TickerModal({ stock, onClose, currencyMode, fxRate }) {
 
             </div>
 
-            {/* NEW: API Data Integration - Technicals & DCF */}
-            {(stock.technicals || stock.dcfValuation) && (
+            {/* NEW: API Data Integration - Technicals */}
+            {stock.technicals && (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '16px', marginBottom: '20px' }}>
                 
                 {/* Twelve Data Technicals */}
@@ -340,61 +340,6 @@ export default function TickerModal({ stock, onClose, currencyMode, fxRate }) {
                     </div>
                   </div>
                 )}
-
-                {/* FMP DCF Valuation */}
-                {stock.dcfValuation && (
-                  <div style={{ background: 'rgba(255,255,255,0.03)', padding: '16px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
-                    <h4 style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <PieChart size={14} color="#f59e0b" /> DCF Intrinsic Value
-                    </h4>
-
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-                        <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Current Price:</span>
-                        <span style={{ fontSize: '1rem', fontWeight: 700, fontFamily: 'var(--font-mono)' }}>
-                          {formatCurrency(stock.dcfValuation.currentPrice, currencyMode, fxRate, stock.nativeCurrency)}
-                        </span>
-                      </div>
-                      
-                      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-                        <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>DCF Fair Value:</span>
-                        <span style={{ fontSize: '1.1rem', fontWeight: 800, color: '#f59e0b', fontFamily: 'var(--font-mono)' }}>
-                          {formatCurrency(stock.dcfValuation.dcf, currencyMode, fxRate, stock.nativeCurrency)}
-                        </span>
-                      </div>
-
-                      {/* Visual Bar */}
-                      {(() => {
-                        const impliedUpside = ((stock.dcfValuation.dcf - stock.dcfValuation.currentPrice) / stock.dcfValuation.currentPrice) * 100;
-                        const isUndervalued = impliedUpside > 0;
-                        return (
-                          <div style={{ marginTop: '6px' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', marginBottom: '4px' }}>
-                              <span style={{ color: isUndervalued ? '#10b981' : '#ef4444', fontWeight: 700 }}>
-                                {isUndervalued ? `+${impliedUpside.toFixed(1)}% Undervalued` : `${impliedUpside.toFixed(1)}% Overvalued`}
-                              </span>
-                            </div>
-                            <div style={{ width: '100%', height: '6px', background: 'rgba(255,255,255,0.1)', borderRadius: '3px', overflow: 'hidden', display: 'flex' }}>
-                              <div style={{ 
-                                width: isUndervalued ? '50%' : '100%', 
-                                background: isUndervalued ? '#10b981' : '#ef4444',
-                                transition: 'width 0.5s ease'
-                              }}></div>
-                              {isUndervalued && (
-                                <div style={{ 
-                                  width: `${Math.min(50, impliedUpside)}%`, 
-                                  background: '#f59e0b',
-                                  transition: 'width 0.5s ease'
-                                }}></div>
-                              )}
-                            </div>
-                          </div>
-                        );
-                      })()}
-                    </div>
-                  </div>
-                )}
-
               </div>
             )}
 
