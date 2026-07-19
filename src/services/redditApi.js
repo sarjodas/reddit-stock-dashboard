@@ -96,7 +96,19 @@ export const MOCK_REDDIT_POSTS = [
     url: 'https://reddit.com/r/ValueInvesting',
     tickers: ['PLTR'],
     sentiment: { score: 0.89, label: 'Bullish', confidence: 'High' },
-    summary: 'Unprecedented customer conversion speeds for AIP software platform driving GAAP operating margin expansion.'
+  },
+  {
+    id: 'p_us3',
+    title: 'SpaceX (SPCX) IPO debut analysis: Why the Starlink spin-off justifies a $200B valuation',
+    author: 'AstroInvestor',
+    subreddit: 'investing',
+    score: 3500,
+    numComments: 820,
+    createdUtc: Date.now() - 3600 * 1000 * 2,
+    url: 'https://reddit.com/r/investing',
+    tickers: ['SPCX'],
+    sentiment: { score: 0.95, label: 'Bullish', confidence: 'High' },
+    summary: 'SpaceX public trading debut has ignited immense retail interest. Starship cost-per-kg to orbit and Starlink revenue acceleration make this the ultimate space monopoly play.'
   }
 ];
 
