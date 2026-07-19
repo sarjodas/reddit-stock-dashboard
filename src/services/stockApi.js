@@ -73,10 +73,13 @@ export async function fetchLiveYahooQuote(symbol) {
     ASML: 'ASML.AS',
     RELIANCE: 'RELIANCE.NS',
     TCS: 'TCS.NS',
-    TATAMOTORS: 'TATAMOTORS.NS'
+    TATAMOTORS: 'TATAMOTORS.NS',
+    SPCX: null
   };
 
-  const targetSymbol = yahooSymbolMap[symbol] || symbol;
+  const targetSymbol = yahooSymbolMap[symbol] !== undefined ? yahooSymbolMap[symbol] : symbol;
+
+  if (!targetSymbol) return null; // Skip private/fake tickers
 
   try {
     const res = await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${targetSymbol}`);
@@ -658,26 +661,26 @@ export const MASTER_STOCKS_DATABASE = {
     country: '🇺🇸 USA',
     nativeCurrency: 'USD',
     brokers: ['Scalable', 'Trading 212', 'Revolut'],
-    price: 215.00,
+    price: 145.00,
     change24h: 4.20,
-    marketCap: '$350 Billion',
+    marketCap: '$210 Billion',
     peRatio: 145.2,
     pbRatio: 18.5,
     eps: 1.48,
-    week52High: 240.00,
-    week52Low: 145.00,
+    week52High: 160.00,
+    week52Low: 95.00,
     beta: 1.85,
     volatility: 55.0,
-    sparkline: [170, 185, 192, 200, 208, 210, 215.00],
+    sparkline: [100, 115, 122, 130, 138, 140, 145.00],
     isEmergingGem: true,
     gemReason: 'Starship commercialization and Starlink IPO spin-off potential',
     catalyst: 'Starlink revenue growth and successful Starship orbital flights',
     downsideRisk: 'Extreme capital intensity and regulatory launch approvals',
     analystRating: 'Strong Buy',
     analystScore: 4.8,
-    targetPrice: 260.00,
-    targetLow: 180.00,
-    targetHigh: 320.00,
+    targetPrice: 200.00,
+    targetLow: 120.00,
+    targetHigh: 250.00,
     buyCount: 18,
     holdCount: 2,
     sellCount: 0
