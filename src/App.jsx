@@ -12,7 +12,7 @@ import SettingsModal from './components/SettingsModal';
 import { Flame, BarChart2, Newspaper, MessageSquare, Sparkles } from 'lucide-react';
 
 import { fetchSubredditPosts, SUBREDDITS } from './services/redditApi';
-import { compileStockAnalytics, fetchUSDEURRate, fetchFinnhubQuote, DEFAULT_USD_EUR_RATE } from './services/stockApi';
+import { compileStockAnalytics, fetchUSDEURRate, fetchFinnhubQuote, DEFAULT_USD_EUR_RATE, DEFAULT_USD_INR_RATE } from './services/stockApi';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('leaderboard');
@@ -23,16 +23,16 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [lastUpdated, setLastUpdated] = useState(null);
   
-  // FX Currency State
+  // FX Currency State (USD, EUR, INR)
   const [currencyMode, setCurrencyMode] = useState('DUAL');
-  const [fxRate, setFxRate] = useState(DEFAULT_USD_EUR_RATE);
+  const [fxRates, setFxRates] = useState({ eur: DEFAULT_USD_EUR_RATE, inr: DEFAULT_USD_INR_RATE });
 
   const [selectedTickerModal, setSelectedTickerModal] = useState(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const [watchlist, setWatchlist] = useState(() => {
     const saved = localStorage.getItem('reddit_ticker_watchlist');
-    return saved ? JSON.parse(saved) : ['NVDA', 'TSLA', 'PLTR'];
+    return saved ? JSON.parse(saved) : ['NVDA', 'TSLA', 'PLTR', 'RELIANCE'];
   });
 
   const [settings, setSettings] = useState(() => {
@@ -91,8 +91,8 @@ export default function App() {
   const loadData = async () => {
     setIsLoading(true);
     try {
-      const rate = await fetchUSDEURRate();
-      setFxRate(rate);
+      const rates = await fetchUSDEURRate();
+      setFxRates(rates);
 
       const fetchedPosts = await fetchSubredditPosts(selectedSubreddits);
       setPosts(fetchedPosts);
@@ -132,27 +132,36 @@ export default function App() {
     }
   }, [selectedSubreddits, settings.refreshInterval, settings.finnhubApiKey]);
 
-  // Robust Search Filter (Handles $NVDA, ticker, company, country, sector)
+  // Robust Search Filter (Handles Ticker Symbol, Full Company Name, Sub-Brands & Sector)
   const cleanQuery = searchTerm.replace(/[\$\#]/g, '').trim().toLowerCase();
 
   const filteredStocks = stocks.filter(stock => {
     if (!cleanQuery) return true;
-    return (
-      stock.symbol.toLowerCase().includes(cleanQuery) ||
-      stock.name.toLowerCase().includes(cleanQuery) ||
-      stock.sector.toLowerCase().includes(cleanQuery) ||
-      (stock.exchange && stock.exchange.toLowerCase().includes(cleanQuery)) ||
-      (stock.country && stock.country.toLowerCase().includes(cleanQuery)) ||
-      (stock.catalyst && stock.catalyst.toLowerCase().includes(cleanQuery))
-    );
+    
+    const symbolMatch = stock.symbol.toLowerCase().includes(cleanQuery);
+    const nameMatch = stock.name.toLowerCase().includes(cleanQuery);
+    const sectorMatch = stock.sector.toLowerCase().includes(cleanQuery);
+    const exchangeMatch = stock.exchange && stock.exchange.toLowerCase().includes(cleanQuery);
+    const countryMatch = stock.country && stock.country.toLowerCase().includes(cleanQuery);
+    const catalystMatch = stock.catalyst && stock.catalyst.toLowerCase().includes(cleanQuery);
+    const gemReasonMatch = stock.gemReason && stock.gemReason.toLowerCase().includes(cleanQuery);
+
+    return symbolMatch || nameMatch || sectorMatch || exchangeMatch || countryMatch || catalystMatch || gemReasonMatch;
   });
+
+  const matchingTickerSymbols = new Set(filteredStocks.map(s => s.symbol.toLowerCase()));
 
   const filteredPosts = posts.filter(post => {
     if (!cleanQuery) return true;
+
     const titleMatch = post.title.toLowerCase().includes(cleanQuery);
-    const tickerMatch = post.tickers.some(t => t.toLowerCase().includes(cleanQuery));
     const subMatch = post.subreddit.toLowerCase().includes(cleanQuery);
-    return titleMatch || tickerMatch || subMatch;
+    const tickerMatch = post.tickers.some(t => {
+      const tLower = t.toLowerCase();
+      return tLower.includes(cleanQuery) || matchingTickerSymbols.has(tLower);
+    });
+
+    return titleMatch || subMatch || tickerMatch;
   });
 
   return (
@@ -255,7 +264,7 @@ export default function App() {
           <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', paddingRight: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
             {cleanQuery && (
               <span className="badge badge-short-term" style={{ fontSize: '0.72rem' }}>
-                Search Result: {filteredStocks.length} tickers found
+                Found {filteredStocks.length} matching companies for "{searchTerm}"
               </span>
             )}
             <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981' }}></span>
@@ -281,7 +290,7 @@ export default function App() {
               stocks={filteredStocks}
               onSelectTicker={(s) => setSelectedTickerModal(s)}
               currencyMode={currencyMode}
-              fxRate={fxRate}
+              fxRate={fxRates}
             />
 
             {/* Main Stock Leaderboard */}
@@ -291,7 +300,7 @@ export default function App() {
               onToggleWatchlist={handleToggleWatchlist}
               onSelectTicker={(s) => setSelectedTickerModal(s)}
               currencyMode={currencyMode}
-              fxRate={fxRate}
+              fxRate={fxRates}
             />
           </>
         )}
@@ -317,7 +326,7 @@ export default function App() {
           stock={selectedTickerModal}
           onClose={() => setSelectedTickerModal(null)}
           currencyMode={currencyMode}
-          fxRate={fxRate}
+          fxRate={fxRates}
         />
       )}
 
