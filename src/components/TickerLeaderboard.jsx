@@ -1,297 +1,256 @@
 import React, { useState } from 'react';
-import { TrendingUp, TrendingDown, Star, Zap, ShieldCheck, BarChart2, ChevronRight, Target, Sparkles, SlidersHorizontal } from 'lucide-react';
+import { Flame, Star, ShieldAlert, TrendingUp, Compass, Globe, Sparkles, Filter } from 'lucide-react';
 import { formatCurrency } from '../services/stockApi';
 
 export default function TickerLeaderboard({ stocks, watchlist, onToggleWatchlist, onSelectTicker, currencyMode, fxRate }) {
   const [horizonFilter, setHorizonFilter] = useState('all');
+  const [regionFilter, setRegionFilter] = useState('all'); // 'all', 'europe', 'us', 'asia'
 
   let filteredStocks = [...stocks];
-  if (horizonFilter === 'discovery') {
-    filteredStocks = filteredStocks.filter(s => 
-      s.impliedUpside >= 20 || s.riskModel.riskScore >= 45 || s.isEmergingGem
-    ).sort((a, b) => (b.impliedUpside * (b.riskModel.riskScore / 50)) - (a.impliedUpside * (a.riskModel.riskScore / 50)));
-  } else if (horizonFilter === 'short') {
+
+  // Region Filter Logic
+  if (regionFilter === 'europe') {
+    filteredStocks = filteredStocks.filter(s => s.country && (s.country.includes('Europe') || s.country.includes('Germany') || s.country.includes('Netherlands') || s.country.includes('Denmark') || s.country.includes('France') || s.country.includes('UK') || s.country.includes('Switzerland') || s.country.includes('Sweden')));
+  } else if (regionFilter === 'us') {
+    filteredStocks = filteredStocks.filter(s => s.country && s.country.includes('USA'));
+  } else if (regionFilter === 'asia') {
+    filteredStocks = filteredStocks.filter(s => s.country && (s.country.includes('Asia') || s.country.includes('Taiwan') || s.country.includes('Japan') || s.country.includes('China') || s.country.includes('India')));
+  }
+
+  // Horizon & Discovery Filter Logic
+  if (horizonFilter === 'short') {
     filteredStocks.sort((a, b) => b.shortTermScore - a.shortTermScore);
   } else if (horizonFilter === 'long') {
     filteredStocks.sort((a, b) => b.longTermScore - a.longTermScore);
-  } else if (horizonFilter === 'buy') {
-    filteredStocks = filteredStocks.filter(s => s.timingModel.timingScore >= 70).sort((a, b) => b.timingModel.timingScore - a.timingModel.timingScore);
-  } else if (horizonFilter === 'upside') {
+  } else if (horizonFilter === 'watchlist') {
+    filteredStocks = filteredStocks.filter(s => watchlist.includes(s.symbol));
+  } else if (horizonFilter === 'discovery') {
+    filteredStocks = filteredStocks.filter(s => s.impliedUpside >= 25 || s.isEmergingGem);
     filteredStocks.sort((a, b) => b.impliedUpside - a.impliedUpside);
-  } else if (horizonFilter === 'value') {
-    filteredStocks = filteredStocks.filter(s => s.peRatio > 0).sort((a, b) => a.peRatio - b.peRatio);
-  } else {
-    filteredStocks.sort((a, b) => b.mentionCount - a.mentionCount);
   }
 
-  const renderSparkline = (points, isPositive) => {
-    if (!points || points.length < 2) return null;
-    const min = Math.min(...points);
-    const max = Math.max(...points);
-    const range = max - min || 1;
-    const width = 75;
-    const height = 22;
-
-    const coords = points.map((val, idx) => {
-      const x = (idx / (points.length - 1)) * width;
-      const y = height - ((val - min) / range) * height;
-      return `${x.toFixed(1)},${y.toFixed(1)}`;
-    }).join(' ');
-
-    const strokeColor = isPositive ? '#10b981' : '#ef4444';
-
-    return (
-      <svg width={width} height={height} style={{ overflow: 'visible' }}>
-        <polyline
-          fill="none"
-          stroke={strokeColor}
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          points={coords}
-        />
-      </svg>
-    );
-  };
-
   return (
-    <div className="glass-panel" style={{ padding: '24px', marginBottom: '28px' }}>
+    <div className="glass-panel" style={{ padding: '24px', marginBottom: '32px' }}>
       
-      {/* Sleek Header & Filter Bar */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '18px', flexWrap: 'wrap', gap: '14px' }}>
+      {/* Header & Dual Filter Toolbar */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px', marginBottom: '20px' }}>
         <div>
-          <h2 style={{ fontSize: '1.2rem', fontWeight: 800, letterSpacing: '-0.01em', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <BarChart2 size={20} color="#38bdf8" /> Trending Stock Leaderboard
+          <h2 style={{ fontSize: '1.25rem', fontWeight: 800, letterSpacing: '-0.02em', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Flame size={20} color="#f43f5e" /> Stock Leaderboard & Real-Time Intelligence
           </h2>
-          <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
-            Subreddit volume rankings, AI sentiment, Buy/Wait entry signals & Wall St. targets ({currencyMode} Mode)
+          <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+            Mathematical risk rating, Wall Street upside, and dual investment horizons
           </p>
         </div>
 
-        {/* Clean Horizon Tabs */}
-        <div style={{ display: 'flex', background: 'rgba(0, 0, 0, 0.4)', padding: '3px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', flexWrap: 'wrap', gap: '2px' }}>
-          <button
-            onClick={() => setHorizonFilter('all')}
-            style={{
-              padding: '5px 11px',
-              borderRadius: 'var(--radius-sm)',
-              fontSize: '0.76rem',
-              fontWeight: 600,
-              border: 'none',
-              cursor: 'pointer',
-              background: horizonFilter === 'all' ? 'rgba(255, 255, 255, 0.12)' : 'transparent',
-              color: horizonFilter === 'all' ? '#fff' : 'var(--text-muted)'
-            }}
-          >
-            🔥 All Tickers
-          </button>
+        {/* Region & Horizon Segmented Filters */}
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
+          
+          {/* Region Filter Pills */}
+          <div style={{ display: 'flex', background: 'rgba(0, 0, 0, 0.45)', padding: '3px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
+            <button
+              onClick={() => setRegionFilter('all')}
+              className={`pill-btn ${regionFilter === 'all' ? 'active' : ''}`}
+              style={{ padding: '4px 10px', fontSize: '0.74rem' }}
+            >
+              🌐 Global
+            </button>
+            <button
+              onClick={() => setRegionFilter('europe')}
+              className={`pill-btn ${regionFilter === 'europe' ? 'active' : ''}`}
+              style={{ padding: '4px 10px', fontSize: '0.74rem' }}
+            >
+              🇪🇺 Europe & UK
+            </button>
+            <button
+              onClick={() => setRegionFilter('us')}
+              className={`pill-btn ${regionFilter === 'us' ? 'active' : ''}`}
+              style={{ padding: '4px 10px', fontSize: '0.74rem' }}
+            >
+              🇺🇸 USA
+            </button>
+            <button
+              onClick={() => setRegionFilter('asia')}
+              className={`pill-btn ${regionFilter === 'asia' ? 'active' : ''}`}
+              style={{ padding: '4px 10px', fontSize: '0.74rem' }}
+            >
+              🌏 Asia
+            </button>
+          </div>
 
-          <button
-            onClick={() => setHorizonFilter('discovery')}
-            style={{
-              padding: '5px 11px',
-              borderRadius: 'var(--radius-sm)',
-              fontSize: '0.76rem',
-              fontWeight: 700,
-              border: 'none',
-              cursor: 'pointer',
-              background: horizonFilter === 'discovery' ? 'linear-gradient(135deg, rgba(239, 68, 68, 0.25) 0%, rgba(245, 158, 11, 0.25) 100%)' : 'transparent',
-              color: horizonFilter === 'discovery' ? '#f59e0b' : 'var(--text-muted)',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '4px'
-            }}
-          >
-            <Sparkles size={13} color="#f59e0b" /> 🔍 High-Risk Discovery
-          </button>
+          {/* Horizon & Discovery Pills */}
+          <div style={{ display: 'flex', background: 'rgba(0, 0, 0, 0.45)', padding: '3px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
+            <button
+              onClick={() => setHorizonFilter('all')}
+              className={`pill-btn ${horizonFilter === 'all' ? 'active' : ''}`}
+              style={{ padding: '4px 10px', fontSize: '0.74rem' }}
+            >
+              All Tickers
+            </button>
+            <button
+              onClick={() => setHorizonFilter('discovery')}
+              className={`pill-btn ${horizonFilter === 'discovery' ? 'active' : ''}`}
+              style={{ padding: '4px 10px', fontSize: '0.74rem' }}
+            >
+              🔍 High-Risk Discovery
+            </button>
+            <button
+              onClick={() => setHorizonFilter('short')}
+              className={`pill-btn ${horizonFilter === 'short' ? 'active' : ''}`}
+              style={{ padding: '4px 10px', fontSize: '0.74rem' }}
+            >
+              ⚡ Short-Term
+            </button>
+            <button
+              onClick={() => setHorizonFilter('long')}
+              className={`pill-btn ${horizonFilter === 'long' ? 'active' : ''}`}
+              style={{ padding: '4px 10px', fontSize: '0.74rem' }}
+            >
+              💎 Long-Term
+            </button>
+            <button
+              onClick={() => setHorizonFilter('watchlist')}
+              className={`pill-btn ${horizonFilter === 'watchlist' ? 'active' : ''}`}
+              style={{ padding: '4px 10px', fontSize: '0.74rem' }}
+            >
+              ⭐ Watchlist ({watchlist.length})
+            </button>
+          </div>
 
-          <button
-            onClick={() => setHorizonFilter('buy')}
-            style={{
-              padding: '5px 11px',
-              borderRadius: 'var(--radius-sm)',
-              fontSize: '0.76rem',
-              fontWeight: 600,
-              border: 'none',
-              cursor: 'pointer',
-              background: horizonFilter === 'buy' ? 'rgba(16, 185, 129, 0.25)' : 'transparent',
-              color: horizonFilter === 'buy' ? '#10b981' : 'var(--text-muted)'
-            }}
-          >
-            🛒 Buy Dip Days
-          </button>
-
-          <button
-            onClick={() => setHorizonFilter('upside')}
-            style={{
-              padding: '5px 11px',
-              borderRadius: 'var(--radius-sm)',
-              fontSize: '0.76rem',
-              fontWeight: 600,
-              border: 'none',
-              cursor: 'pointer',
-              background: horizonFilter === 'upside' ? 'rgba(56, 189, 248, 0.25)' : 'transparent',
-              color: horizonFilter === 'upside' ? '#38bdf8' : 'var(--text-muted)'
-            }}
-          >
-            🎯 Highest Upside
-          </button>
-
-          <button
-            onClick={() => setHorizonFilter('short')}
-            style={{
-              padding: '5px 11px',
-              borderRadius: 'var(--radius-sm)',
-              fontSize: '0.76rem',
-              fontWeight: 600,
-              border: 'none',
-              cursor: 'pointer',
-              background: horizonFilter === 'short' ? 'rgba(6, 182, 212, 0.25)' : 'transparent',
-              color: horizonFilter === 'short' ? '#06b6d4' : 'var(--text-muted)'
-            }}
-          >
-            ⚡ Swing
-          </button>
-
-          <button
-            onClick={() => setHorizonFilter('long')}
-            style={{
-              padding: '5px 11px',
-              borderRadius: 'var(--radius-sm)',
-              fontSize: '0.76rem',
-              fontWeight: 600,
-              border: 'none',
-              cursor: 'pointer',
-              background: horizonFilter === 'long' ? 'rgba(139, 92, 246, 0.25)' : 'transparent',
-              color: horizonFilter === 'long' ? '#8b5cf6' : 'var(--text-muted)'
-            }}
-          >
-            🏛️ Hold
-          </button>
         </div>
       </div>
 
-      {/* Clean Table Layout */}
-      <div style={{ overflowX: 'auto' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem' }}>
+      {/* Table Container */}
+      <div style={{ overflowX: 'auto', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.86rem' }}>
           <thead>
-            <tr style={{ borderBottom: '1px solid var(--border-color)', color: 'var(--text-muted)', fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              <th style={{ padding: '10px 6px' }}>Rank</th>
-              <th style={{ padding: '10px 10px' }}>Ticker</th>
-              <th style={{ padding: '10px 10px' }}>Price ({currencyMode})</th>
-              <th style={{ padding: '10px 10px' }}>Entry Timing Signal</th>
-              <th style={{ padding: '10px 10px' }}>Wall St. Target</th>
-              <th style={{ padding: '10px 10px' }}>Sentiment & Risk</th>
-              <th style={{ padding: '10px 10px' }}>Horizon Scores</th>
-              <th style={{ padding: '10px 10px' }}>Trend</th>
-              <th style={{ padding: '10px 6px', textAlign: 'right' }}>Action</th>
+            <tr style={{ background: 'rgba(255, 255, 255, 0.03)', borderBottom: '1px solid var(--border-color)', color: 'var(--text-muted)' }}>
+              <th style={{ padding: '14px 16px', fontWeight: 700 }}>Ticker & Company</th>
+              <th style={{ padding: '14px 16px', fontWeight: 700 }}>Market Price</th>
+              <th style={{ padding: '14px 16px', fontWeight: 700 }}>Reddit Hype & Bullish %</th>
+              <th style={{ padding: '14px 16px', fontWeight: 700 }}>Horizon Scores</th>
+              <th style={{ padding: '14px 16px', fontWeight: 700 }}>Risk & Valuation</th>
+              <th style={{ padding: '14px 16px', fontWeight: 700 }}>Wall St. Target</th>
+              <th style={{ padding: '14px 16px', fontWeight: 700, textAlign: 'center' }}>Action</th>
             </tr>
           </thead>
           <tbody>
-            {filteredStocks.map((stock, idx) => {
-              const isSaved = watchlist.includes(stock.symbol);
-              const timing = stock.timingModel || { signal: 'Accumulate', badgeClass: 'badge-short-term', icon: '📥', timingScore: 65 };
+            {filteredStocks.map((stock) => {
+              const isWatch = watchlist.includes(stock.symbol);
+              const isPos = stock.change24h >= 0;
 
               return (
                 <tr
                   key={stock.symbol}
+                  className="leaderboard-row"
                   style={{
                     borderBottom: '1px solid rgba(255, 255, 255, 0.04)',
-                    background: horizonFilter === 'discovery' ? 'rgba(245, 158, 11, 0.02)' : 'transparent',
-                    transition: 'var(--transition-fast)'
+                    transition: 'var(--transition-fast)',
+                    cursor: 'pointer'
                   }}
-                  className="leaderboard-row"
+                  onClick={() => onSelectTicker(stock)}
                 >
-                  <td style={{ padding: '12px 6px', fontWeight: 700, color: idx < 3 ? '#f59e0b' : 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
-                    #{idx + 1}
-                  </td>
-
-                  <td style={{ padding: '12px 10px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  
+                  {/* Ticker, Exchange & Country */}
+                  <td style={{ padding: '14px 16px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                       <button
-                        onClick={() => onToggleWatchlist(stock.symbol)}
-                        style={{ background: 'none', border: 'none', color: isSaved ? '#f59e0b' : 'var(--text-muted)', cursor: 'pointer' }}
-                        title={isSaved ? 'Remove from Watchlist' : 'Add to Watchlist'}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onToggleWatchlist(stock.symbol);
+                        }}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          cursor: 'pointer',
+                          color: isWatch ? '#f59e0b' : 'var(--text-muted)',
+                          padding: '2px'
+                        }}
                       >
-                        <Star size={15} fill={isSaved ? '#f59e0b' : 'none'} />
+                        <Star size={16} fill={isWatch ? '#f59e0b' : 'none'} />
                       </button>
-                      <div onClick={() => onSelectTicker(stock)} style={{ cursor: 'pointer' }}>
+
+                      <div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                          <span style={{ fontWeight: 800, fontSize: '0.95rem', color: '#fff', fontFamily: 'var(--font-mono)' }}>
-                            ${stock.symbol}
+                          <span style={{ fontWeight: 800, fontSize: '0.95rem', color: '#fff' }}>${stock.symbol}</span>
+                          <span className="badge badge-exchange" style={{ fontSize: '0.65rem', padding: '1px 6px' }}>
+                            {stock.exchange}
                           </span>
-                          <span className="badge badge-exchange" style={{ fontSize: '0.62rem', padding: '1px 5px' }}>{stock.exchange}</span>
                         </div>
-                        <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{stock.name}</div>
+                        <div style={{ fontSize: '0.76rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <span>{stock.name}</span>
+                          <span style={{ opacity: 0.8 }}>• {stock.country}</span>
+                        </div>
                       </div>
                     </div>
                   </td>
 
-                  {/* Price */}
-                  <td style={{ padding: '12px 10px' }}>
-                    <div style={{ fontWeight: 700, fontFamily: 'var(--font-mono)', fontSize: '0.85rem' }}>
+                  {/* Price & 24h Change */}
+                  <td style={{ padding: '14px 16px', fontFamily: 'var(--font-mono)' }}>
+                    <div style={{ fontWeight: 700, fontSize: '0.92rem', color: '#fff' }}>
                       {formatCurrency(stock.price, currencyMode, fxRate)}
                     </div>
-                    <div style={{ fontSize: '0.72rem', fontWeight: 600, color: stock.change24h >= 0 ? '#10b981' : '#ef4444' }}>
-                      {stock.change24h >= 0 ? `+${stock.change24h}%` : `${stock.change24h}%`} (24h)
+                    <div style={{ fontSize: '0.76rem', color: isPos ? '#34d399' : '#fb7185', fontWeight: 600 }}>
+                      {isPos ? '+' : ''}{stock.change24h}%
                     </div>
                   </td>
 
-                  {/* Entry Timing Badge */}
-                  <td style={{ padding: '12px 10px' }}>
-                    <span className={`badge ${timing.badgeClass}`} style={{ fontSize: '0.72rem', padding: '3px 8px' }}>
-                      {timing.icon} {timing.signal}
+                  {/* Reddit Mentions & Sentiment */}
+                  <td style={{ padding: '14px 16px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{ fontWeight: 700, fontSize: '0.88rem' }}>{stock.mentionCount} posts</span>
+                      <span className={`badge ${stock.bullishRatio >= 65 ? 'badge-bullish' : stock.bullishRatio >= 45 ? 'badge-neutral' : 'badge-bearish'}`} style={{ fontSize: '0.7rem' }}>
+                        {stock.bullishRatio}% Bull
+                      </span>
+                    </div>
+                    <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+                      24h Spike: +{stock.mentionChange24h}%
+                    </div>
+                  </td>
+
+                  {/* Horizon Scores */}
+                  <td style={{ padding: '14px 16px' }}>
+                    <div style={{ display: 'flex', gap: '6px' }}>
+                      <span className="badge badge-short-term" style={{ fontSize: '0.7rem' }}>
+                        ⚡ Short: {stock.shortTermScore}/99
+                      </span>
+                      <span className="badge badge-long-term" style={{ fontSize: '0.7rem' }}>
+                        💎 Long: {stock.longTermScore}/99
+                      </span>
+                    </div>
+                  </td>
+
+                  {/* Risk Tier & P/E Ratio */}
+                  <td style={{ padding: '14px 16px' }}>
+                    <span className={`badge ${stock.riskModel.badgeClass}`} style={{ fontSize: '0.72rem' }}>
+                      {stock.riskModel.icon} {stock.riskModel.tier} ({stock.riskModel.riskScore})
                     </span>
-                    <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', marginTop: '2px' }}>
-                      Score: {timing.timingScore}/100
+                    <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '3px' }}>
+                      P/E: {stock.peRatio > 0 ? `${stock.peRatio}x` : 'N/A'} • Cap: {stock.marketCap}
                     </div>
                   </td>
 
-                  {/* Wall St Analyst Target & Implied Upside */}
-                  <td style={{ padding: '12px 10px' }}>
-                    <div style={{ fontWeight: 700, color: stock.impliedUpside >= 0 ? '#38bdf8' : '#ef4444', fontFamily: 'var(--font-mono)', fontSize: '0.8rem' }}>
-                      Target: {formatCurrency(stock.targetPrice, currencyMode, fxRate)}
+                  {/* Wall St Target Price */}
+                  <td style={{ padding: '14px 16px', fontFamily: 'var(--font-mono)' }}>
+                    <div style={{ fontWeight: 700, color: stock.impliedUpside >= 0 ? '#34d399' : '#fb7185' }}>
+                      {formatCurrency(stock.targetPrice, currencyMode, fxRate)}
                     </div>
-                    <div style={{ fontSize: '0.72rem', fontWeight: 600, color: stock.impliedUpside >= 0 ? '#10b981' : '#ef4444' }}>
-                      {stock.analystRating} ({stock.impliedUpside >= 0 ? `+${stock.impliedUpside}% Upside` : `${stock.impliedUpside}%`})
-                    </div>
-                  </td>
-
-                  {/* Sentiment & Risk Combined */}
-                  <td style={{ padding: '12px 10px' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
-                      <span className={`badge ${stock.bullishRatio >= 55 ? 'badge-bullish' : stock.bullishRatio <= 40 ? 'badge-bearish' : 'badge-neutral'}`} style={{ fontSize: '0.68rem', padding: '1px 6px' }}>
-                        {stock.bullishRatio >= 55 ? <TrendingUp size={10} /> : <TrendingDown size={10} />}
-                        {stock.bullishRatio}% Bull ({stock.mentionCount} posts)
-                      </span>
-                      <span className={`badge ${stock.riskModel.badgeClass}`} style={{ fontSize: '0.68rem', padding: '1px 6px' }}>
-                        {stock.riskModel.icon} {stock.riskModel.tier} ({stock.riskModel.riskScore})
-                      </span>
+                    <div style={{ fontSize: '0.72rem', color: stock.impliedUpside >= 0 ? '#34d399' : '#fb7185', fontWeight: 600 }}>
+                      {stock.impliedUpside >= 0 ? '+' : ''}{stock.impliedUpside}% Implied
                     </div>
                   </td>
 
-                  <td style={{ padding: '12px 10px' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
-                      <span className="badge badge-short-term" style={{ fontSize: '0.65rem', padding: '1px 6px' }}>
-                        ⚡ Swing: {stock.shortTermScore}/100
-                      </span>
-                      <span className="badge badge-long-term" style={{ fontSize: '0.65rem', padding: '1px 6px' }}>
-                        🏛️ Hold: {stock.longTermScore}/100
-                      </span>
-                    </div>
-                  </td>
-
-                  <td style={{ padding: '12px 10px' }}>
-                    {renderSparkline(stock.sparkline, stock.change24h >= 0)}
-                  </td>
-
-                  <td style={{ padding: '12px 6px', textAlign: 'right' }}>
+                  {/* Action */}
+                  <td style={{ padding: '14px 16px', textAlign: 'center' }}>
                     <button
-                      onClick={() => onSelectTicker(stock)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onSelectTicker(stock);
+                      }}
                       className="btn btn-secondary"
-                      style={{ padding: '4px 8px', fontSize: '0.72rem' }}
+                      style={{ padding: '5px 10px', fontSize: '0.74rem' }}
                     >
-                      Details <ChevronRight size={13} />
+                      Deep Dive
                     </button>
                   </td>
 
