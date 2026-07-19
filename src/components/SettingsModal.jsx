@@ -113,6 +113,32 @@ export default function SettingsModal({ isOpen, onClose, settings, onSaveSetting
                   style={{ width: '100%', padding: '10px', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: '#fff', fontFamily: 'var(--font-mono)' }}
                 />
               </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                  Twelve Data API Key (Technical Indicators)
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. 12data_key_..."
+                  value={formData.twelveDataApiKey || ''}
+                  onChange={(e) => handleChange('twelveDataApiKey', e.target.value)}
+                  style={{ width: '100%', padding: '10px', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: '#fff', fontFamily: 'var(--font-mono)' }}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                  FMP API Key (DCF & Earnings)
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. fmp_key_..."
+                  value={formData.fmpApiKey || ''}
+                  onChange={(e) => handleChange('fmpApiKey', e.target.value)}
+                  style={{ width: '100%', padding: '10px', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: '#fff', fontFamily: 'var(--font-mono)' }}
+                />
+              </div>
             </div>
           )}
 

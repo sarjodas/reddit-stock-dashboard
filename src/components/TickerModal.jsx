@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, TrendingUp, TrendingDown, ShieldCheck, AlertTriangle, Zap, DollarSign, ExternalLink, MessageSquare, Globe, Building2, BarChart2, Newspaper, Clock, ShoppingCart, Target, Award, Activity, CheckCircle2, Smartphone } from 'lucide-react';
+import { X, TrendingUp, TrendingDown, ShieldCheck, AlertTriangle, Zap, DollarSign, ExternalLink, MessageSquare, Globe, Building2, BarChart2, Newspaper, Clock, ShoppingCart, Target, Award, Activity, CheckCircle2, Smartphone, PieChart } from 'lucide-react';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip } from 'recharts';
 import { formatCurrency } from '../services/stockApi';
 import CandlestickChart from './CandlestickChart';
@@ -278,6 +278,127 @@ export default function TickerModal({ stock, onClose, currencyMode, fxRate }) {
               </div>
 
             </div>
+
+            </div>
+
+            {/* NEW: API Data Integration - Technicals & DCF */}
+            {(stock.technicals || stock.dcfValuation) && (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '16px', marginBottom: '20px' }}>
+                
+                {/* Twelve Data Technicals */}
+                {stock.technicals && (
+                  <div style={{ background: 'rgba(255,255,255,0.03)', padding: '16px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
+                    <h4 style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <Activity size={14} color="#8b5cf6" /> Technical Indicators (Live)
+                    </h4>
+                    
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                      {/* RSI */}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>RSI (14-day):</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <span style={{ fontSize: '0.9rem', fontWeight: 700, fontFamily: 'var(--font-mono)' }}>
+                            {stock.technicals.rsi ? stock.technicals.rsi.toFixed(2) : 'N/A'}
+                          </span>
+                          {stock.technicals.rsi > 70 ? (
+                            <span className="badge badge-bearish" style={{ fontSize: '0.65rem', padding: '2px 6px' }}>Overbought</span>
+                          ) : stock.technicals.rsi < 30 ? (
+                            <span className="badge badge-bullish" style={{ fontSize: '0.65rem', padding: '2px 6px' }}>Oversold</span>
+                          ) : (
+                            <span className="badge badge-neutral" style={{ fontSize: '0.65rem', padding: '2px 6px' }}>Neutral</span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* MACD */}
+                      {stock.technicals.macd && (
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <span style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>MACD (12,26,9):</span>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <span style={{ fontSize: '0.85rem', fontFamily: 'var(--font-mono)' }}>
+                              Line: {stock.technicals.macd.macd.toFixed(2)} | Sig: {stock.technicals.macd.signal.toFixed(2)}
+                            </span>
+                            <span className={`badge ${stock.technicals.macd.histogram > 0 ? 'badge-bullish' : 'badge-bearish'}`} style={{ fontSize: '0.65rem', padding: '2px 6px' }}>
+                              {stock.technicals.macd.histogram > 0 ? 'Bullish X' : 'Bearish X'}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* SMA */}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>50-Day SMA:</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <span style={{ fontSize: '0.9rem', fontWeight: 700, fontFamily: 'var(--font-mono)' }}>
+                            {stock.technicals.sma50 ? formatCurrency(stock.technicals.sma50, currencyMode, fxRate, stock.nativeCurrency) : 'N/A'}
+                          </span>
+                          {stock.technicals.sma50 && (
+                            <span className={`badge ${stock.price > stock.technicals.sma50 ? 'badge-bullish' : 'badge-bearish'}`} style={{ fontSize: '0.65rem', padding: '2px 6px' }}>
+                              {stock.price > stock.technicals.sma50 ? 'Above' : 'Below'}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* FMP DCF Valuation */}
+                {stock.dcfValuation && (
+                  <div style={{ background: 'rgba(255,255,255,0.03)', padding: '16px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
+                    <h4 style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <PieChart size={14} color="#f59e0b" /> DCF Intrinsic Value
+                    </h4>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+                        <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Current Price:</span>
+                        <span style={{ fontSize: '1rem', fontWeight: 700, fontFamily: 'var(--font-mono)' }}>
+                          {formatCurrency(stock.dcfValuation.currentPrice, currencyMode, fxRate, stock.nativeCurrency)}
+                        </span>
+                      </div>
+                      
+                      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
+                        <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>DCF Fair Value:</span>
+                        <span style={{ fontSize: '1.1rem', fontWeight: 800, color: '#f59e0b', fontFamily: 'var(--font-mono)' }}>
+                          {formatCurrency(stock.dcfValuation.dcf, currencyMode, fxRate, stock.nativeCurrency)}
+                        </span>
+                      </div>
+
+                      {/* Visual Bar */}
+                      {(() => {
+                        const impliedUpside = ((stock.dcfValuation.dcf - stock.dcfValuation.currentPrice) / stock.dcfValuation.currentPrice) * 100;
+                        const isUndervalued = impliedUpside > 0;
+                        return (
+                          <div style={{ marginTop: '6px' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', marginBottom: '4px' }}>
+                              <span style={{ color: isUndervalued ? '#10b981' : '#ef4444', fontWeight: 700 }}>
+                                {isUndervalued ? `+${impliedUpside.toFixed(1)}% Undervalued` : `${impliedUpside.toFixed(1)}% Overvalued`}
+                              </span>
+                            </div>
+                            <div style={{ width: '100%', height: '6px', background: 'rgba(255,255,255,0.1)', borderRadius: '3px', overflow: 'hidden', display: 'flex' }}>
+                              <div style={{ 
+                                width: isUndervalued ? '50%' : '100%', 
+                                background: isUndervalued ? '#10b981' : '#ef4444',
+                                transition: 'width 0.5s ease'
+                              }}></div>
+                              {isUndervalued && (
+                                <div style={{ 
+                                  width: `${Math.min(50, impliedUpside)}%`, 
+                                  background: '#f59e0b',
+                                  transition: 'width 0.5s ease'
+                                }}></div>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })()}
+                    </div>
+                  </div>
+                )}
+
+              </div>
+            )}
 
             {/* 3-Column Grid: Fundamentals, Risk Gauge & Horizon Scores */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px', marginBottom: '24px' }}>

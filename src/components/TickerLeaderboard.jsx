@@ -186,8 +186,14 @@ export default function TickerLeaderboard({ stocks, watchlist, onToggleWatchlist
                       ) : (
                         <span className="badge badge-neutral" style={{ fontSize: '0.66rem' }}>Unrated</span>
                       )}
-                      <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', marginTop: '3px' }}>
-                        P/E: {stock.peRatio > 0 ? `${stock.peRatio}x` : 'N/A'} · P/B: {stock.pbRatio}x
+                      <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', marginTop: '3px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <span>P/E: {stock.peRatio > 0 ? `${stock.peRatio}x` : 'N/A'} · P/B: {stock.pbRatio}x</span>
+                        {stock.technicals?.rsi && (
+                          <span className="badge badge-neutral" style={{ padding: '1px 4px', fontSize: '0.6rem' }}>
+                            RSI {Math.round(stock.technicals.rsi)}
+                            {stock.technicals.rsi > 70 ? ' 🔴' : stock.technicals.rsi < 30 ? ' 🟢' : ''}
+                          </span>
+                        )}
                       </div>
                     </td>
 
