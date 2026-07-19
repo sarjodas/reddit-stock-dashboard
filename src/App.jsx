@@ -7,9 +7,10 @@ import TickerLeaderboard from './components/TickerLeaderboard';
 import AnalyticsCharts from './components/AnalyticsCharts';
 import StockNewsFeed from './components/StockNewsFeed';
 import PostsFeed from './components/PostsFeed';
+import EtfRadar from './components/EtfRadar';
 import TickerModal from './components/TickerModal';
 import SettingsModal from './components/SettingsModal';
-import { Flame, BarChart2, Newspaper, MessageSquare, Sparkles } from 'lucide-react';
+import { Flame, BarChart2, Newspaper, MessageSquare, Sparkles, ShieldCheck } from 'lucide-react';
 
 import { fetchSubredditPosts, SUBREDDITS } from './services/redditApi';
 import { compileStockAnalytics, fetchUSDEURRate, fetchFinnhubQuote, DEFAULT_USD_EUR_RATE, DEFAULT_USD_INR_RATE } from './services/stockApi';
@@ -219,6 +220,27 @@ export default function App() {
             </button>
 
             <button
+              onClick={() => setActiveTab('etfs')}
+              style={{
+                padding: '8px 18px',
+                borderRadius: 'var(--radius-md)',
+                fontSize: '0.85rem',
+                fontWeight: 700,
+                border: 'none',
+                cursor: 'pointer',
+                background: activeTab === 'etfs' ? 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)' : 'transparent',
+                color: activeTab === 'etfs' ? '#fff' : 'var(--text-muted)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                boxShadow: activeTab === 'etfs' ? '0 4px 12px rgba(2, 132, 199, 0.3)' : 'none',
+                transition: 'var(--transition-normal)'
+              }}
+            >
+              <ShieldCheck size={16} color={activeTab === 'etfs' ? '#fff' : 'var(--text-muted)'} /> 🛡️ ETFs & ETCs Risk Radar
+            </button>
+
+            <button
               onClick={() => setActiveTab('analytics')}
               style={{
                 padding: '8px 18px',
@@ -305,12 +327,17 @@ export default function App() {
           </>
         )}
 
-        {/* Tab 2: Visual Analytics & Risk Matrix */}
+        {/* Tab 2: Best Performing ETFs & ETCs Risk Radar */}
+        {activeTab === 'etfs' && (
+          <EtfRadar currencyMode={currencyMode} fxRate={fxRates} />
+        )}
+
+        {/* Tab 3: Visual Analytics & Risk Matrix */}
         {activeTab === 'analytics' && (
           <AnalyticsCharts stocks={filteredStocks} />
         )}
 
-        {/* Tab 3: News & Live Reddit Threads */}
+        {/* Tab 4: News & Live Reddit Threads */}
         {activeTab === 'news' && (
           <>
             <StockNewsFeed stocks={filteredStocks} />
