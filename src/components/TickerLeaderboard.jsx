@@ -129,7 +129,7 @@ export default function TickerLeaderboard({ stocks, watchlist, onToggleWatchlist
                             <span style={{ fontWeight: 800, fontSize: '0.9rem', color: '#fff', whiteSpace: 'nowrap' }}>${stock.symbol}</span>
                             <span className="badge badge-exchange" style={{ fontSize: '0.6rem', padding: '1px 5px' }}>{stock.exchange?.split('/')[0]?.trim()}</span>
                           </div>
-                          <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '150px' }}>
+                          <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', width: '100%' }}>
                             {stock.name}
                           </div>
                         </div>

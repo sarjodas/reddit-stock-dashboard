@@ -402,7 +402,7 @@ export default function CandlestickChart({ symbol, basePrice, currencyMode, fxRa
                   fill={isHovered ? '#38bdf8' : '#94a3b8'}
                   fontSize="9.5"
                   fontWeight={isHovered ? '800' : '600'}
-                  textAnchor="middle"
+                  textAnchor={idx === 0 ? 'start' : idx === candles.length - 1 ? 'end' : 'middle'}
                   fontFamily="var(--font-mono)"
                 >
                   {candle.label}

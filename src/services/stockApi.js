@@ -1156,24 +1156,20 @@ export function compileStockAnalytics(posts, finnhubApiKey = null, dynamicCacheU
       sellCount: 1
     };
 
-    let seed = 0;
-    for (let i = 0; i < symbol.length; i++) {
-      seed = (seed << 5) - seed + symbol.charCodeAt(i);
-      seed |= 0;
-    }
-    seed = Math.abs(seed);
-
     const metrics = tickerMentions[symbol] || {
-      mentionCount: (seed % 35) + 12,
-      bullishCount: (seed % 20) + 10,
-      bearishCount: (seed % 6) + 1,
-      subreddits: new Set(['stocks', 'wallstreetbets']),
+      mentionCount: 0,
+      bullishCount: 0,
+      bearishCount: 0,
+      subreddits: new Set(),
       posts: []
     };
 
     const totalMentions = metrics.mentionCount;
-    const bullishRatio = Math.round((metrics.bullishCount / Math.max(1, metrics.bullishCount + metrics.bearishCount)) * 100);
-    const mentionChange24h = (seed % 140) - 20;
+    // If no mentions, ratio is NA (we use 0 to prevent NaN bugs later)
+    const bullishRatio = totalMentions > 0 ? Math.round((metrics.bullishCount / totalMentions) * 100) : 0;
+    
+    // Simulate a 24h trend delta based purely on actual count, or 0 if unmentioned
+    const mentionChange24h = totalMentions > 0 ? (totalMentions > 5 ? 12 : -5) : 0;
 
     const postMetrics = {
       mentionCount: totalMentions,
