@@ -18,6 +18,7 @@ import { compileStockAnalytics, fetchUSDEURRate, fetchFinnhubQuote, DEFAULT_USD_
 export default function App() {
   const [activeTab, setActiveTab] = useState('leaderboard');
   const [selectedSubreddits, setSelectedSubreddits] = useState(SUBREDDITS.map(s => s.id));
+  const [brokerFilter, setBrokerFilter] = useState('all'); // 'all', 'Scalable', 'Trading 212', 'Revolut'
   const [searchTerm, setSearchTerm] = useState('');
   const [posts, setPosts] = useState([]);
   const [stocks, setStocks] = useState([]);
@@ -133,10 +134,16 @@ export default function App() {
     }
   }, [selectedSubreddits, settings.refreshInterval, settings.finnhubApiKey]);
 
-  // Robust Search Filter (Handles Ticker Symbol, Full Company Name, Sub-Brands & Sector)
+  // Robust Multi-Filter (Search Term + Broker App Compatibility)
   const cleanQuery = searchTerm.replace(/[\$\#]/g, '').trim().toLowerCase();
 
   const filteredStocks = stocks.filter(stock => {
+    // 1. Broker App Filter
+    if (brokerFilter !== 'all' && (!stock.brokers || !stock.brokers.includes(brokerFilter))) {
+      return false;
+    }
+
+    // 2. Search Query Filter
     if (!cleanQuery) return true;
     
     const symbolMatch = stock.symbol.toLowerCase().includes(cleanQuery);
@@ -284,9 +291,9 @@ export default function App() {
           </div>
 
           <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', paddingRight: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-            {cleanQuery && (
+            {brokerFilter !== 'all' && (
               <span className="badge badge-short-term" style={{ fontSize: '0.72rem' }}>
-                Found {filteredStocks.length} matching companies for "{searchTerm}"
+                Broker: {brokerFilter} ({filteredStocks.length})
               </span>
             )}
             <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981' }}></span>
@@ -297,11 +304,13 @@ export default function App() {
         {/* Tab 1: Leaderboard, Emerging Gems & Metrics */}
         {activeTab === 'leaderboard' && (
           <>
-            {/* Subreddit Filter Buttons */}
+            {/* Subreddit Stream & Global Broker App Filter */}
             <SubredditFilter
               selectedSubreddits={selectedSubreddits}
               onToggleSubreddit={handleToggleSubreddit}
               onSelectAll={handleSelectAllSubreddits}
+              brokerFilter={brokerFilter}
+              onChangeBroker={setBrokerFilter}
             />
 
             {/* Top Metrics Overview Banner */}
@@ -323,6 +332,8 @@ export default function App() {
               onSelectTicker={(s) => setSelectedTickerModal(s)}
               currencyMode={currencyMode}
               fxRate={fxRates}
+              brokerFilter={brokerFilter}
+              onChangeBroker={setBrokerFilter}
             />
           </>
         )}
