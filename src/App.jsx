@@ -148,7 +148,7 @@ export default function App() {
       }, settings.refreshInterval * 1000);
       return () => clearInterval(interval);
     }
-  }, [selectedSubreddits, settings.refreshInterval, settings.finnhubApiKey, settings.twelveDataApiKey]);
+  }, [settings.refreshInterval, settings.finnhubApiKey, settings.twelveDataApiKey]);
 
   // Robust Multi-Filter (Search Term + Broker App Compatibility)
   const cleanQuery = searchTerm.replace(/[\$\#]/g, '').trim().toLowerCase();
