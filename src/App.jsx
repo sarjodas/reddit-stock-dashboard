@@ -172,7 +172,11 @@ export default function App() {
   });
 
   const redditPoweredStocks = filteredStocks.filter(s => s.country && s.country.includes('USA'));
-  const globalStocks = filteredStocks.filter(s => !(s.country && s.country.includes('USA')));
+  const globalStocks = filteredStocks.filter(s => {
+    if (s.country && s.country.includes('USA')) return false;
+    const vs = s.valueSignal || {};
+    return vs.grahamPasses || vs.buffettPasses || vs.isTech;
+  });
 
   const matchingTickerSymbols = new Set(filteredStocks.map(s => s.symbol.toLowerCase()));
 
