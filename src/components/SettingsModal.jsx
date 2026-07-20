@@ -42,92 +42,34 @@ export default function SettingsModal({ isOpen, onClose, settings, onSaveSetting
 
         <form onSubmit={handleSubmit}>
           
-          {/* Mode Selector */}
-          <div style={{ marginBottom: '20px', background: 'rgba(255, 255, 255, 0.03)', padding: '14px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
-            <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '8px' }}>
-              Data Provider API Mode
-            </label>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-              <button
-                type="button"
-                className={`btn ${formData.apiMode === 'public' ? 'btn-primary' : 'btn-secondary'}`}
-                onClick={() => handleChange('apiMode', 'public')}
-                style={{ justifyContent: 'center', fontSize: '0.85rem' }}
-              >
-                🌐 Public Mode (Zero Setup)
-              </button>
-              <button
-                type="button"
-                className={`btn ${formData.apiMode === 'custom' ? 'btn-primary' : 'btn-secondary'}`}
-                onClick={() => handleChange('apiMode', 'custom')}
-                style={{ justifyContent: 'center', fontSize: '0.85rem' }}
-              >
-                🔑 Custom OAuth Mode
-              </button>
+          {/* API Keys Section */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '20px' }}>
+            <div>
+              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                Finnhub / Stock API Key (Optional)
+              </label>
+              <input
+                type="text"
+                placeholder="e.g. c1234567890finnhub"
+                value={formData.finnhubApiKey || ''}
+                onChange={(e) => handleChange('finnhubApiKey', e.target.value)}
+                style={{ width: '100%', padding: '10px', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: '#fff', fontFamily: 'var(--font-mono)' }}
+              />
             </div>
-            <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '8px' }}>
-              {formData.apiMode === 'public' 
-                ? 'Using open Reddit JSON endpoints + Yahoo Finance quotes. Works instantly out of the box.'
-                : 'Using custom Reddit OAuth credentials & dedicated stock API keys for higher rate limits.'}
-            </p>
+
+            <div>
+              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                Twelve Data API Key (Technical Indicators)
+              </label>
+              <input
+                type="text"
+                placeholder="e.g. 12data_key_..."
+                value={formData.twelveDataApiKey || ''}
+                onChange={(e) => handleChange('twelveDataApiKey', e.target.value)}
+                style={{ width: '100%', padding: '10px', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: '#fff', fontFamily: 'var(--font-mono)' }}
+              />
+            </div>
           </div>
-
-          {/* Custom Credentials Section */}
-          {formData.apiMode === 'custom' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '20px' }}>
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '4px' }}>
-                  Reddit Client ID
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g. xYz123456789"
-                  value={formData.redditClientId || ''}
-                  onChange={(e) => handleChange('redditClientId', e.target.value)}
-                  style={{ width: '100%', padding: '10px', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: '#fff', fontFamily: 'var(--font-mono)' }}
-                />
-              </div>
-
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '4px' }}>
-                  Reddit Client Secret
-                </label>
-                <input
-                  type="password"
-                  placeholder="e.g. •••••••••••••••••••••"
-                  value={formData.redditClientSecret || ''}
-                  onChange={(e) => handleChange('redditClientSecret', e.target.value)}
-                  style={{ width: '100%', padding: '10px', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: '#fff', fontFamily: 'var(--font-mono)' }}
-                />
-              </div>
-
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '4px' }}>
-                  Finnhub / Stock API Key (Optional)
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g. c1234567890finnhub"
-                  value={formData.finnhubApiKey || ''}
-                  onChange={(e) => handleChange('finnhubApiKey', e.target.value)}
-                  style={{ width: '100%', padding: '10px', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: '#fff', fontFamily: 'var(--font-mono)' }}
-                />
-              </div>
-
-              <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '4px' }}>
-                  Twelve Data API Key (Technical Indicators)
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g. 12data_key_..."
-                  value={formData.twelveDataApiKey || ''}
-                  onChange={(e) => handleChange('twelveDataApiKey', e.target.value)}
-                  style={{ width: '100%', padding: '10px', background: 'rgba(0,0,0,0.3)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: '#fff', fontFamily: 'var(--font-mono)' }}
-                />
-              </div>
-            </div>
-          )}
 
           {/* Auto Refresh Setting */}
           <div style={{ marginBottom: '24px' }}>

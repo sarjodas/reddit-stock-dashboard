@@ -1,7 +1,7 @@
 import React from 'react';
 import { MessageSquare, TrendingUp, Flame, Users, ShieldAlert } from 'lucide-react';
 
-export default function MetricsOverview({ stocks, totalPostsCount, selectedSubreddits }) {
+export default function MetricsOverview({ stocks }) {
   const totalMentions = stocks.reduce((acc, curr) => acc + curr.mentionCount, 0);
   const totalBullish  = stocks.reduce((acc, curr) => acc + (curr.bullishRatio * curr.mentionCount) / 100, 0);
   const avgBullishRatio = totalMentions > 0 ? Math.round((totalBullish / totalMentions) * 100) : null;
@@ -38,7 +38,7 @@ export default function MetricsOverview({ stocks, totalPostsCount, selectedSubre
           {totalMentions > 0 ? totalMentions.toLocaleString() : '—'} <span style={{ fontSize: '0.78rem', color: '#10b981', fontWeight: 600 }}>Mentions</span>
         </div>
         <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '4px' }}>
-          Across {totalPostsCount > 0 ? totalPostsCount : '—'} Reddit threads
+          Top 50 trending on r/wallstreetbets
         </p>
       </div>
 
@@ -101,10 +101,10 @@ export default function MetricsOverview({ stocks, totalPostsCount, selectedSubre
           </div>
         </div>
         <div style={{ fontSize: '1.65rem', fontWeight: 800, fontFamily: 'var(--font-mono)', color: '#8b5cf6' }}>
-          {selectedSubreddits ? selectedSubreddits.length : 16} <span style={{ fontSize: '0.78rem', fontWeight: 600 }}>Subreddits</span>
+          1 <span style={{ fontSize: '0.78rem', fontWeight: 600 }}>Source</span>
         </div>
         <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '4px' }}>
-          WSB, Stocks, Finanzen, IndianStreetBets & more
+          Live r/wallstreetbets Tracking
         </p>
       </div>
 

@@ -1,28 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import Header from './components/Header';
 import MetricsOverview from './components/MetricsOverview';
-import SubredditFilter from './components/SubredditFilter';
 import EmergingGems from './components/EmergingGems';
 import TickerLeaderboard from './components/TickerLeaderboard';
 import AnalyticsCharts from './components/AnalyticsCharts';
 import StockNewsFeed from './components/StockNewsFeed';
-import PostsFeed from './components/PostsFeed';
 import EtfRadar from './components/EtfRadar';
 import TickerModal from './components/TickerModal';
 import SettingsModal from './components/SettingsModal';
 import { Flame, BarChart2, Newspaper, MessageSquare, Sparkles, ShieldCheck } from 'lucide-react';
 
-import { fetchSubredditPosts, SUBREDDITS } from './services/redditApi';
-import { compileStockAnalytics, fetchUSDEURRate, fetchLiveYahooQuote, fetchLiveStockNews, DEFAULT_USD_EUR_RATE, DEFAULT_USD_INR_RATE, MASTER_STOCKS_DATABASE } from './services/stockApi';
+import { compileTradestieAnalytics, fetchUSDEURRate, fetchLiveYahooQuote, fetchLiveStockNews, DEFAULT_USD_EUR_RATE, DEFAULT_USD_INR_RATE, MASTER_STOCKS_DATABASE } from './services/stockApi';
+import { fetchDynamicStockInfo } from './services/dynamicStockFetcher';
+import { fetchTechnicalIndicators } from './services/twelveDataApi';
+import { fetchTradestieSentiment } from './services/tradestieApi';
 import { fetchDynamicStockInfo } from './services/dynamicStockFetcher';
 import { fetchTechnicalIndicators } from './services/twelveDataApi';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('leaderboard');
-  const [selectedSubreddits, setSelectedSubreddits] = useState(SUBREDDITS.map(s => s.id));
   const [brokerFilter, setBrokerFilter] = useState('all'); // 'all', 'Scalable', 'Trading 212', 'Revolut'
   const [searchTerm, setSearchTerm] = useState('');
-  const [posts, setPosts] = useState([]);
   const [stocks, setStocks] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [lastUpdated, setLastUpdated] = useState(null);
@@ -42,9 +40,6 @@ export default function App() {
   const [settings, setSettings] = useState(() => {
     const saved = localStorage.getItem('reddit_ticker_settings');
     const defaultSettings = {
-      apiMode: 'custom',
-      redditClientId: '',
-      redditClientSecret: '',
       finnhubApiKey: '***REMOVED***',
       refreshInterval: 5
     };
@@ -75,22 +70,6 @@ export default function App() {
     localStorage.setItem('reddit_ticker_settings', JSON.stringify(updatedSettings));
   };
 
-  const handleToggleSubreddit = (subId) => {
-    if (selectedSubreddits.includes(subId)) {
-      if (selectedSubreddits.length === 1) return;
-      setSelectedSubreddits(selectedSubreddits.filter(s => s !== subId));
-    } else {
-      setSelectedSubreddits([...selectedSubreddits, subId]);
-    }
-  };
-
-  const handleSelectAllSubreddits = () => {
-    if (selectedSubreddits.length === SUBREDDITS.length) {
-      setSelectedSubreddits(['wallstreetbets']);
-    } else {
-      setSelectedSubreddits(SUBREDDITS.map(s => s.id));
-    }
-  };
 
   const loadData = async () => {
     setIsLoading(true);
@@ -98,12 +77,10 @@ export default function App() {
       const rates = await fetchUSDEURRate();
       setFxRates(rates);
 
-      const fetchedPosts = await fetchSubredditPosts(selectedSubreddits);
-      setPosts(fetchedPosts);
+      const fetchedTradestie = await fetchTradestieSentiment();
 
       // Extract unique tickers from posts to dynamically fetch unknown ones
-      const uniqueTickers = new Set();
-      fetchedPosts.forEach(p => p.tickers.forEach(t => uniqueTickers.add(t)));
+      const uniqueTickers = new Set(fetchedTradestie.map(t => t.ticker));
       
       const unknownTickers = [...uniqueTickers].filter(t => !MASTER_STOCKS_DATABASE[t]);
       
@@ -119,7 +96,7 @@ export default function App() {
         });
       }
 
-      const compiled = compileStockAnalytics(fetchedPosts, settings.finnhubApiKey, dynamicCacheUpdates, selectedSubreddits.length, SUBREDDITS.length);
+      const compiled = compileTradestieAnalytics(fetchedTradestie, settings.finnhubApiKey, dynamicCacheUpdates);
 
       // Apply live regularMarketPrice quotes
       const liveQuotePromises = compiled.map(s => fetchLiveYahooQuote(s.symbol));
@@ -198,18 +175,7 @@ export default function App() {
 
   const matchingTickerSymbols = new Set(filteredStocks.map(s => s.symbol.toLowerCase()));
 
-  const filteredPosts = posts.filter(post => {
-    if (!cleanQuery) return true;
 
-    const titleMatch = post.title.toLowerCase().includes(cleanQuery);
-    const subMatch = post.subreddit.toLowerCase().includes(cleanQuery);
-    const tickerMatch = post.tickers.some(t => {
-      const tLower = t.toLowerCase();
-      return tLower.includes(cleanQuery) || matchingTickerSymbols.has(tLower);
-    });
-
-    return titleMatch || subMatch || tickerMatch;
-  });
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg-primary)' }}>
@@ -325,7 +291,7 @@ export default function App() {
                 transition: 'var(--transition-normal)'
               }}
             >
-              <Newspaper size={16} color={activeTab === 'news' ? '#fff' : 'var(--text-muted)'} /> 📰 Impact News & Reddit Discussions
+              <Newspaper size={16} color={activeTab === 'news' ? '#fff' : 'var(--text-muted)'} /> 📰 Impact News
             </button>
           </div>
 
@@ -343,17 +309,8 @@ export default function App() {
         {/* Tab 1: Leaderboard, Emerging Gems & Metrics */}
         {activeTab === 'leaderboard' && (
           <>
-            {/* Subreddit Stream & Global Broker App Filter */}
-            <SubredditFilter
-              selectedSubreddits={selectedSubreddits}
-              onToggleSubreddit={handleToggleSubreddit}
-              onSelectAll={handleSelectAllSubreddits}
-              brokerFilter={brokerFilter}
-              onChangeBroker={setBrokerFilter}
-            />
-
             {/* Top Metrics Overview Banner */}
-            <MetricsOverview stocks={filteredStocks} totalPostsCount={posts.length} selectedSubreddits={selectedSubreddits} />
+            <MetricsOverview stocks={filteredStocks} />
 
             {/* Emerging Gems Spotlight */}
             <EmergingGems
@@ -387,11 +344,10 @@ export default function App() {
           <AnalyticsCharts stocks={filteredStocks} />
         )}
 
-        {/* Tab 4: News & Live Reddit Threads */}
+        {/* Tab 4: News */}
         {activeTab === 'news' && (
           <>
             <StockNewsFeed stocks={filteredStocks} />
-            <PostsFeed posts={filteredPosts} selectedSubreddits={selectedSubreddits} />
           </>
         )}
 

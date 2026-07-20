@@ -1247,51 +1247,11 @@ export function fetchStockNews(symbol) {
   return createFallbackNews(symbol);
 }
 
-export function compileStockAnalytics(posts, finnhubApiKey = null, dynamicCacheUpdates = {}, activeSubredditCount = 16, totalSubredditCount = 16) {
-  const tickerMentions = {};
-  const processedPostIds = new Set();
-
-  posts.forEach(post => {
-    // Prevent duplicate counting of the same post
-    if (processedPostIds.has(post.id)) return;
-    processedPostIds.add(post.id);
-
-    // Prevent counting the same ticker multiple times in a single post
-    const uniqueTickers = [...new Set(post.tickers)];
-
-    uniqueTickers.forEach(symbol => {
-      if (!tickerMentions[symbol]) {
-        tickerMentions[symbol] = {
-          mentionCount: 0,
-          bullishCount: 0,
-          bearishCount: 0,
-          subreddits: new Set(),
-          posts: []
-        };
-      }
-
-      tickerMentions[symbol].mentionCount += 1;
-      if (post.sentiment?.label === 'Bullish') tickerMentions[symbol].bullishCount += 1;
-      if (post.sentiment?.label === 'Bearish') tickerMentions[symbol].bearishCount += 1;
-      tickerMentions[symbol].subreddits.add(post.subreddit);
-      tickerMentions[symbol].posts.push(post);
-    });
-  });
-
+export function compileTradestieAnalytics(tradestieData, finnhubApiKey = null, dynamicCacheUpdates = {}) {
   const results = [];
-  const isStreamFiltered = activeSubredditCount < totalSubredditCount;
 
-  // When user has filtered subreddits, ONLY show stocks that are actually mentioned
-  // in the active streams. When all subreddits are active, show everything.
-  let allSymbols;
-  if (isStreamFiltered) {
-    // Only include tickers that appear in the active subreddit posts, plus any dynamically fetched ones
-    allSymbols = new Set([...Object.keys(tickerMentions), ...Object.keys(dynamicCacheUpdates)]);
-  } else {
-    allSymbols = new Set([...Object.keys(MASTER_STOCKS_DATABASE), ...Object.keys(dynamicCacheUpdates), ...Object.keys(tickerMentions)]);
-  }
-
-  allSymbols.forEach(symbol => {
+  tradestieData.forEach(item => {
+    const symbol = item.ticker;
     const baseData = MASTER_STOCKS_DATABASE[symbol] || dynamicCacheUpdates[symbol] || {
       symbol,
       name: `${symbol} Corp.`,
@@ -1322,17 +1282,10 @@ export function compileStockAnalytics(posts, finnhubApiKey = null, dynamicCacheU
       sellCount: 1
     };
 
-    const metrics = tickerMentions[symbol] || {
-      mentionCount: 0,
-      bullishCount: 0,
-      bearishCount: 0,
-      subreddits: new Set(),
-      posts: []
-    };
-
-    const totalMentions = metrics.mentionCount;
-    // If no mentions, ratio is NA (we use 0 to prevent NaN bugs later)
-    const bullishRatio = totalMentions > 0 ? Math.round((metrics.bullishCount / totalMentions) * 100) : 0;
+    const totalMentions = item.no_of_comments || 0;
+    
+    // Tradestie sentiment_score is roughly -1 to 1. Convert to bullishRatio 0 to 100.
+    const bullishRatio = Math.max(0, Math.min(100, Math.round(((item.sentiment_score + 1) / 2) * 100)));
     
     // Simulate a 24h trend delta based purely on actual count, or 0 if unmentioned
     const mentionChange24h = totalMentions > 0 ? (totalMentions > 5 ? 12 : -5) : 0;
@@ -1354,8 +1307,8 @@ export function compileStockAnalytics(posts, finnhubApiKey = null, dynamicCacheU
       mentionCount: totalMentions,
       mentionChange24h,
       bullishRatio,
-      subreddits: Array.from(metrics.subreddits),
-      posts: metrics.posts,
+      subreddits: ['wallstreetbets'],
+      posts: [],
       shortTermScore: horizons.shortTermScore,
       longTermScore: horizons.longTermScore,
       riskModel,
@@ -1371,7 +1324,6 @@ export function compileStockAnalytics(posts, finnhubApiKey = null, dynamicCacheU
     const buffettBonus = enriched.valueSignal.buffettPasses ? 15 : 0;
     const grahamBonus = enriched.valueSignal.grahamPasses ? 10 : 0;
     
-    // Scale mentions logarithmically so mega-caps don't blindly dominate small caps
     const mentionLog = totalMentions > 0 ? Math.log10(totalMentions) * 15 : 0;
     const sentimentBonus = totalMentions > 0 ? (bullishRatio / 100) * 20 : 0;
 
@@ -1384,7 +1336,7 @@ export function compileStockAnalytics(posts, finnhubApiKey = null, dynamicCacheU
                        + mentionLog 
                        + sentimentBonus;
 
-    // Filter out dead small stocks (low/negative chatter AND bearish/neutral analysts)
+    // Filter out dead small stocks
     let isSmallCap = false;
     if (baseData.marketCap.includes('Million')) {
       isSmallCap = true;
@@ -1396,11 +1348,10 @@ export function compileStockAnalytics(posts, finnhubApiKey = null, dynamicCacheU
     const hasLowChatter = totalMentions < 5 || mentionChange24h <= 0;
     const isAnalystBearish = (baseData.analystScore || 3.5) < 3.5 || ['Sell', 'Strong Sell', 'Underperform'].includes(baseData.analystRating);
 
-    // Flag as dead stock if it has NO mentions in the active Subreddit stream, OR if it's a failing small cap
     enriched.isDeadStock = (totalMentions === 0) || (isSmallCap && hasLowChatter && isAnalystBearish);
 
     results.push(enriched);
   });
 
-  return results.sort((a, b) => b.smartRank - a.smartRank);
+  return results.sort((a, b) => b.mentionCount - a.mentionCount);
 }
