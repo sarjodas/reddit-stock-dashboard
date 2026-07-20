@@ -67,7 +67,7 @@ export default function TickerLeaderboard({ stocks, watchlist, onToggleWatchlist
 
           {/* Region */}
           <div style={{ display: 'flex', background: 'rgba(0,0,0,0.45)', padding: '3px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
-            {[['all','🌐 All'],['india','🇮🇳 India'],['us','🇺🇸 US']].map(([v,l]) => (
+            {[['all','🌐 All'],['us','🇺🇸 US']].map(([v,l]) => (
               <button key={v} onClick={() => setRegionFilter(v)} className={`pill-btn ${regionFilter === v ? 'active' : ''}`} style={{ padding: '4px 9px', fontSize: '0.72rem' }}>{l}</button>
             ))}
           </div>

@@ -143,13 +143,7 @@ export default function Header({
             >
               EUR (€)
             </button>
-            <button
-              onClick={() => onChangeCurrency('INR')}
-              className={`pill-btn ${currencyMode === 'INR' ? 'active' : ''}`}
-              style={{ padding: '3px 8px', fontSize: '0.72rem' }}
-            >
-              INR (₹)
-            </button>
+
             <button
               onClick={() => onChangeCurrency('DUAL')}
               className={`pill-btn ${currencyMode === 'DUAL' ? 'active' : ''}`}
