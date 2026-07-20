@@ -1,5 +1,5 @@
 import React from 'react';
-import { Rocket, TrendingUp, ShieldAlert, Sparkles, ArrowUpRight, Zap, ShieldCheck, MessageSquare } from 'lucide-react';
+import { Rocket, TrendingUp, ShieldAlert, Sparkles, ArrowUpRight, Zap, MessageSquare } from 'lucide-react';
 import { formatCurrency } from '../services/stockApi';
 
 // Helper: Categorize market region for diversity

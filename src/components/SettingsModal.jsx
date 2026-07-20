@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Sliders, Key, Shield, RefreshCw, CheckCircle2, Lock } from 'lucide-react';
+import { X, Sliders, CheckCircle2 } from 'lucide-react';
 
 export default function SettingsModal({ isOpen, onClose, settings, onSaveSettings }) {
   const [formData, setFormData] = useState(settings);

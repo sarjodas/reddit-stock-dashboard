@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, TrendingUp, TrendingDown, ShieldCheck, AlertTriangle, Zap, DollarSign, ExternalLink, MessageSquare, Globe, Building2, BarChart2, Newspaper, Clock, ShoppingCart, Target, Award, Activity, CheckCircle2, Smartphone, PieChart } from 'lucide-react';
+import { X, AlertTriangle, Zap, Building2, BarChart2, ShoppingCart, Target, Activity, CheckCircle2, Smartphone } from 'lucide-react';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip } from 'recharts';
 import { formatCurrency } from '../services/stockApi';
 import CandlestickChart from './CandlestickChart';

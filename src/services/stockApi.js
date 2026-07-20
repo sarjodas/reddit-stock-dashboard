@@ -1247,7 +1247,7 @@ export function fetchStockNews(symbol) {
   return createFallbackNews(symbol);
 }
 
-export function compileTradestieAnalytics(tradestieData, finnhubApiKey = null, dynamicCacheUpdates = {}) {
+export function compileTradestieAnalytics(tradestieData, dynamicCacheUpdates = {}) {
   const results = [];
 
   tradestieData.forEach(item => {

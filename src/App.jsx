@@ -8,14 +8,13 @@ import StockNewsFeed from './components/StockNewsFeed';
 import EtfRadar from './components/EtfRadar';
 import TickerModal from './components/TickerModal';
 import SettingsModal from './components/SettingsModal';
-import { Flame, BarChart2, Newspaper, MessageSquare, Sparkles, ShieldCheck } from 'lucide-react';
+import { Flame, BarChart2, Newspaper, ShieldCheck } from 'lucide-react';
 
 import { compileTradestieAnalytics, fetchUSDEURRate, fetchLiveYahooQuote, fetchLiveStockNews, DEFAULT_USD_EUR_RATE, DEFAULT_USD_INR_RATE, MASTER_STOCKS_DATABASE } from './services/stockApi';
 import { fetchDynamicStockInfo } from './services/dynamicStockFetcher';
 import { fetchTechnicalIndicators } from './services/twelveDataApi';
 import { fetchTradestieSentiment } from './services/tradestieApi';
-import { fetchDynamicStockInfo } from './services/dynamicStockFetcher';
-import { fetchTechnicalIndicators } from './services/twelveDataApi';
+
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('leaderboard');
@@ -96,7 +95,7 @@ export default function App() {
         });
       }
 
-      const compiled = compileTradestieAnalytics(fetchedTradestie, settings.finnhubApiKey, dynamicCacheUpdates);
+      const compiled = compileTradestieAnalytics(fetchedTradestie, dynamicCacheUpdates);
 
       // Apply live regularMarketPrice quotes
       const liveQuotePromises = compiled.map(s => fetchLiveYahooQuote(s.symbol));

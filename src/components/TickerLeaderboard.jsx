@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Flame, Star, ShieldAlert, TrendingUp, Globe, Sparkles, CheckCircle2 } from 'lucide-react';
+import { Flame, Star } from 'lucide-react';
 import { formatCurrency } from '../services/stockApi';
 
 const brokerColor = b =>

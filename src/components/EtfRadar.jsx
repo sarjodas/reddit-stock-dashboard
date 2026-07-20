@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ShieldCheck, AlertTriangle, TrendingUp, Compass, ArrowUpRight, ArrowDownRight, Layers, Coins, Lock, Zap, HelpCircle, CheckCircle2 } from 'lucide-react';
+import { ShieldCheck, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { formatCurrency } from '../services/stockApi';
 
 export const ETF_DATABASE = [

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { TrendingUp, TrendingDown, Clock, Activity } from 'lucide-react';
+import { Activity } from 'lucide-react';
 import { formatCurrency } from '../services/stockApi';
 
 export default function CandlestickChart({ symbol, basePrice, currencyMode, fxRate, nativeCurrency = 'USD' }) {

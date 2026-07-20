@@ -1,5 +1,5 @@
 import React from 'react';
-import { Flame, RefreshCw, Search, Sliders, TrendingUp, Zap } from 'lucide-react';
+import { Flame, RefreshCw, Search, Sliders, Zap } from 'lucide-react';
 
 export default function Header({
   searchTerm,
