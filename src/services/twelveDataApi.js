@@ -33,7 +33,55 @@ export async function fetchTechnicalIndicators(symbol, apiKey) {
     cache.set(symbol, result);
     return result;
   } catch (err) {
-    console.warn(`TwelveData fetch failed for ${symbol}:`, err);
+    console.error(`Twelve Data API error for ${symbol}:`, err);
     return null;
+  }
+}
+
+/**
+ * Fetch real historical timeseries for Candlestick charts
+ * @param {string} symbol - Ticker symbol
+ * @param {string} interval - e.g., '1h', '1day', '1week'
+ * @param {string} apiKey - Twelve Data API Key
+ * @param {number} outputsize - Number of data points
+ */
+export async function fetchTimeSeries(symbol, interval, apiKey, outputsize = 30) {
+  if (!apiKey || apiKey.trim() === '') return [];
+  
+  const cacheKey = `timeseries_${symbol}_${interval}_${outputsize}`;
+  if (cache.has(cacheKey)) return cache.get(cacheKey);
+
+  try {
+    const url = `https://api.twelvedata.com/time_series?symbol=${symbol}&interval=${interval}&outputsize=${outputsize}&apikey=${apiKey}`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`Timeseries fetch failed: ${res.status}`);
+    
+    const data = await res.json();
+    if (data.status === 'error' || !data.values) {
+      console.warn('Twelve Data returned error:', data.message || 'No values');
+      return [];
+    }
+
+    // Format for Recharts
+    const formatted = data.values.map((v, i) => {
+      const open = parseFloat(v.open);
+      const close = parseFloat(v.close);
+      return {
+        id: data.values.length - i,
+        label: v.datetime, // Depending on interval, you might want to format this
+        open: open,
+        high: parseFloat(v.high),
+        low: parseFloat(v.low),
+        close: close,
+        volume: parseInt(v.volume, 10),
+        isBullish: close >= open
+      };
+    }).reverse(); // Recharts usually renders left-to-right (oldest to newest)
+
+    cache.set(cacheKey, formatted);
+    return formatted;
+  } catch (err) {
+    console.error('Error fetching time series:', err);
+    return [];
   }
 }

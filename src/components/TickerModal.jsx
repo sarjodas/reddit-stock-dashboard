@@ -4,7 +4,7 @@ import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip } from 'rec
 import { formatCurrency } from '../services/stockApi';
 import CandlestickChart from './CandlestickChart';
 
-export default function TickerModal({ stock, onClose, currencyMode, fxRate }) {
+export default function TickerModal({ stock, onClose, currencyMode, fxRate, twelveDataApiKey }) {
   const [activeTab, setActiveTab] = useState('candles'); // Default to interactive Candlesticks!
 
   if (!stock) return null;
@@ -174,6 +174,7 @@ export default function TickerModal({ stock, onClose, currencyMode, fxRate }) {
               currencyMode={currencyMode}
               fxRate={fxRate}
               nativeCurrency={stock.nativeCurrency}
+              twelveDataApiKey={twelveDataApiKey}
             />
 
             {/* Timing Banner below Candlestick Chart */}

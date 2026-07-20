@@ -38,13 +38,12 @@ export default function App() {
 
   const [settings, setSettings] = useState(() => {
     const saved = localStorage.getItem('reddit_ticker_settings');
-    const defaultSettings = {
-      finnhubApiKey: '***REMOVED***',
-      refreshInterval: 5
+    return saved ? JSON.parse(saved) : {
+      refreshInterval: 10,
+      finnhubApiKey: '', // User must configure this in settings
+      twelveDataApiKey: '', // User must configure this in settings
+      marketFilter: 'all'
     };
-    if (!saved) return defaultSettings;
-    const parsed = JSON.parse(saved);
-    return { ...defaultSettings, ...parsed, finnhubApiKey: parsed.finnhubApiKey || '***REMOVED***' };
   });
 
   const handleToggleWatchlist = (symbol) => {
@@ -359,6 +358,7 @@ export default function App() {
           onClose={() => setSelectedTickerModal(null)}
           currencyMode={currencyMode}
           fxRate={fxRates}
+          twelveDataApiKey={settings.twelveDataApiKey}
         />
       )}
 

@@ -1,74 +1,61 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Activity } from 'lucide-react';
 import { formatCurrency } from '../services/stockApi';
+import { fetchTimeSeries } from '../services/twelveDataApi';
 
-export default function CandlestickChart({ symbol, basePrice, currencyMode, fxRate, nativeCurrency = 'USD' }) {
+export default function CandlestickChart({ symbol, basePrice, currencyMode, fxRate, nativeCurrency = 'USD', twelveDataApiKey }) {
   const [timeframe, setTimeframe] = useState('1D'); // '1D', '1W', '1M', '1Y'
   const [chartType, setChartType] = useState('candlestick'); // 'candlestick' or 'line'
   const [hoveredCandle, setHoveredCandle] = useState(null);
   const [livePrice, setLivePrice] = useState(basePrice);
   const [isTickUp, setIsTickUp] = useState(true);
   const [candles, setCandles] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState(null);
   const svgRef = useRef(null);
 
-  // Generate realistic OHLC candles based on timeframe & basePrice (walk backwards to avoid end-of-chart jumps)
-  const generateCandleData = (tf, price) => {
-    const count = tf === '1D' ? 24 : tf === '1W' ? 30 : tf === '1M' ? 30 : 52;
-    const volatilityPct = tf === '1D' ? 0.006 : tf === '1W' ? 0.014 : 0.025;
-    
-    const now = new Date();
-    const reversedCandles = [];
-    let currentClose = price;
-
-    for (let i = 0; i < count; i++) {
-      const change = (Math.random() - 0.49) * currentClose * volatilityPct;
-      const open = Math.max(1, currentClose - change);
-      const high = Math.max(open, currentClose) + Math.random() * currentClose * (volatilityPct * 0.4);
-      const low = Math.min(open, currentClose) - Math.random() * currentClose * (volatilityPct * 0.4);
-      const volume = Math.floor(Math.random() * 500000) + 150000;
-
-      let dateObj;
-      if (tf === '1D') {
-        dateObj = new Date(now.getTime() - i * (6.5 * 3600 * 1000 / count));
-      } else if (tf === '1W') {
-        dateObj = new Date(now.getTime() - i * (7 * 86400 * 1000 / count));
-      } else if (tf === '1M') {
-        dateObj = new Date(now.getTime() - i * (30 * 86400 * 1000 / count));
-      } else {
-        dateObj = new Date(now.getTime() - i * (365 * 86400 * 1000 / count));
-      }
-
-      let label;
-      if (tf === '1D') {
-        label = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
-      } else if (tf === '1Y') {
-        label = `${dateObj.toLocaleString('en-US', { month: 'short' })} '${dateObj.getFullYear().toString().slice(-2)}`;
-      } else {
-        label = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-      }
-
-      reversedCandles.push({
-        id: count - 1 - i,
-        label,
-        open: parseFloat(open.toFixed(2)),
-        high: parseFloat(high.toFixed(2)),
-        low: parseFloat(low.toFixed(2)),
-        close: parseFloat(currentClose.toFixed(2)),
-        volume,
-        isBullish: currentClose >= open
-      });
-
-      currentClose = open;
-    }
-
-    return reversedCandles.reverse();
-  };
-
-  // Initialize candles on symbol/timeframe change
   useEffect(() => {
+    async function loadData() {
+      if (!twelveDataApiKey) {
+        setErrorMsg('Please configure Twelve Data API key in Settings to view historical charts.');
+        setCandles([]);
+        return;
+      }
+      setIsLoading(true);
+      setErrorMsg(null);
+      
+      let interval = '1h';
+      let outputsize = 30;
+      
+      if (timeframe === '1D') {
+        interval = '5min';
+        outputsize = 78;
+      } else if (timeframe === '1W') {
+        interval = '1h';
+        outputsize = 40;
+      } else if (timeframe === '1M') {
+        interval = '1day';
+        outputsize = 22;
+      } else if (timeframe === '1Y') {
+        interval = '1week';
+        outputsize = 52;
+      }
+      
+      const data = await fetchTimeSeries(symbol, interval, twelveDataApiKey, outputsize);
+      if (data && data.length > 0) {
+        setCandles(data);
+      } else {
+        setErrorMsg('Failed to fetch historical data or API rate limit reached.');
+        setCandles([]);
+      }
+      setIsLoading(false);
+    }
+    
+    loadData();
     setLivePrice(basePrice);
-    setCandles(generateCandleData(timeframe, basePrice));
-  }, [symbol, timeframe, basePrice]);
+  }, [symbol, timeframe, basePrice, twelveDataApiKey]);
+
+
 
   // Real-time live price tick simulation (updates active candle every 2.5 seconds)
   useEffect(() => {
@@ -152,9 +139,20 @@ export default function CandlestickChart({ symbol, basePrice, currencyMode, fxRa
       padding: '16px',
       marginBottom: '20px'
     }}>
+      {isLoading && (
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(11, 17, 32, 0.7)', zIndex: 10, borderRadius: 'var(--radius-md)' }}>
+          <div className="spinner" style={{ width: '30px', height: '30px', border: '3px solid rgba(255,255,255,0.1)', borderTopColor: '#38bdf8', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+        </div>
+      )}
+      {errorMsg && !isLoading && (
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(11, 17, 32, 0.9)', zIndex: 10, padding: '20px', textAlign: 'center', borderRadius: 'var(--radius-md)' }}>
+          <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>{errorMsg}</span>
+        </div>
+      )}
       
       {/* Top Header & Timeframe Selector */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px', flexWrap: 'wrap', gap: '10px' }}>
+
         
         {/* Live Price Header */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
