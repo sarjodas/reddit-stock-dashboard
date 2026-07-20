@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Flame, Star } from 'lucide-react';
+import { Flame, Star, Globe } from 'lucide-react';
 import { formatCurrency } from '../services/stockApi';
 
 const brokerColor = b =>
@@ -7,7 +7,7 @@ const brokerColor = b =>
   b === 'Trading 212'  ? { bg: 'rgba(56,189,248,0.15)',  color: '#38bdf8', border: 'rgba(56,189,248,0.3)' }  :
                          { bg: 'rgba(192,132,252,0.15)', color: '#c084fc', border: 'rgba(192,132,252,0.3)' };
 
-export default function TickerLeaderboard({ stocks, watchlist, onToggleWatchlist, onSelectTicker, currencyMode, fxRate }) {
+export default function TickerLeaderboard({ stocks, watchlist, onToggleWatchlist, onSelectTicker, currencyMode, fxRate, isGlobal = false }) {
   const [horizonFilter, setHorizonFilter] = useState('all');
   const [regionFilter,  setRegionFilter]  = useState('all');
   const [hideDeadStocks, setHideDeadStocks] = useState(true);
@@ -55,10 +55,11 @@ export default function TickerLeaderboard({ stocks, watchlist, onToggleWatchlist
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '14px', marginBottom: '20px' }}>
         <div>
           <h2 style={{ fontSize: '1.2rem', fontWeight: 800, letterSpacing: '-0.02em', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Flame size={20} color="#f43f5e" /> Stock Leaderboard
+            {isGlobal ? <Globe size={20} color="#f43f5e" /> : <Flame size={20} color="#f43f5e" />} 
+            {isGlobal ? 'Global Markets (Non-Reddit)' : 'Stock Leaderboard'}
           </h2>
           <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '2px' }}>
-            {filtered.length} stocks · Graham/Buffett value signals · Reddit sentiment
+            {filtered.length} stocks · Graham/Buffett value signals {isGlobal ? '' : '· Reddit sentiment'}
           </p>
         </div>
 
@@ -110,7 +111,7 @@ export default function TickerLeaderboard({ stocks, watchlist, onToggleWatchlist
                 <th style={{ padding: '13px 14px', fontWeight: 700 }}>Broker Apps</th>
                 <th style={{ padding: '13px 14px', fontWeight: 700 }}>Price</th>
                 <th style={{ padding: '13px 14px', fontWeight: 700 }}>Value Signal</th>
-                <th style={{ padding: '13px 14px', fontWeight: 700 }}>Reddit Sentiment</th>
+                {!isGlobal && <th style={{ padding: '13px 14px', fontWeight: 700 }}>Reddit Sentiment</th>}
                 <th style={{ padding: '13px 14px', fontWeight: 700 }}>Scores</th>
                 <th style={{ padding: '13px 14px', fontWeight: 700 }}>Target</th>
                 <th style={{ padding: '13px 14px', fontWeight: 700, textAlign: 'center' }}>Action</th>
@@ -198,16 +199,18 @@ export default function TickerLeaderboard({ stocks, watchlist, onToggleWatchlist
                     </td>
 
                     {/* Reddit Sentiment */}
-                    <td style={{ padding: '12px 14px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                        <span style={{ fontSize: '0.78rem', fontWeight: 700, color: vs.sentimentColor || '#fbbf24' }}>
-                          {vs.sentimentEmoji} {vs.sentimentLabel || `${stock.bullishRatio}% Bull`}
-                        </span>
-                      </div>
-                      <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', marginTop: '2px' }}>
-                        {stock.mentionCount} posts · {mentionSign}{stock.mentionChange24h}% · {vs.buzzTier || 'Steady'}
-                      </div>
-                    </td>
+                    {!isGlobal && (
+                      <td style={{ padding: '12px 14px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                          <span style={{ fontSize: '0.78rem', fontWeight: 700, color: vs.sentimentColor || '#fbbf24' }}>
+                            {vs.sentimentEmoji} {vs.sentimentLabel || `${stock.bullishRatio}% Bull`}
+                          </span>
+                        </div>
+                        <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+                          {stock.mentionCount} posts · {mentionSign}{stock.mentionChange24h}% · {vs.buzzTier || 'Steady'}
+                        </div>
+                      </td>
+                    )}
 
                     {/* Horizon Scores */}
                     <td style={{ padding: '12px 14px' }}>

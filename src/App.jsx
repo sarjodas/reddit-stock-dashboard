@@ -8,7 +8,7 @@ import StockNewsFeed from './components/StockNewsFeed';
 import EtfRadar from './components/EtfRadar';
 import TickerModal from './components/TickerModal';
 import SettingsModal from './components/SettingsModal';
-import { Flame, BarChart2, Newspaper, ShieldCheck } from 'lucide-react';
+import { Flame, BarChart2, Newspaper, ShieldCheck, Globe } from 'lucide-react';
 
 import { compileTradestieAnalytics, fetchUSDEURRate, fetchLiveYahooQuote, fetchLiveStockNews, DEFAULT_USD_EUR_RATE, DEFAULT_USD_INR_RATE, MASTER_STOCKS_DATABASE } from './services/stockApi';
 import { fetchDynamicStockInfo } from './services/dynamicStockFetcher';
@@ -171,6 +171,9 @@ export default function App() {
     return symbolMatch || nameMatch || sectorMatch || exchangeMatch || countryMatch || catalystMatch || gemReasonMatch;
   });
 
+  const redditPoweredStocks = filteredStocks.filter(s => s.country && s.country.includes('USA'));
+  const globalStocks = filteredStocks.filter(s => !(s.country && s.country.includes('USA')));
+
   const matchingTickerSymbols = new Set(filteredStocks.map(s => s.symbol.toLowerCase()));
 
 
@@ -227,6 +230,27 @@ export default function App() {
               }}
             >
               <Flame size={16} color={activeTab === 'leaderboard' ? '#fff' : 'var(--text-muted)'} /> 🔥 Tickers & Emerging Gems
+            </button>
+
+            <button
+              onClick={() => setActiveTab('global')}
+              style={{
+                padding: '8px 18px',
+                borderRadius: 'var(--radius-md)',
+                fontSize: '0.85rem',
+                fontWeight: 700,
+                border: 'none',
+                cursor: 'pointer',
+                background: activeTab === 'global' ? 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)' : 'transparent',
+                color: activeTab === 'global' ? '#fff' : 'var(--text-muted)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                boxShadow: activeTab === 'global' ? '0 4px 12px rgba(2, 132, 199, 0.3)' : 'none',
+                transition: 'var(--transition-normal)'
+              }}
+            >
+              <Globe size={16} color={activeTab === 'global' ? '#fff' : 'var(--text-muted)'} /> 🌍 Global Markets
             </button>
 
             <button
@@ -328,11 +352,11 @@ export default function App() {
         {activeTab === 'leaderboard' && (
           <>
             {/* Top Metrics Overview Banner */}
-            <MetricsOverview stocks={filteredStocks} />
+            <MetricsOverview stocks={redditPoweredStocks} />
 
             {/* Emerging Gems Spotlight */}
             <EmergingGems
-              stocks={filteredStocks}
+              stocks={redditPoweredStocks}
               onSelectTicker={(s) => setSelectedTickerModal(s)}
               currencyMode={currencyMode}
               fxRate={fxRates}
@@ -340,7 +364,7 @@ export default function App() {
 
             {/* Main Stock Leaderboard */}
             <TickerLeaderboard
-              stocks={filteredStocks}
+              stocks={redditPoweredStocks}
               watchlist={watchlist}
               onToggleWatchlist={handleToggleWatchlist}
               onSelectTicker={(s) => setSelectedTickerModal(s)}
@@ -350,6 +374,21 @@ export default function App() {
               onChangeBroker={setBrokerFilter}
             />
           </>
+        )}
+
+        {/* Global Markets Tab */}
+        {activeTab === 'global' && (
+          <TickerLeaderboard
+            stocks={globalStocks}
+            watchlist={watchlist}
+            onToggleWatchlist={handleToggleWatchlist}
+            onSelectTicker={(s) => setSelectedTickerModal(s)}
+            currencyMode={currencyMode}
+            fxRate={fxRates}
+            brokerFilter={brokerFilter}
+            onChangeBroker={setBrokerFilter}
+            isGlobal={true}
+          />
         )}
 
         {/* Tab 2: Best Performing ETFs & ETCs Risk Radar */}
