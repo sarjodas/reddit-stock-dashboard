@@ -299,8 +299,28 @@ export default function App() {
                 Broker: {brokerFilter} ({filteredStocks.length})
               </span>
             )}
-            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981' }}></span>
-            Finnhub Key: <strong style={{ color: '#10b981' }}>Active 🟢</strong>
+            {settings.finnhubApiKey ? (
+              <>
+                <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981' }}></span>
+                Finnhub Key: <strong style={{ color: '#10b981' }}>Active 🟢</strong>
+              </>
+            ) : (
+              <>
+                <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#ef4444' }}></span>
+                Finnhub Key: <strong style={{ color: '#ef4444' }}>Missing 🔴</strong>
+              </>
+            )}
+            {settings.twelveDataApiKey ? (
+              <>
+                <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981', marginLeft: '6px' }}></span>
+                Twelve Data Key: <strong style={{ color: '#10b981' }}>Active 🟢</strong>
+              </>
+            ) : (
+              <>
+                <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#ef4444', marginLeft: '6px' }}></span>
+                Twelve Data Key: <strong style={{ color: '#ef4444' }}>Missing 🔴</strong>
+              </>
+            )}
           </div>
         </div>
 
