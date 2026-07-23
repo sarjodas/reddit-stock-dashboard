@@ -81,7 +81,7 @@ export async function fetchLiveYahooQuote(symbol) {
   if (!targetSymbol) return null; // Skip private/fake tickers
 
   try {
-    const res = await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${targetSymbol}`);
+    const res = await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${targetSymbol}?_=${Date.now()}`, { cache: 'no-store' });
     if (res.ok) {
       const data = await res.json();
       const meta = data?.chart?.result?.[0]?.meta;
