@@ -1,23 +1,28 @@
 const cache = new Map();
+const CACHE_TTL = 120000; // 2 minutes
 
 export async function fetchTechnicalIndicators(symbol, apiKey) {
   if (!apiKey || apiKey.trim() === '') return null;
-  if (cache.has(symbol)) return cache.get(symbol);
+  const cacheKey = `tech_${symbol}`;
+  const cached = cache.get(cacheKey);
+  if (cached && (Date.now() - cached.timestamp < CACHE_TTL)) {
+    return cached.data;
+  }
 
   try {
     const baseUrl = 'https://api.twelvedata.com';
-    const params = `symbol=${symbol}&interval=1day&apikey=${apiKey}&outputsize=1`;
+    const params = `symbol=${symbol}&interval=1day&apikey=${apiKey}&outputsize=1&_=${Date.now()}`;
     
     // Fetch RSI (14-period default)
-    const rsiRes = await fetch(`${baseUrl}/rsi?${params}`);
+    const rsiRes = await fetch(`${baseUrl}/rsi?${params}`, { cache: 'no-store' });
     const rsiData = await rsiRes.json();
     
     // Fetch MACD (12, 26, 9 default)
-    const macdRes = await fetch(`${baseUrl}/macd?${params}`);
+    const macdRes = await fetch(`${baseUrl}/macd?${params}`, { cache: 'no-store' });
     const macdData = await macdRes.json();
     
     // Fetch SMA (50-period)
-    const smaRes = await fetch(`${baseUrl}/sma?symbol=${symbol}&interval=1day&time_period=50&apikey=${apiKey}&outputsize=1`);
+    const smaRes = await fetch(`${baseUrl}/sma?symbol=${symbol}&interval=1day&time_period=50&apikey=${apiKey}&outputsize=1&_=${Date.now()}`, { cache: 'no-store' });
     const smaData = await smaRes.json();
 
     const result = {
@@ -30,7 +35,7 @@ export async function fetchTechnicalIndicators(symbol, apiKey) {
       sma50: smaData?.values?.[0]?.sma ? parseFloat(smaData.values[0].sma) : null
     };
 
-    cache.set(symbol, result);
+    cache.set(cacheKey, { data: result, timestamp: Date.now() });
     return result;
   } catch (err) {
     console.error(`Twelve Data API error for ${symbol}:`, err);
@@ -49,11 +54,14 @@ export async function fetchTimeSeries(symbol, interval, apiKey, outputsize = 30)
   if (!apiKey || apiKey.trim() === '') return [];
   
   const cacheKey = `timeseries_${symbol}_${interval}_${outputsize}`;
-  if (cache.has(cacheKey)) return cache.get(cacheKey);
+  const cached = cache.get(cacheKey);
+  if (cached && (Date.now() - cached.timestamp < CACHE_TTL)) {
+    return cached.data;
+  }
 
   try {
-    const url = `https://api.twelvedata.com/time_series?symbol=${symbol}&interval=${interval}&outputsize=${outputsize}&apikey=${apiKey}`;
-    const res = await fetch(url);
+    const url = `https://api.twelvedata.com/time_series?symbol=${symbol}&interval=${interval}&outputsize=${outputsize}&apikey=${apiKey}&_=${Date.now()}`;
+    const res = await fetch(url, { cache: 'no-store' });
     if (!res.ok) throw new Error(`Timeseries fetch failed: ${res.status}`);
     
     const data = await res.json();
@@ -78,7 +86,7 @@ export async function fetchTimeSeries(symbol, interval, apiKey, outputsize = 30)
       };
     }).reverse(); // Recharts usually renders left-to-right (oldest to newest)
 
-    cache.set(cacheKey, formatted);
+    cache.set(cacheKey, { data: formatted, timestamp: Date.now() });
     return formatted;
   } catch (err) {
     console.error('Error fetching time series:', err);
